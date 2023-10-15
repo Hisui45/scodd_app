@@ -1,5 +1,6 @@
-package com.example.scodd
+package com.example.scodd.login
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,13 +11,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.scodd.R
+import com.example.scodd.dashboard.DashboardActivity
 import com.example.scodd.ui.theme.ScoddTheme
 
-class MainActivity : ComponentActivity() {
+class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -32,7 +36,7 @@ class MainActivity : ComponentActivity() {
 fun Logo(){
     Image(
         painter = painterResource(id = R.drawable.logo_vector),
-        contentDescription = stringResource(R.string.logo_content_description),
+        contentDescription = stringResource(R.string.logo_content_desc),
         contentScale = ContentScale.None,
     )
 }
@@ -42,7 +46,7 @@ fun Rooster(){
     Image(
         modifier = Modifier.width(300.dp).height(300.dp),
         painter = painterResource(id = R.drawable.rooster),
-        contentDescription = stringResource(R.string.rooster_content_description),
+        contentDescription = stringResource(R.string.rooster_content_desc),
         contentScale = ContentScale.FillHeight
     )
 }
@@ -57,6 +61,7 @@ fun CreateAccountButton(onClick: () -> Unit){
 
 @Composable
 fun LogInButton(onClick: () -> Unit){
+
     Button(onClick = { onClick() },
         modifier = Modifier.width(380.dp).height(40.dp)){
         Text(stringResource(R.string.log_in_button))
@@ -65,6 +70,8 @@ fun LogInButton(onClick: () -> Unit){
 
 @Composable
 fun LoginScreen(){
+    val context = LocalContext.current
+
     // A surface container using the 'secondaryContainer' color from the theme
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.secondaryContainer) {
         Column(
@@ -88,8 +95,12 @@ fun LoginScreen(){
             modifier = Modifier.padding(8.dp)
         ){
 
-            CreateAccountButton(onClick = {})
-            LogInButton(onClick = {})
+            CreateAccountButton(onClick = {
+
+            })
+            LogInButton(onClick = {
+                context.startActivity(Intent(context,DashboardActivity :: class.java))
+            })
         }
 
     }
@@ -102,8 +113,7 @@ fun LoginScreen(){
 // @Preview(showSystemUi = true, device = "spec:width=1280dp,height=800dp,dpi=480")
 // @Preview(showSystemUi = true, device = "spec:width=1920dp,height=1080dp,dpi=480")
 @Composable
-
-fun DefaultPreview(){
+fun LoginPreview(){
     ScoddTheme {
         LoginScreen()
     }
