@@ -20,42 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ScoddTheme {
-                // A surface container using the 'secondaryContainer' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.secondaryContainer) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(8.dp, 16.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo_vector),
-                            contentDescription = "SCODD",
-                            contentScale = ContentScale.None,
-                        )
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(8.dp, 16.dp)) {
-                        Image(
-                            painter = painterResource(id = R.drawable.rooster_png),
-                            contentDescription = "picture of a rooster with a mop in hand and" +
-                                    " bucket on it's head covered in water",
-                            contentScale = ContentScale.FillHeight,
-                            modifier = Modifier.height(300.dp).width(300.dp)
-                        )
-                    }
-
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(8.dp)
-                    ){
-                        CreateAccountButton(onClick = {})
-                        LogInButton(onClick = {})
-                    }
-
-                }
+                LoginScreen()
             }
         }
     }
@@ -63,16 +28,24 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun Logo(){
+    Image(
+        painter = painterResource(id = R.drawable.logo_vector),
+        contentDescription = "SCODD",
+        contentScale = ContentScale.None,
+    )
 }
-
 
 @Composable
-fun Logo(){
-
+fun Rooster(){
+    Image(
+        modifier = Modifier.width(300.dp).height(300.dp),
+        painter = painterResource(id = R.drawable.rooster),
+        contentDescription = "picture of a rooster with a mop in hand and" +
+                " bucket on it's head covered in water",
+        contentScale = ContentScale.FillHeight
+    )
 }
-
 
 @Composable
 fun CreateAccountButton(onClick: () -> Unit){
@@ -90,46 +63,80 @@ fun LogInButton(onClick: () -> Unit){
     }
 }
 
+@Composable
+fun LoginScreen(){
+    // A surface container using the 'secondaryContainer' color from the theme
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.secondaryContainer) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(8.dp, 24.dp, 8.dp, 0.dp)
+        ) {
+            Logo()
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Rooster()
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(8.dp)
+        ){
+
+            CreateAccountButton(onClick = {})
+            LogInButton(onClick = {})
+        }
+
+    }
+}
+
+
+
+@Preview(showSystemUi = true, device = "spec:width=411dp,height=891dp")
+// @Preview(showSystemUi = true, device = "spec:width=673.5dp,height=841dp,dpi=480")
+// @Preview(showSystemUi = true, device = "spec:width=1280dp,height=800dp,dpi=480")
+// @Preview(showSystemUi = true, device = "spec:width=1920dp,height=1080dp,dpi=480")
+@Composable
+
+fun DefaultPreview(){
+    ScoddTheme {
+        LoginScreen()
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun LogoPreview() {
     ScoddTheme {
-        // A surface container using the 'secondaryContainer' color from the theme
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.secondaryContainer) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(8.dp, 16.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo_vector),
-                    contentDescription = "SCODD",
-                    contentScale = ContentScale.None,
-                )
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(8.dp, 16.dp)) {
-                Image(
-                    painter = painterResource(id = R.drawable.rooster_png),
-                    contentDescription = "picture of a rooster with a mop in hand and" +
-                            " bucket on it's head covered in water",
-                    contentScale = ContentScale.None
-                )
-            }
+        Logo()
+    }
+}
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(8.dp)
-            ){
-                CreateAccountButton(onClick = {})
-                LogInButton(onClick = {})
-            }
+@Preview(showBackground = true)
+@Composable
+fun RoosterPreview() {
+    ScoddTheme {
+        Rooster()
+    }
+}
 
-        }
+@Preview(showBackground = true)
+@Composable
+fun AccountPreview() {
+    ScoddTheme {
+        CreateAccountButton(onClick = {})
+    }
+}
 
+@Preview(showBackground = true)
+@Composable
+fun LogInPreview() {
+    ScoddTheme {
+        LogInButton(onClick = {})
     }
 }
