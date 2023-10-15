@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.scodd.ui.theme.ScoddTheme
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
 fun Logo(){
     Image(
         painter = painterResource(id = R.drawable.logo_vector),
-        contentDescription = "SCODD",
+        contentDescription = stringResource(R.string.logo_content_description),
         contentScale = ContentScale.None,
     )
 }
@@ -41,8 +42,7 @@ fun Rooster(){
     Image(
         modifier = Modifier.width(300.dp).height(300.dp),
         painter = painterResource(id = R.drawable.rooster),
-        contentDescription = "picture of a rooster with a mop in hand and" +
-                " bucket on it's head covered in water",
+        contentDescription = stringResource(R.string.rooster_content_description),
         contentScale = ContentScale.FillHeight
     )
 }
@@ -51,7 +51,7 @@ fun Rooster(){
 fun CreateAccountButton(onClick: () -> Unit){
     Button(onClick = { onClick() },
         modifier = Modifier.width(380.dp).height(40.dp)){
-        Text("Create Account")
+        Text(stringResource(R.string.create_acc_button))
     }
 }
 
@@ -59,7 +59,7 @@ fun CreateAccountButton(onClick: () -> Unit){
 fun LogInButton(onClick: () -> Unit){
     Button(onClick = { onClick() },
         modifier = Modifier.width(380.dp).height(40.dp)){
-        Text("Log-In")
+        Text(stringResource(R.string.log_in_button))
     }
 }
 

@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">scodd</string>
+
+    //Login
+    <string name="logo_content_description">SCODD</string>
+    <string name="rooster_content_description">picture of a rooster with a mop in hand and bucket on it\'s head covered in water</string>
+    <string name="create_acc_button">Create Account</string>
+    <string name="log_in_button">Log-In</string>
 </resources>
