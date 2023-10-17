@@ -28,6 +28,8 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = Brown40,
     onPrimaryContainer = YellowBrown40,
     background = White40,
+    surfaceVariant = Cream40,
+    outline = Black40
 
 
     /* Other default colors to override
