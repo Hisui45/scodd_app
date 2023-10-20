@@ -31,6 +31,14 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     ),
 
+    bodyMedium = TextStyle(
+        fontFamily = londrinaSolid,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp
+    ),
+
     labelLarge = TextStyle(
         fontFamily = londrinaSolid,
         fontWeight = FontWeight.Normal,
@@ -47,17 +55,26 @@ val Typography = Typography(
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     ),
+
+    labelSmall = TextStyle(
+        fontFamily = londrinaSolid,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.28.sp
+    ),
+
     titleLarge = TextStyle(
         fontFamily = londrinaSolid,
         fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
+        fontSize = 24.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
 
     titleMedium = TextStyle(
         fontFamily = londrinaSolid,
-        fontWeight = FontWeight.Light,
+        fontWeight = FontWeight.Normal,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
@@ -77,6 +94,14 @@ val Typography = Typography(
         fontSize = 26.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
+    ),
+
+    headlineMedium = TextStyle(
+        fontFamily = londrinaSolid,
+        fontWeight = FontWeight.Normal,
+        fontSize = 30.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.6.sp
     ),
 
     displayLarge = TextStyle(

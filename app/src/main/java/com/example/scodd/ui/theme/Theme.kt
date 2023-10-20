@@ -38,7 +38,8 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = White40,
     inverseOnSurface = Black40,
     onTertiary = YellowBrown40,
-    onBackground = Gray40
+    onBackground = Gray40,
+
 
 
 
@@ -62,7 +63,7 @@ fun ScoddTheme(
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
+//            val context = LocalContext.current
             if (darkTheme) DarkColorScheme else LightColorScheme
         }
 

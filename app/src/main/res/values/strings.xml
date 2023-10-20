@@ -13,4 +13,8 @@
     <string name="sun_content_desc">bright sun</string>
     <string name="title_activity_scodd">ScoddActivity</string>
 
+
+    //Chore
+    <string name="search_bar_placeholder">Find Chore</string>
+
 </resources>

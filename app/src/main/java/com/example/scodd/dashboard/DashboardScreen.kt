@@ -14,6 +14,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,7 +37,6 @@ fun DashboardScreen(){
     }
 
 }
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Greeting(name: String) {
     var hour by remember { mutableStateOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) }
@@ -99,7 +99,7 @@ fun Header(time : String){
         Column{
             Text(
                 text = "Today’s Roundup",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.drawBehind {
                     val strokeWidthPx = 1.dp.toPx()
                     val verticalOffset = size.height + 1.sp.toPx()
@@ -121,7 +121,6 @@ fun Header(time : String){
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Overview(numChore : Int, numRoom : Int ){
     ElevatedCard(
@@ -195,6 +194,7 @@ fun Message(message : String){
     ) {
         Text("$message",
             style= MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(8.dp),
             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -202,7 +202,6 @@ fun Message(message : String){
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActionCards(){
 
