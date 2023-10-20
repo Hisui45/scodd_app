@@ -1,17 +1,10 @@
 package com.example.scodd.dashboard
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -31,53 +23,57 @@ import com.example.scodd.ui.theme.ScoddTheme
 import kotlinx.coroutines.delay
 import java.util.*
 
-class DashboardActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-
-            ScoddTheme {
-                DashboardScreen()
-
-
-            }
+@Composable
+fun DashboardScreen(){
+    Surface{
+        Column {
+            Greeting("Jade")
+            Header("6:00PM")
+            Overview(12, 4)
+            Message("It doesn't have to be perfect.")
+            ActionCards()
         }
     }
-}
 
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Greeting(name: String) {
     var hour by remember { mutableStateOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(8.dp, 10.dp)
+        modifier = Modifier.padding(8.dp, 0.dp, 8.dp, 10.dp)
     ) {
         Card(
-            modifier = Modifier.width(400.dp).height(57.dp),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer),
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onTertiary),
             shape = RoundedCornerShape(size = 12.dp)
         ){
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(10.dp, 10.dp, 10.dp,10.dp)
+                modifier = Modifier.padding(9.dp)
             ) {
+                val period = getPeriod(hour)
+                val resource = if (period == "Evening" || period == "Night") R.drawable.bedtime_24 else R.drawable.light_mode_24px
 
                 Icon(
-                    painterResource(id = R.drawable.sun_icon),
-                    contentDescription = stringResource(R.string.sun_content_desc),
-                    Modifier.width(24.dp).height(24.dp).padding(1.dp)
+                    painterResource(id = resource ),
+                    contentDescription = stringResource(R.string.sun_content_desc)
                 )
-                Text(text = "Good ${getPeriod(hour)}, $name!",
+                Text(text = "Good $period, $name!",
                     style = MaterialTheme.typography.headlineSmall,
 
-                )
+                    )
+
             }
 
         }
     }
+
+
 
 
 
@@ -93,32 +89,11 @@ fun Greeting(name: String) {
 }
 
 @Composable
-fun TopBar(){
-    CenterAlignedTopAppBar(
-        title = {
-            Image(
-                painter = painterResource(id = R.drawable.logo_vector),
-                contentDescription = stringResource(R.string.logo_content_desc),
-                contentScale = ContentScale.Inside,
-                modifier = Modifier.size(145.dp)
-            )
-        },
-        actions = {
-            IconButton(
-                onClick = {},
-            ){
-                 Icon(Icons.Default.AccountCircle, "account")
-            }
-        }
-    )
-}
-
-@Composable
 fun Header(time : String){
 
     val outline = MaterialTheme.colorScheme.outline
     Row(
-        Modifier.padding(16.dp, 0.dp, 12.dp, 0.dp )
+        Modifier.padding(18.dp, 0.dp)
     ){
 
         Column{
@@ -135,7 +110,7 @@ fun Header(time : String){
                         end = Offset(size.width, verticalOffset)
                     )
                 }
-                )
+            )
         }
         Spacer(Modifier.weight(1f))
         Text(
@@ -161,16 +136,18 @@ fun Overview(numChore : Int, numRoom : Int ){
                 modifier = Modifier.weight(0.50f).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-               Box{
-                   Text(
-                       text = "$numChore",
-                       style = MaterialTheme.typography.displayLarge,
-                   )
-                   Text(
-                       text = "$numChore",
-                       style = MaterialTheme.typography.displayMedium,
-                   )
-               }
+                Box(
+                    Modifier.height(110.dp)
+                ){
+                    Text(
+                        text = "$numChore",
+                        style = MaterialTheme.typography.displayLarge,
+                    )
+                    Text(
+                        text = "$numChore",
+                        style = MaterialTheme.typography.displayMedium,
+                    )
+                }
                 Text(
                     text = if (numChore > 1) "Chores" else "Chore",
                     style = MaterialTheme.typography.displaySmall
@@ -187,7 +164,9 @@ fun Overview(numChore : Int, numRoom : Int ){
                 modifier = Modifier.weight(0.50f).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box{
+                Box(
+                    Modifier.height(110.dp)
+                ){
                     Text(
                         text = "$numRoom",
                         style = MaterialTheme.typography.displayLarge,
@@ -211,13 +190,14 @@ fun Overview(numChore : Int, numRoom : Int ){
 @Composable
 fun Message(message : String){
     Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer,
+        color = MaterialTheme.colorScheme.primaryContainer,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text("$message",
             style= MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
 }
@@ -226,97 +206,57 @@ fun Message(message : String){
 @Composable
 fun ActionCards(){
 
+    //Schedule
+
     Column(Modifier.fillMaxHeight()) {
         ElevatedCard(
-            Modifier.fillMaxWidth().padding(14.dp).weight(0.5f),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+            Modifier.fillMaxWidth().padding(14.dp, 14.dp, 14.dp, 14.dp).weight(0.5f),
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer,MaterialTheme.colorScheme.onTertiaryContainer)
         ){
+
             Column(
-                Modifier.fillMaxWidth().padding(16.dp),
+                Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.End
             ){
-                Icon(Icons.Default.MoreVert,"More")
+                IconButton(
+                    onClick ={}
+                ){
+                    Icon(Icons.Default.MoreVert,"More")
+
+                }
                 Spacer(Modifier.weight(1f))
-                Text("Schedule", style = MaterialTheme.typography.titleSmall)
+                Text("Schedule",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(16.dp))
             }
 
         }
+
+        //Establishing Habits
 
         ElevatedCard(
-            Modifier.fillMaxWidth().padding(14.dp).weight(0.5f),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+            Modifier.fillMaxWidth().padding(14.dp, 0.dp, 14.dp, 14.dp).weight(0.5f),
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer,MaterialTheme.colorScheme.onTertiaryContainer)
         ){
             Column(
-                Modifier.fillMaxWidth().padding(16.dp).weight(0.5f),
+                Modifier.fillMaxWidth().weight(0.5f),
                 horizontalAlignment = Alignment.End
             ){
-                Icon(Icons.Default.MoreVert,"More")
+                IconButton(
+                    onClick ={}
+                ){
+                    Icon(Icons.Default.MoreVert,"More")
+
+                }
                 Spacer(Modifier.weight(1f))
-                Text("Establishing Habits", style = MaterialTheme.typography.titleSmall)
+                Text("Establishing Habits",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(16.dp))
             }
         }
 
     }
 
-
-}
-
-@Composable
-fun NavigationBar(){
-
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.secondaryContainer
-    ) {
-
-        IconButton(
-            onClick = { /* Handle navigation icon click */ }
-        ) {
-            Icon(imageVector = Icons.Default.Home, contentDescription = "Home")
-        }
-
-        IconButton(
-            onClick = { /* Handle navigation icon click */ }
-        ) {
-            Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-        }
-
-        IconButton(
-            onClick = { /* Handle navigation icon click */ }
-        ) {
-            Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Profile")
-        }
-    }
-}
-
-sealed class Screen(val route: String) {
-    object Dashboard : Screen("dashboard")
-    object Chores : Screen("chore")
-    object Modes : Screen("mode")
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DashboardScreen(){
-    // A surface container using the 'background' color from the theme
-
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            topBar = {TopBar()},
-            bottomBar = {NavigationBar()},
-            content = {
-                Surface(Modifier.padding(it)){
-                    Column {
-                    Greeting("Jade")
-                    Header("6:00PM")
-                    Overview(12, 4)
-                    Message("It doesn't have to be perfect.")
-                    ActionCards()
-                    }
-                }
-               }
-        )
-    }
 
 }
 
@@ -348,15 +288,19 @@ private fun getPeriod(hour: Int) = when (hour) {
     in 6..11 -> {
         "Morning"
     }
+
     in 12..16 -> {
         "Afternoon"
     }
+
     in 17..20 -> {
         "Evening"
     }
+
     in 21..23 -> {
         "Night"
     }
+
     else -> {
         "Morning"
     }

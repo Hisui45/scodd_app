@@ -15,3 +15,5 @@ val Brown40 = Color(0xFF291800)
 val White40 = Color(0xFFFEF7FF)
 val Cream40 = Color(0xFFF7F2FA)
 val Black40 = Color(0xFF000000)
+val Red40 = Color(0xFFD81159)
+val Gray40 = Color(0xFF49454F);

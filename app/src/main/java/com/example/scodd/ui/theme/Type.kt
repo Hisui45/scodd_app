@@ -40,6 +40,13 @@ val Typography = Typography(
 
     ),
 
+    labelMedium = TextStyle(
+        fontFamily = londrinaSolid,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
     titleLarge = TextStyle(
         fontFamily = londrinaSolid,
         fontWeight = FontWeight.Normal,
