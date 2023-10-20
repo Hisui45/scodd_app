@@ -8,10 +8,12 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -20,16 +22,24 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Marigold40,
-    secondary = Burgundy40,
+    primary = Burgundy40,
+    secondary = Marigold40,
     tertiary = Pink40,
-    primaryContainer = Marigold40,
-    secondaryContainer = Burgundy40,
+    primaryContainer = Burgundy40,
+    secondaryContainer = Marigold40,
     onPrimary = Brown40,
-    onPrimaryContainer = YellowBrown40,
-    background = White40,
+    onPrimaryContainer = White40,
+    onSecondaryContainer = Red40,
+//    background = White40,
     surfaceVariant = Cream40,
-    outline = Black40
+    outline = Black40,
+    onTertiaryContainer = Black40,
+    onSurface = White40,
+    onSurfaceVariant = White40,
+    inverseOnSurface = Black40,
+    onTertiary = YellowBrown40,
+    onBackground = Gray40
+
 
 
     /* Other default colors to override
@@ -59,11 +69,13 @@ fun ScoddTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.secondary.toArgb()
-            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
+            (view.context as Activity).window.statusBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController((view.context as Activity).window, view).isAppearanceLightStatusBars =
+                darkTheme
         }
     }
 

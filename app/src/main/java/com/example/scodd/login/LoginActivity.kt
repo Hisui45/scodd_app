@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.scodd.R
-import com.example.scodd.dashboard.DashboardActivity
+import com.example.scodd.ScoddActivity
 import com.example.scodd.ui.theme.ScoddTheme
 
 class LoginActivity : ComponentActivity() {
@@ -54,7 +54,8 @@ fun Rooster(){
 @Composable
 fun CreateAccountButton(onClick: () -> Unit){
     Button(onClick = { onClick() },
-        modifier = Modifier.width(380.dp).height(40.dp)){
+        modifier = Modifier.width(380.dp).height(40.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)){
         Text(stringResource(R.string.create_acc_button))
     }
 }
@@ -63,7 +64,8 @@ fun CreateAccountButton(onClick: () -> Unit){
 fun LogInButton(onClick: () -> Unit){
 
     Button(onClick = { onClick() },
-        modifier = Modifier.width(380.dp).height(40.dp)){
+        modifier = Modifier.width(380.dp).height(40.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)){
         Text(stringResource(R.string.log_in_button))
     }
 }
@@ -73,7 +75,7 @@ fun LoginScreen(){
     val context = LocalContext.current
 
     // A surface container using the 'secondaryContainer' color from the theme
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.secondaryContainer) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primaryContainer) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,7 +101,7 @@ fun LoginScreen(){
 
             })
             LogInButton(onClick = {
-                context.startActivity(Intent(context,DashboardActivity :: class.java))
+                context.startActivity(Intent(context, ScoddActivity :: class.java))
             })
         }
 

@@ -13,9 +13,9 @@
         android:theme="@style/Theme.Scodd"
         tools:targetApi="31">
         <activity
-            android:name=".dashboard.DashboardActivity"
+            android:name=".ScoddActivity"
             android:exported="false"
-            android:label="@string/title_activity_dashboard"
+            android:label="@string/title_activity_scodd"
             android:theme="@style/Theme.Scodd">
             <meta-data
                 android:name="android.app.lib_name"
