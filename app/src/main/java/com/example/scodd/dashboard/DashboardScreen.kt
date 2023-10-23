@@ -1,12 +1,18 @@
 package com.example.scodd.dashboard
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -20,6 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scodd.R
+import com.example.scodd.ScoddChore
+import com.example.scodd.scoddChores
+import com.example.scodd.scoddRooms
 import com.example.scodd.ui.theme.ScoddTheme
 import kotlinx.coroutines.delay
 import java.util.*
@@ -32,7 +41,13 @@ fun DashboardScreen(){
             Header("6:00PM")
             Overview(12, 4)
             Message("It doesn't have to be perfect.")
-            ActionCards()
+            if(scoddChores.isEmpty()){
+                Text("Nothing to see here.")
+            }else{
+                FocusArea()
+                ChoreList()
+            }
+//            ActionCards()
         }
     }
 
@@ -259,6 +274,68 @@ fun ActionCards(){
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FocusArea(){
+    Column(
+        modifier = Modifier.fillMaxWidth(1f).padding(8.dp)
+    ){
+        Text("Focus Area",
+            style = MaterialTheme.typography.titleMedium)
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            items(scoddRooms){room ->
+                FilterChip(
+                    selected = false,
+                    label = { Text(room.title) },
+                    onClick = {},
+                    colors = FilterChipDefaults.filterChipColors(labelColor = MaterialTheme.colorScheme.onBackground))
+            }
+        }
+    }
+
+}
+@Composable
+fun ChoreList(){
+    LazyColumn(
+//        Modifier.padding(0.dp, 12.dp,0.dp, 0.dp),
+//        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp)
+    ) {
+        items(scoddChores){  chore ->
+            ChoreListItem(chore)
+
+        }
+    }
+}
+@Composable
+fun ChoreListItem(chore : ScoddChore){
+    val checkedState = remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 12.dp)
+    ){
+        ListItem(
+            headlineContent = {
+                Text(chore.title, style = MaterialTheme.typography.titleSmall)
+            },
+            trailingContent = {
+                Checkbox(
+                    checked = checkedState.value,
+                    onCheckedChange = { checkedState.value = it },
+                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = MaterialTheme.colorScheme.onBackground,
+                        checkmarkColor = MaterialTheme.colorScheme.onPrimaryContainer)
+                )
+
+            },
+            colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                headlineColor = MaterialTheme.colorScheme.outline),
+            shadowElevation = 5.dp
+        )
+        Divider(Modifier.fillMaxWidth(1f), 1.dp, MaterialTheme.colorScheme.outline)
+    }
+
+}
 @Preview //(showSystemUi = true)
 @Composable
 fun DashboardPreview() {

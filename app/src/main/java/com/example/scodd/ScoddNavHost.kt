@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.scodd.chore.ChoreScreen
 import com.example.scodd.dashboard.DashboardScreen
+import com.example.scodd.mode.ModeScreen
 
 @Composable
 fun ScoddNavHost(
@@ -38,7 +39,7 @@ fun ScoddNavHost(
             )
         }
         composable(route = Modes.route) {
-//            BillsScreen()
+            ModeScreen()
         }
 //        composable(
 //            route = SingleAccount.routeWithArgs,

@@ -7,7 +7,7 @@ interface ScoddChore {
 }
 
 object Chore1 : ScoddChore{
-    override val title = "Wash Dishes"
+    override val title = "Wash Dishes and Clean Stove and Wipe Counter"
     override val room = Room1
     override val favorites =  false
 }

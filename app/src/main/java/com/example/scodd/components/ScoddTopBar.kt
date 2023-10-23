@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,6 +18,13 @@ import com.example.scodd.R
 @Composable
 fun ScoddTopBar(){
     CenterAlignedTopAppBar(
+        navigationIcon = {
+             IconButton(
+                 onClick = {}
+             ){
+                 Icon(Icons.Default.DateRange, "schedule", tint = MaterialTheme.colorScheme.onBackground)
+             }
+        },
         title = {
             Image(
                 painter = painterResource(id = R.drawable.logo_vector),
