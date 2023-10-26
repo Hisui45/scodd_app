@@ -1,5 +1,6 @@
 package com.example.scodd.login
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,22 +9,31 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import com.example.scodd.R
 import com.example.scodd.ScoddActivity
+import com.example.scodd.components.LoginButton
+import com.example.scodd.components.StatusBar
+import com.example.scodd.ui.theme.Burgundy40
+import com.example.scodd.ui.theme.Marigold40
 import com.example.scodd.ui.theme.ScoddTheme
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            StatusBar(Burgundy40)
             ScoddTheme {
                 LoginScreen()
             }
@@ -53,21 +63,12 @@ fun Rooster(){
 
 @Composable
 fun CreateAccountButton(onClick: () -> Unit){
-    Button(onClick = { onClick() },
-        modifier = Modifier.width(380.dp).height(40.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)){
-        Text(stringResource(R.string.create_acc_button))
-    }
+    LoginButton(onClick,stringResource(R.string.create_acc_button))
 }
 
 @Composable
 fun LogInButton(onClick: () -> Unit){
-
-    Button(onClick = { onClick() },
-        modifier = Modifier.width(380.dp).height(40.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)){
-        Text(stringResource(R.string.log_in_button))
-    }
+    LoginButton(onClick, stringResource(R.string.log_in_button))
 }
 
 @Composable
@@ -75,7 +76,7 @@ fun LoginScreen(){
     val context = LocalContext.current
 
     // A surface container using the 'secondaryContainer' color from the theme
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primaryContainer) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.secondaryContainer) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,7 +93,7 @@ fun LoginScreen(){
         }
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
+            verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Bottom),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(8.dp)
         ){

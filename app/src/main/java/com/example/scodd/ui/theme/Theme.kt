@@ -22,23 +22,48 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Burgundy40,
-    secondary = Marigold40,
-    tertiary = Pink40,
-    primaryContainer = Burgundy40,
-    secondaryContainer = Marigold40,
-    onPrimary = Brown40,
-    onPrimaryContainer = White40,
-    onSecondaryContainer = Red40,
-//    background = White40,
-    surfaceVariant = Cream40,
-    outline = Black40,
-    onTertiaryContainer = Black40,
-    onSurface = White40,
+
+    primary = Marigold40,
+    onPrimary = YellowBrown40,
+    primaryContainer = Marigold40,
+    onPrimaryContainer = Red40,
+    inversePrimary = Black40,
+
+    secondary = Burgundy40,
+    onSecondary = White40,
+    secondaryContainer = Burgundy40,
+    onSecondaryContainer = White40,
     onSurfaceVariant = White40,
-    inverseOnSurface = Black40,
-    onTertiary = YellowBrown40,
-    onBackground = Gray40,
+    surface = White40,
+
+    outline = LightGray40,
+    outlineVariant = White40
+
+//    primary = Burgundy40,
+//    onPrimary = Brown40,
+//    primaryContainer = Burgundy40,
+//    onPrimaryContainer = White40,
+////    inversePrimary = ,
+//    secondary = Marigold40,
+//    onSecondary = YellowBrown40,
+//    secondaryContainer = Marigold40,
+//    onSecondaryContainer = Red40,
+//    tertiary = Pink40,
+//    onTertiary = YellowBrown40,
+//    onTertiaryContainer = Black40,
+////    background = White40,
+//    onBackground = Gray40,
+//    surface = White40,
+//    onSurface = White40,  // Icons & Navigation Bar Icons
+//    surfaceVariant = Cream40,
+//    onSurfaceVariant = White40,  //Navigation Bar Icons
+////    surfaceTint = ,
+////    inverseSurface = ,
+//    inverseOnSurface = Black40,
+//
+//    outline = Black40,
+//    outlineVariant = White40
+
 
 
 
@@ -71,14 +96,14 @@ fun ScoddTheme(
         else -> LightColorScheme
     }
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController((view.context as Activity).window, view).isAppearanceLightStatusBars =
-                darkTheme
-        }
-    }
+//    val view = LocalView.current
+//    if (!view.isInEditMode) {
+//        SideEffect {
+//            (view.context as Activity).window.statusBarColor = colorScheme.surface.toArgb()
+//            WindowCompat.getInsetsController((view.context as Activity).window, view).isAppearanceLightStatusBars =
+//                !darkTheme
+//        }
+//    }
 
     MaterialTheme(
         colorScheme = colorScheme,

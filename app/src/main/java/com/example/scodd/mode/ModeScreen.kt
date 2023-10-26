@@ -2,6 +2,7 @@ package com.example.scodd.mode
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
@@ -10,15 +11,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.scodd.objects.ScoddDestination
 
 @Composable
-fun ModeScreen() {
+fun ModeScreen(
+    modeScreens: List<ScoddDestination>,
+    onModeClick: (ScoddDestination) -> Unit) {
     Surface{
         Column(
             Modifier.padding(12.dp, 0.dp)
         ){
             ModeTitleCard()
-            ModeList()
+            ModeList(modeScreens,onModeClick)
         }
 
     }
@@ -27,16 +31,15 @@ fun ModeScreen() {
 @Composable
 fun ModeTitleCard(){
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer),
-        modifier = Modifier.fillMaxWidth(1f).padding(0.dp, 12.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary),
+        modifier = Modifier.fillMaxWidth(1f).padding(bottom = 8.dp)
     ){
         Column(
             Modifier.padding(24.dp)
         ){
             Text("Modes",
-                style = MaterialTheme.typography.displaySmall,
-                modifier = Modifier.height(90.dp))
+                style = MaterialTheme.typography.displaySmall)
             Text("Utilize different techniques to work through chores and workflows.",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Light)
@@ -44,11 +47,13 @@ fun ModeTitleCard(){
 
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ModeCard(mode : String, onClick: () -> Unit){
+fun ModeCard(mode : ScoddDestination, onModeClick: (ScoddDestination) -> Unit ){
+
     ElevatedCard(
-        modifier = Modifier.padding(0.dp, 0.dp, 0.dp , 12.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer,MaterialTheme.colorScheme.onTertiaryContainer)
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer,MaterialTheme.colorScheme.inversePrimary),
+        onClick = {onModeClick(mode)}
     ){
 
         Column(
@@ -56,42 +61,30 @@ fun ModeCard(mode : String, onClick: () -> Unit){
             horizontalAlignment = Alignment.End
         ){
             IconButton(
-                onClick ={onClick}
+                onClick ={}
             ){
                 Icon(Icons.Default.MoreVert,"More")
 
             }
             Spacer(Modifier.weight(1f))
-            Text(mode,
-                style = MaterialTheme.typography.titleSmall,
+            Text(mode.route,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(16.dp))
         }
 
     }
 }
 @Composable
-fun ModeList(){
+fun ModeList(modeScreens: List<ScoddDestination>,
+             onModeClick: (ScoddDestination) -> Unit,
+){
     LazyColumn(
-        modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp)
+        contentPadding = PaddingValues(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ){
-        item {
-            ModeCard("Time Crunch", onClick = {})
-        }
-
-        item{
-            ModeCard("Chore Quest", onClick = {})
-        }
-
-        item{
-            ModeCard("Chore Spin", onClick = {})
-        }
-
-        item{
-            ModeCard("Sand Glass", onClick = {})
-        }
-
-        item{
-            ModeCard("Piggy Bank", onClick = {})
+        items(modeScreens){ mode ->
+            ModeCard(
+                mode, onModeClick)
         }
     }
 }

@@ -11,7 +11,7 @@
         android:roundIcon="@drawable/rooster"
         android:supportsRtl="true"
         android:theme="@style/Theme.Scodd"
-        tools:targetApi="31">
+        tools:targetApi="33">
         <activity
             android:name=".ScoddActivity"
             android:exported="false"
@@ -24,7 +24,7 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="true"
-            android:label="@string/title_activity_login"
+            android:label="@string/app_name"
             android:theme="@style/Theme.Scodd">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

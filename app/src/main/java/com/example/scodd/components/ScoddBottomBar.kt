@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import com.example.scodd.ScoddDestination
+import com.example.scodd.objects.ScoddDestination
 
 
 @Composable
@@ -15,16 +15,20 @@ fun ScoddBottomBar(
     onNavSelected: (ScoddDestination) -> Unit,
     currentScreen: ScoddDestination
 ){
+
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
         modifier = Modifier.height(74.dp)
     ) {
         allScreens.forEach { screen ->
             NavigationBarItem(
-                icon = { Icon(ImageVector.vectorResource(id = screen.icon ), screen.route) },
+                icon = { Icon(ImageVector.vectorResource(id = screen.icon), screen.route) },
                 label = { Text(screen.route) },
-                selected = currentScreen == screen,
-                onClick = { onNavSelected(screen)}
+                selected = currentScreen == screen || currentScreen.parentRoute == screen.route,
+                onClick = { onNavSelected(screen)},
+                colors = NavigationBarItemDefaults.colors(selectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer)
             )
         }
 

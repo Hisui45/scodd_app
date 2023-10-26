@@ -2,23 +2,35 @@ package com.example.scodd
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import com.example.scodd.chore.ChoreScreen
+import com.example.scodd.chore.CreateChoreScreen
+import com.example.scodd.chore.CreateWorkflowScreen
 import com.example.scodd.dashboard.DashboardScreen
-import com.example.scodd.mode.ModeScreen
+import com.example.scodd.mode.*
+import com.example.scodd.objects.Chore
+import com.example.scodd.objects.Dashboard
+import com.example.scodd.objects.Mode
+import com.example.scodd.objects.scoddModeScreens
 
 @Composable
 fun ScoddNavHost(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    focusManager : FocusManager
 ) {
     NavHost(
         navController = navController,
         startDestination = Dashboard.route,
-        modifier = modifier
+        modifier = modifier,
+
     ) {
         composable(route = Dashboard.route) {
             DashboardScreen(
@@ -33,14 +45,12 @@ fun ScoddNavHost(
 //                }
             )
         }
-        composable(route = Chores.route) {
-            ChoreScreen(
 
-            )
-        }
-        composable(route = Modes.route) {
-            ModeScreen()
-        }
+        choreGraph(navController, focusManager)
+
+        modeGraph(navController)
+
+
 //        composable(
 //            route = SingleAccount.routeWithArgs,
 //            arguments = SingleAccount.arguments,
@@ -53,6 +63,87 @@ fun ScoddNavHost(
     }
 }
 
+fun NavGraphBuilder.choreGraph(navController: NavController, focusManager: FocusManager){
+
+    navigation(route = Chore.route, startDestination = Chore.Chores.route){
+
+        composable(route = Chore.Chores.route) {
+            ChoreScreen(
+                onCreateWorkflowClick = {
+                    navController.navigate(Chore.CreateWorkflow.route)
+                },
+                onCreateChoreClick = {
+                    navController.navigate(Chore.CreateChore.route)
+                }
+            )
+        }
+
+        composable(route = Chore.CreateChore.route){
+            CreateChoreScreen(focusManager)
+        }
+
+        composable(route = Chore.CreateWorkflow.route){
+            CreateWorkflowScreen()
+        }
+
+    }
+}
+
+
+fun NavGraphBuilder.modeGraph(navController: NavController){
+
+    navigation(route = Mode.route, startDestination = Mode.Modes.route){
+
+        composable(route = Mode.Modes.route) {
+            ModeScreen(
+                modeScreens = scoddModeScreens,
+                onModeClick = { mode ->
+                    navController.navigate(mode.route)
+                }
+            )
+        }
+
+        composable(route = Mode.TimeMode.route){
+            TimeModeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = Mode.QuestMode.route){
+            QuestModeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = Mode.SpinMode.route){
+            SpinModeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = Mode.SandMode.route){
+            SandModeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = Mode.BankMode.route){
+            BankModeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    }
+}
 fun NavHostController.navigateSingleTopTo(route: String) =
     this.navigate(route) {
         // Pop up to the start destination of the graph to
@@ -64,9 +155,9 @@ fun NavHostController.navigateSingleTopTo(route: String) =
             saveState = true
         }
         // Avoid multiple copies of the same destination when
-        // reselecting the same item
+        // re-selecting the same item
         launchSingleTop = true
-        // Restore state when reselecting a previously selected item
+        // Restore state when re-selecting a previously selected item
         restoreState = true
     }
 
