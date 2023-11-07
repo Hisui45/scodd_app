@@ -2,7 +2,7 @@ package com.example.scodd.objects
 
 interface ScoddRoom {
     val title : String
-    val selected : Boolean
+    var selected : Boolean
 }
 
 
@@ -13,37 +13,37 @@ interface ScoddRoom {
 
 object Room1 : ScoddRoom {
     override val title = "Kitchen"
-    override val selected = false
+    override var selected = false
 }
 
 object Room2 : ScoddRoom {
     override val title = "Bedroom"
-    override val selected = false
+    override var selected = true
 }
 
 object Room3 : ScoddRoom {
     override val title = "Living Room"
-    override val selected = false
+    override var selected = false
 }
 
 object Room4 : ScoddRoom {
     override val title = "Bathroom"
-    override val selected = false
+    override var selected = false
 }
 
 object Room5 : ScoddRoom {
     override val title = "Personal"
-    override val selected = false
+    override var selected = false
 }
 
 object Room6 : ScoddRoom {
     override val title = "Home Office"
-    override val selected = false
+    override var selected = false
 }
 
 object Room7 : ScoddRoom {
     override val title = "Favorites"
-    override val selected = false
+    override var selected = false
 }
 
 

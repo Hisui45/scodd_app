@@ -2,8 +2,11 @@ package com.example.scodd.chore
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
@@ -15,12 +18,17 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.example.scodd.R
 import com.example.scodd.components.*
 import com.example.scodd.objects.*
+import com.example.scodd.ui.theme.Burgundy40
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneOffset
@@ -30,14 +38,14 @@ import java.time.format.FormatStyle
 @Composable
 fun CreateChoreScreen(focusManager: FocusManager){
     val horizontalPadding = 12.dp
-
+    StatusBar(Burgundy40)
     Surface(Modifier.fillMaxHeight(1f).pointerInput(Unit) {
         detectTapGestures(onPress = {
             focusManager.clearFocus()
         })
     })
     {
-        Column(Modifier.padding(vertical = 8.dp)){
+        Column(Modifier.padding(vertical = 4.dp).fillMaxHeight().verticalScroll(rememberScrollState())){
 
             RoomSection(horizontalPadding)
 
@@ -47,6 +55,7 @@ fun CreateChoreScreen(focusManager: FocusManager){
 
             ModesSection(horizontalPadding)
 
+
         }
 
     }
@@ -55,8 +64,9 @@ fun CreateChoreScreen(focusManager: FocusManager){
 @Composable
 fun RoomSection(horizontalPadding : Dp){
     Column(Modifier.padding(horizontal = horizontalPadding)){
-        LabelText("Room")
-        RoomFiltersIconFlowRow()
+        LabelText(stringResource(R.string.room_title))
+        //Input copy of Room list with rooms that the chore is a part of when editing chore, default(all false) when new chore
+        SelectableRoomFilterChips(scoddRooms)
     }
     ChoreDivider()
 }
@@ -65,17 +75,25 @@ fun RoomSection(horizontalPadding : Dp){
 fun WorkflowSection(horizontalPadding : Dp){
     val createWorkflowDialog = remember { mutableStateOf(false) }
     Column(Modifier.padding(horizontal = horizontalPadding)){
-        LabelText("Workflow")
+        LabelText(stringResource(R.string.workflow_title))
     }
-    WorkflowSelectRow(onCreateWorkflowClick = { createWorkflowDialog.value = true } )
+    WorkflowSelectAddRow(onCreateWorkflowClick = { createWorkflowDialog.value = true } )
     ChoreDivider()
 
-    if(createWorkflowDialog.value){
-        CreateWorkflowDialog(createWorkflowDialog)
-    }
+    CreateDialog(
+        stringResource(R.string.create_workflow_label),
+        onDismissRequest = {
+            createWorkflowDialog.value = false
+        },
+        onCreateClick = {
+            createWorkflowDialog.value = false
+            //Push to data model to create new object
+        },
+        createWorkflowDialog)
+
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutineSection(horizontalPadding: Dp){
     val selectDateDialog = remember { mutableStateOf(false) }
@@ -93,32 +111,34 @@ fun RoutineSection(horizontalPadding: Dp){
     val showSchedule = remember { mutableStateOf(true) }
 
     Column(Modifier.padding(horizontal = horizontalPadding)){
-        LabelText("Routine")
+        LabelText(stringResource(R.string.routine_label))
         if (selectedDate != null) {
             OutlinedTextField(
-                value = selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)) + " at " + selectedTime,
+                value = selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                        + "" + stringResource(R.string.date_label_conj) + "" + selectedTime,
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 onValueChange = {},
                 trailingIcon = {
                     Row{
-                        ScoddOpenDialogFilledButtons(selectDateDialog, Icons.Default.DateRange, "date" )
-                        ScoddOpenDialogFilledButtons(selectTimeDialog, Icons.Default.CheckCircle, "time" )
+                        ScoddOpenDialogFilledButtons(selectDateDialog, Icons.Default.DateRange, stringResource(R.string.date_button_contDesc) )
+                        ScoddOpenDialogFilledButtons(selectTimeDialog, Icons.Default.CheckCircle, stringResource(R.string.time_button_contDesc) )
                     }
 
                 },
+                readOnly = true,
                 colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
                     focusedLabelColor = MaterialTheme.colorScheme.secondary,
                     unfocusedLabelColor = MaterialTheme.colorScheme.secondary),
-                label = {Text(if (showSchedule.value) "Date" else "Start Date")}
+                label = {Text(if (showSchedule.value) stringResource(R.string.date_label) else stringResource(R.string.start_date_label))}
             )
         }
 
 
-        ChoreSwitch(showSchedule.value,"One-Time", onCheckChanged = {showSchedule.value = !showSchedule.value} )
+        ChoreSwitch(showSchedule, stringResource(R.string.one_time_label))
 
         if(!showSchedule.value){
-            LabelText("Schedule")
+            LabelText(stringResource(R.string.schedule_label))
             TimingsChooser()
         }
 
@@ -139,35 +159,25 @@ fun RoutineSection(horizontalPadding: Dp){
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TimingsChooser(){
-
-    var selectedChip = remember {mutableStateOf(scoddTimings.find { it.selected }) }
+    val selected = remember { mutableStateOf(0) }  //Use to pre-fill value and use to know what it is
 
     FlowRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth()
     ) {
-        scoddTimings.forEach { interval ->
-            var selected = remember { mutableStateOf(interval.selected) }
-            FilterIconChip(interval.title,selected,
-                onClick = {
-//                    var currentSelected = scoddTimings.find { it.selected }
-//                    if (currentSelected != null) {
-//                        currentSelected.selected = false
-//                    }
-                    interval.selected = !interval.selected
-                    selected.value = !selected.value
-                    selectedChip.value = scoddTimings.find { it.selected }
-                }
-            )
+        scoddTimings.forEachIndexed { index, scoddTime ->
+            SwitchableIconFilterChips(scoddTime.title,index,selected.value,
+                onSelectedChanged = {
+                    selected.value = index
+                })
         }
     }
 
-    if(selectedChip.value == Custom){
+    if(scoddTimings[selected.value] == Custom){
         CustomFrequency()
-        DaysOfTheWeekChooser()
     }
 
-    if(selectedChip.value == Weekly){
+    if(scoddTimings[selected.value] == Weekly){
         DaysOfTheWeekChooser()
     }
 
@@ -176,116 +186,96 @@ fun TimingsChooser(){
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DaysOfTheWeekChooser(){
-    var selectedChip = remember {mutableStateOf(scoddDaysOfWeek.find { it.selected }) }
-
+    val selected = remember { mutableStateOf(0) }
     FlowRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth()
     ) {
-        scoddDaysOfWeek.forEach { interval ->
-            var selected = remember { mutableStateOf(interval.selected) }
-            FilterChip(interval.title,selected,
-                onClick = {
-                    interval.selected = !interval.selected
-                    selected.value = !selected.value
-                    selectedChip.value = scoddDaysOfWeek.find { it.selected }
-                }
-            )
+        scoddDaysOfWeek.forEachIndexed { index, chip ->
+            SwitchableFilterChip(chip.title,index,selected.value,
+                onSelectedChanged = {
+                    selected.value = index
+                })
         }
     }
+
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomFrequency(){
     val number = remember { mutableStateOf(1) }
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(scoddFrequency[0]) }
-    val pattern = remember { Regex("^\\d+\$") }
-    val focusManager = LocalFocusManager.current
+    val selectedOption = remember { mutableStateOf(scoddFrequency[0]) }
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
-    ){
+    ) {
+        Text(stringResource(R.string.freq_label))
+        ChoreDropdownNumberInput(number,selectedOption, scoddFrequency)
+    }
 
-        Text("Every")
-        OutlinedTextField(
-            value = if (number.value == 0) "" else number.value.toString(),
-            onValueChange = {
-                if (it.isEmpty() || it.matches(pattern)) {
-                    number.value = if (it == "") 0 else it.toInt()
-                }
-               },
-            modifier = Modifier.width(150.dp),
-            singleLine = true,
-            keyboardActions = KeyboardActions(onDone = {
-                focusManager.clearFocus()
-            }),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline)
-            )
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = {
-                expanded = !expanded
-            }
-        ){
-            OutlinedTextField(
-                readOnly = true,
-                value = if (number.value <= 1) selectedOptionText.title else selectedOptionText.title + "s",
-                onValueChange = { },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = expanded
-                    )
-                },
-                colors = OutlinedTextFieldDefaults.colors(unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline,
-                    focusedTrailingIconColor = MaterialTheme.colorScheme.outline,
-                    focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline),
-                modifier = Modifier.menuAnchor(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
-                }
-            ) {
-                scoddFrequency.forEach { frequency ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(if (number.value <= 1) frequency.title else frequency.title + "s" )
-                               },
-                        onClick = {
-                            selectedOptionText = frequency
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
+    if(selectedOption.value == Week){
+        DaysOfTheWeekChooser()
     }
 }
 
 @Composable
 fun ModesSection(horizontalPadding: Dp){
+    val crunchActive = remember { mutableStateOf(false) }
+    val time = remember { mutableStateOf(1) }
+    val timeUnit = remember { mutableStateOf(scoddTimeUnits[1]) }
+
+    val bankActive = remember { mutableStateOf(false) }
+    val amount = remember { mutableStateOf(1) }
+
     Column(Modifier.padding(horizontal = horizontalPadding)){
-        LabelText("Modes")
-        ChoreSwitch(false,"Time Crunch", onCheckChanged = {})
-        ChoreSwitch(false,"Piggy Bank", onCheckChanged = {})
+        LabelText(stringResource(R.string.mode_label))
+        ChoreSwitch(crunchActive, stringResource(R.string.time_mode_title))
+        if(crunchActive.value){
+            LabelText(stringResource(R.string.time_duration_label))
+            ChoreDropdownNumberInput(time,timeUnit, scoddTimeUnits)
+        }
+
+        ChoreSwitch(bankActive, stringResource(R.string.bank_mode_title))
+        if(bankActive.value){
+            LabelText(stringResource(R.string.bank_amount))
+            BankModeInput(amount)
+        }
+
     }
+}
+
+@Composable
+fun BankModeInput(amount : MutableState<Int>){
+    val focusManager = LocalFocusManager.current
+    OutlinedTextField(
+        value = if (amount.value == -1 ) "" else amount.value.toString(),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        onValueChange = {amount.value = if (it.isEmpty()) -1 else it.toInt()},
+        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.secondary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+            focusedLabelColor = MaterialTheme.colorScheme.secondary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
+            unfocusedPrefixColor = MaterialTheme.colorScheme.outline,
+            focusedPrefixColor = MaterialTheme.colorScheme.outline),
+        prefix = {
+            Icon(imageVector = ImageVector.vectorResource(R.drawable.attach_money_24), null)
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        keyboardActions = KeyboardActions(onDone = {
+            focusManager.clearFocus()
+        })
+    )
 }
 
 @Composable
 fun ScoddOpenDialogFilledButtons(open : MutableState<Boolean>, icon : ImageVector, contentDescription: String){
     FilledIconButton(
         onClick = {open.value = true},
-        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     ){
-        Icon(icon, contentDescription, tint = MaterialTheme.colorScheme.outline)
+        Icon(icon, contentDescription, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 
 }
@@ -293,69 +283,113 @@ fun ScoddOpenDialogFilledButtons(open : MutableState<Boolean>, icon : ImageVecto
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoddDatePickerDialog(datePickerState: DatePickerState, selectDateDialog : MutableState<Boolean>){
-    DatePickerDialog(
+
+    Dialog(
         onDismissRequest = {selectDateDialog.value = false},
-        confirmButton = {
-            TextButton(
-                onClick = {selectDateDialog.value = false}
-            ){
-                Text("Okay")
-            }
-        }
+        properties = DialogProperties(usePlatformDefaultWidth = false)
     ){
-        DatePicker(
-            state = datePickerState,
-            showModeToggle = true
-            )
+        Card(
+            modifier = Modifier.padding(horizontal = 27.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(28.dp)
+        ){
+            Column(
+                Modifier.padding(top= 16.dp, bottom = 12.dp)
+            ){
+                DatePicker(
+                    state = datePickerState,
+                    showModeToggle = true,
+                    colors = DatePickerDefaults.colors(titleContentColor = MaterialTheme.colorScheme.inversePrimary,
+                        headlineContentColor = MaterialTheme.colorScheme.outline,
+                        weekdayContentColor = MaterialTheme.colorScheme.secondary,
+                        subheadContentColor = MaterialTheme.colorScheme.inversePrimary,
+//                        todayContentColor = MaterialTheme.colorScheme.inversePrimary,
+                        yearContentColor = MaterialTheme.colorScheme.inversePrimary,
+//                        selectedDayContentColor = MaterialTheme.colorScheme.inversePrimary,
+//                        currentYearContentColor = MaterialTheme.colorScheme.inversePrimary,
+//                        dayInSelectionRangeContentColor = MaterialTheme.colorScheme.inversePrimary,
+//                        dayContentColor = MaterialTheme.colorScheme.inversePrimary,
+//                        selectedYearContentColor = MaterialTheme.colorScheme.inversePrimary,
+////                        disabledDayContentColor = MaterialTheme.colorScheme.inversePrimary,
+//                        todayDateBorderColor = MaterialTheme.colorScheme.secondary,
+//                        disabledSelectedDayContentColor = MaterialTheme.colorScheme.inversePrimary,
+////                        selectedDayContainerColor = MaterialTheme.colorScheme.inversePrimary,
+//                        selectedYearContainerColor = MaterialTheme.colorScheme.inversePrimary
+                        )
+
+                )
+                val buttonColor = MaterialTheme.colorScheme.onSurfaceVariant
+                Row{
+                    Spacer(Modifier.weight(1f))
+                    TextButton(
+                        onClick = {selectDateDialog.value = false}, //Discard Changes
+                        colors = ButtonDefaults.textButtonColors(contentColor = buttonColor)
+                    ){
+                        Text(stringResource(R.string.dialog_option_cancel))
+                    }
+                    TextButton(
+                        onClick = {selectDateDialog.value = false}, //Implement Changes
+                        colors = ButtonDefaults.textButtonColors(contentColor = buttonColor)
+                    ){
+                        Text(stringResource(R.string.dialog_option_ok))
+                    }
+                }
+
+            }
+
+        }
+
     }
 
 
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoddTimePickerDialog(timePickerState: TimePickerState, selectTimeDialog : MutableState<Boolean>){
     Dialog(
-        onDismissRequest = {selectTimeDialog.value = false}
+        onDismissRequest = {selectTimeDialog.value = false},
+        properties = DialogProperties(usePlatformDefaultWidth = false)
     ){
         Card(
-            Modifier.fillMaxWidth()
+            modifier = Modifier.padding(horizontal = 43.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(28.dp)
         ){
-            TimePicker(
-                state = timePickerState,
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp)
-            )
-        }
-
-    }
-
-
-}
-
-@Composable
-fun CreateWorkflowDialog(openAlertDialog: MutableState<Boolean>){
-    var title = ""
-    Dialog(
-        onDismissRequest = {openAlertDialog.value = false}
-    ){
-        ElevatedCard{
-            Column(Modifier.padding(16.dp)){
-                Text("New Workflow", modifier = Modifier.padding(vertical = 12.dp))
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = {title = it},
-                    modifier = Modifier.padding(vertical = 16.dp)
+            Column(Modifier.padding(start = 24.dp, end = 24.dp, top= 24.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),){
+                Text(stringResource(R.string.dialog_select_time_label))
+                TimePicker(
+                    state = timePickerState,
+                    colors = TimePickerDefaults.colors(periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.outline,
+                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary)
                 )
+                val buttonColor = MaterialTheme.colorScheme.onSurfaceVariant
                 Row{
                     Spacer(Modifier.weight(1f))
-                    Button(
-                        onClick = {},
+                    TextButton(
+                        onClick = {selectTimeDialog.value = false}, //Discard Changes
+                        colors = ButtonDefaults.textButtonColors(contentColor = buttonColor)
                     ){
-                        Text("Create")
+                        Text(stringResource(R.string.dialog_option_cancel))
+                    }
+                    TextButton(
+                        onClick = {selectTimeDialog.value = false}, //Implement Changes
+                        colors = ButtonDefaults.textButtonColors(contentColor = buttonColor)
+                    ){
+                        Text(stringResource(R.string.dialog_option_ok))
                     }
                 }
             }
 
         }
+
     }
+
+
 }
+

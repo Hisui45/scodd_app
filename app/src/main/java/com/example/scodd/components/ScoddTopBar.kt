@@ -11,10 +11,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.*
@@ -22,12 +19,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -65,36 +64,55 @@ fun ScoddMainTopBar(){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScoddSmallTopBar(title : String, onNavigateBack : () -> Unit, focusManager: FocusManager){
+fun ScoddSmallTopBar(title : String, onNavigateBack : () -> Unit, focusManager: FocusManager, createType : Int){
     var value by rememberSaveable { mutableStateOf(title) }
+    val isError = remember { mutableStateOf(false) }
+    var colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary,
+        navigationIconContentColor = MaterialTheme.colorScheme.onSecondary,
+    )
+    var contentColor = MaterialTheme.colorScheme.onSecondary
+
+    if (createType == 1){
+        contentColor = MaterialTheme.colorScheme.onPrimary
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+        )
+    }
+
+    fun validate(value : String){
+        isError.value = value == title || value == ""
+    }
+
     TopAppBar(
         title = {
                 AppBarTextField(
                     value = value,
-                    onValueChange = { newValue -> value = newValue },
-                    hint = "descriptive name",
-                    focusManager = focusManager
+                    onValueChange = { newValue -> value = newValue
+                                    validate(value)},
+                    hint = "",
+                    focusManager = focusManager,
+                    isError = isError.value,
+                    contentColor = contentColor
                     )
                 },
-        navigationIcon = {
-            IconButton(
-                onClick = {onNavigateBack()}
-            ){
-                Icon(Icons.Default.ArrowBack, "back")
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary,
-            actionIconContentColor = MaterialTheme.colorScheme.onSecondary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSecondary,
-            titleContentColor = MaterialTheme.colorScheme.onSecondary),
+        navigationIcon = { NavigationButton(onNavigateBack)},
+        colors = colors,
         actions = {
-            IconButton(
-                onClick = {}
+            TextButton(
+                onClick = {
+                    validate(value)
+                    if(!isError.value){
+                        //Create Chore
+                        onNavigateBack()
+                    }
+                }
             ){
-                Icon(Icons.Default.MoreVert, "more")
+                Text("Create", color = contentColor)
             }
         }
     )
+
+
 }
 
 /**
@@ -110,6 +128,8 @@ fun AppBarTextField(
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     focusManager : FocusManager,
+    isError : Boolean,
+    contentColor : Color
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val textStyle = LocalTextStyle.current
@@ -119,11 +139,12 @@ fun AppBarTextField(
         unfocusedContainerColor = Color.Transparent,
         disabledContainerColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
-        focusedIndicatorColor = Color.Transparent
+        focusedIndicatorColor = Color.Transparent,
+        errorContainerColor = MaterialTheme.colorScheme.inversePrimary.copy(0.20f)
     )
 
     // If color is not provided via the text style, use content color as a default
-    val textColor = MaterialTheme.colorScheme.onSecondary
+    val textColor = contentColor
 
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor, lineHeight = 50.sp))
 
@@ -154,7 +175,7 @@ fun AppBarTextField(
                 .heightIn(32.dp)
                 .indicatorLine(
                     enabled = true,
-                    isError = false,
+                    isError = isError,
                     interactionSource = interactionSource,
                     colors = colors
                 )
@@ -162,8 +183,8 @@ fun AppBarTextField(
                 ,
             textStyle = mergedTextStyle,
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSecondary),
-            keyboardOptions = keyboardOptions,
-            keyboardActions = KeyboardActions(onDone = {focusManager.clearFocus()}),
+            keyboardOptions = keyboardOptions.copy(KeyboardCapitalization.Sentences, autoCorrect = true),
+            keyboardActions = KeyboardActions{focusManager.clearFocus()},
             interactionSource = interactionSource,
             singleLine = true,
             decorationBox = { innerTextField ->
@@ -175,12 +196,25 @@ fun AppBarTextField(
                     singleLine = true,
                     visualTransformation = VisualTransformation.None,
                     interactionSource = interactionSource,
-                    isError = false,
+                    isError = isError,
                     placeholder = { Text(text = hint) },
                     colors = colors,
                     contentPadding = PaddingValues(bottom = 4.dp),
+                    shape = RectangleShape
                 )
             }
         )
+    }
+}
+
+
+
+
+@Composable
+fun NavigationButton(onNavigateBack: () -> Unit){
+    IconButton(
+        onClick = {onNavigateBack()}
+    ){
+        Icon(Icons.Default.ArrowBack, "back")
     }
 }

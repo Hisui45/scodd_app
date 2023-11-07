@@ -11,6 +11,24 @@ interface ScoddDestination {
 /**
  * Scodd app navigation destinations
  */
+
+object Authorize : ScoddDestination{
+    override val icon = R.drawable.mop_24
+    override val route = "Authorize"
+    override val parentRoute = ""
+
+    object Login : ScoddDestination {
+        override val icon = R.drawable.burst_mode_24
+        override val route = "Login"
+        override val parentRoute = "Authorize"
+    }
+    object Register : ScoddDestination {
+        override val icon = R.drawable.burst_mode_24
+        override val route = "Register"
+        override val parentRoute = "Authorize"
+    }
+}
+
 object Dashboard : ScoddDestination {
     override val icon = R.drawable.window_24
     override val route = "Dashboard"
@@ -30,6 +48,18 @@ object Chore : ScoddDestination {
     object CreateWorkflow : ScoddDestination {
         override val icon = R.drawable.burst_mode_24
         override val route = "New Workflow"
+        override val parentRoute = "Chores"
+    }
+
+    object SelectChore : ScoddDestination {
+        override val icon = R.drawable.burst_mode_24
+        override val route = "Select Chores"
+        override val parentRoute = "Chores"
+    }
+
+    object Workflow : ScoddDestination {
+        override val icon = R.drawable.burst_mode_24
+        override val route = "Workflow"
         override val parentRoute = "Chores"
     }
 
@@ -82,5 +112,6 @@ object Mode : ScoddDestination {
 }
 
 val scoddScreens = listOf(Chore.Chores, Dashboard, Mode.Modes)
-val scoddChoreScreens = listOf(Chore.CreateChore, Chore.CreateWorkflow)
-val scoddModeScreens = listOf(Mode.TimeMode, Mode.QuestMode, Mode.SpinMode, Mode.SandMode, Mode.BankMode)
+val scoddChoreScreens = listOf(Chore.CreateChore,Chore.CreateWorkflow)
+val scoddModeScreens = listOf(Mode.TimeMode, Mode.SpinMode,Mode.BankMode, Mode.QuestMode, Mode.SandMode)
+//val scoddWorkflowScreens = listOf()

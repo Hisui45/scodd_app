@@ -25,8 +25,8 @@ val londrinaShadow = FontFamily(
 val Typography = Typography(
 
     displayLarge = TextStyle(
-        fontFamily = londrinaShadow,
-        fontWeight = FontWeight.Normal,
+        fontFamily = londrinaSolid,
+        fontWeight = FontWeight.Light,
         fontSize = 57.sp,
         lineHeight = 64.sp,
         letterSpacing = (-0.25).sp

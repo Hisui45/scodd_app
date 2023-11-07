@@ -34,7 +34,7 @@ val scoddTimings = listOf(Daily, Weekly, Monthly, Yearly, Custom)
 
 object Sunday : ScoddTime{
     override val title = "Sun"
-    override var selected = false
+    override var selected = true
 }
 
 object Monday : ScoddTime{
@@ -90,4 +90,22 @@ object Year : ScoddTime{
 }
 
 val scoddFrequency = listOf(Day, Week, Month, Year)
+
+
+object Second : ScoddTime{
+    override val title = "second"
+    override var selected = false
+}
+
+object Minute : ScoddTime{
+    override val title = "minute"
+    override var selected = false
+}
+
+object Hour : ScoddTime{
+    override val title = "hour"
+    override var selected = false
+}
+
+val scoddTimeUnits = listOf(Second, Minute, Hour)
 

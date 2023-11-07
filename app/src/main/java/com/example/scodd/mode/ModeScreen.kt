@@ -11,13 +11,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.scodd.components.StatusBar
 import com.example.scodd.objects.ScoddDestination
+import com.example.scodd.ui.theme.White40
 
 @Composable
 fun ModeScreen(
     modeScreens: List<ScoddDestination>,
     onModeClick: (ScoddDestination) -> Unit) {
     Surface{
+        StatusBar(White40)
         Column(
             Modifier.padding(12.dp, 0.dp)
         ){
@@ -52,7 +55,7 @@ fun ModeTitleCard(){
 fun ModeCard(mode : ScoddDestination, onModeClick: (ScoddDestination) -> Unit ){
 
     ElevatedCard(
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer,MaterialTheme.colorScheme.inversePrimary),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary,MaterialTheme.colorScheme.onPrimary),
         onClick = {onModeClick(mode)}
     ){
 

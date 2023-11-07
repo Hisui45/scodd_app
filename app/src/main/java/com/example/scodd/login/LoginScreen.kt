@@ -1,46 +1,22 @@
 package com.example.scodd.login
 
-import android.app.Activity
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import com.example.scodd.R
-import com.example.scodd.ScoddActivity
 import com.example.scodd.components.LoginButton
 import com.example.scodd.components.StatusBar
 import com.example.scodd.ui.theme.Burgundy40
 import com.example.scodd.ui.theme.Marigold40
 import com.example.scodd.ui.theme.ScoddTheme
-
-class LoginActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            StatusBar(Burgundy40)
-            ScoddTheme {
-                LoginScreen()
-            }
-        }
-    }
-}
-
 
 @Composable
 fun Logo(){
@@ -72,9 +48,8 @@ fun LogInButton(onClick: () -> Unit){
 }
 
 @Composable
-fun LoginScreen(){
-    val context = LocalContext.current
-
+fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick : () -> Unit) {
+    StatusBar(Burgundy40)
     // A surface container using the 'secondaryContainer' color from the theme
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.secondaryContainer) {
         Column(
@@ -91,19 +66,13 @@ fun LoginScreen(){
         ){
             Rooster()
         }
-
         Column(
             verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Bottom),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(8.dp)
         ){
-
-            CreateAccountButton(onClick = {
-
-            })
-            LogInButton(onClick = {
-                context.startActivity(Intent(context, ScoddActivity :: class.java))
-            })
+            CreateAccountButton(onClick = {onRegisterClick()})
+            LogInButton(onClick = {onLoginClick()})
         }
 
     }
@@ -112,13 +81,13 @@ fun LoginScreen(){
 
 
 @Preview(showSystemUi = true, device = "spec:width=411dp,height=891dp")
-// @Preview(showSystemUi = true, device = "spec:width=673.5dp,height=841dp,dpi=480")
-// @Preview(showSystemUi = true, device = "spec:width=1280dp,height=800dp,dpi=480")
-// @Preview(showSystemUi = true, device = "spec:width=1920dp,height=1080dp,dpi=480")
+//@Preview(showSystemUi = true, device = "spec:width=673.5dp,height=841dp,dpi=480")
+//@Preview(showSystemUi = true, device = "spec:width=1280dp,height=800dp,dpi=480")
+//@Preview(showSystemUi = true, device = "spec:width=1920dp,height=1080dp,dpi=480")
 @Composable
 fun LoginPreview(){
     ScoddTheme {
-        LoginScreen()
+        LoginScreen(onLoginClick = {}, onRegisterClick = {})
     }
 }
 

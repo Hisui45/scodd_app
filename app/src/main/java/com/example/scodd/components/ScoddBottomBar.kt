@@ -1,5 +1,6 @@
 package com.example.scodd.components
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,11 +27,30 @@ fun ScoddBottomBar(
                 label = { Text(screen.route) },
                 selected = currentScreen == screen || currentScreen.parentRoute == screen.route,
                 onClick = { onNavSelected(screen)},
-                colors = NavigationBarItemDefaults.colors(selectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer)
+                colors = NavigationBarItemDefaults.colors(selectedTextColor = MaterialTheme.colorScheme.onSecondary,
+                    indicatorColor = MaterialTheme.colorScheme.primary,
+                    selectedIconColor = MaterialTheme.colorScheme.tertiary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSecondary)
             )
         }
 
     }
+}
+
+@Composable
+fun ModeBottomBar(onStartClick : () -> Unit){
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.background(MaterialTheme.colorScheme.background).fillMaxWidth().padding(8.dp).height(40.dp)
+    ){
+        Button(
+            onClick = {onStartClick()},
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary)
+        ){
+            Text("START", style = MaterialTheme.typography.titleLarge)
+        }
+    }
+
 }

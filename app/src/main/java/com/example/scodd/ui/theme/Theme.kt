@@ -25,19 +25,29 @@ private val LightColorScheme = lightColorScheme(
 
     primary = Marigold40,
     onPrimary = YellowBrown40,
-    primaryContainer = Marigold40,
-    onPrimaryContainer = Red40,
+    primaryContainer = LightMarigold40,
+    onPrimaryContainer = Black40,
+
+
     inversePrimary = Black40,
 
     secondary = Burgundy40,
     onSecondary = White40,
     secondaryContainer = Burgundy40,
     onSecondaryContainer = White40,
-    onSurfaceVariant = White40,
+
+
+    tertiary = Red40,
+    tertiaryContainer = Pink40,
+    onTertiaryContainer = RedBrown40,
+
+//    onSurfaceVariant = Marigold40,
     surface = White40,
 
+//    inverseSurface = LightMarigold40,
+
     outline = LightGray40,
-    outlineVariant = White40
+//    outlineVariant = White40
 
 //    primary = Burgundy40,
 //    onPrimary = Brown40,

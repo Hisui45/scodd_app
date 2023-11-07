@@ -3,7 +3,6 @@ package com.example.scodd.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -18,12 +17,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scodd.R
+import com.example.scodd.components.ChoreListItem
 import com.example.scodd.objects.ScoddChore
-import com.example.scodd.components.FilterChip
+import com.example.scodd.components.SelectableRoomFilterChip
+import com.example.scodd.components.StatusBar
 import com.example.scodd.objects.scoddChores
 import com.example.scodd.objects.scoddRooms
 import com.example.scodd.ui.theme.*
@@ -35,6 +37,7 @@ fun DashboardScreen(){
 
     Surface{
         Column {
+            StatusBar(White40)
             Greeting("Jade")
             Header("6:00PM")
             Overview(12, 4)
@@ -202,7 +205,6 @@ fun Message(message : String){
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FocusArea(){
     Column(
@@ -210,71 +212,50 @@ fun FocusArea(){
     ){
         Text("Focus Area",
             style = MaterialTheme.typography.titleLarge)
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    }
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp)
+    ){
+        itemsIndexed(scoddRooms){ index, room -> //Use index to know what room is selected
+            val selected = remember { mutableStateOf(false) } //Take from room object to pre-fill value
+            SelectableRoomFilterChip(room.title, selected.value,
+                onSelectedChanged = {
+                    selected.value = !selected.value
+                    //Update room selected value here
 
 
-            item{
-                val allChip = remember { mutableStateOf(true) }
-                /**
-                     * TODO: Implement selection and de-selection
-                     */
-                FilterChip("All", allChip, onClick = {
-                    /**
-                     * TODO: Implement selection and de-selection
-                     */
                 })
-            }
-            items(scoddRooms){ room ->
-                val roomSelected = remember { mutableStateOf(room.selected) }
-                /**
-                         * TODO: Implement selection and de-selection
-                         */FilterChip(room.title,roomSelected,
-                    onClick = {
-                        /**
-                         * TODO: Implement selection and de-selection
-                         */
-                    })
-            }
         }
     }
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChoreList(){
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ) {
         itemsIndexed(scoddChores){ index, chore ->
-            ChoreListItem(chore)
-            if (index < scoddChores.lastIndex)
-                Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+            val checked = remember { mutableStateOf(false) }
+            SwipeToDismiss(
+                state = rememberDismissState(),
+                background = {},
+                dismissContent = {
+                    Column{
+                        ChoreListItem(chore.room.title, chore.title,checked.value,
+                            onCheckChanged = {
+                                checked.value = !checked.value
+                            }, true)
+                        if (index < scoddChores.lastIndex)
+                        Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+                    }
+                })
+
+
         }
     }
-}
-
-@Composable
-fun ChoreListItem(chore : ScoddChore){
-    val checkedState = remember { mutableStateOf(false) }
-    Column{
-        ListItem(
-            headlineContent = {
-                Text(chore.title, style = MaterialTheme.typography.titleLarge)
-            },
-            trailingContent = {
-                Checkbox(
-                    checked = checkedState.value,
-                    onCheckedChange = { checkedState.value = it },
-                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.outline,
-                        checkmarkColor = MaterialTheme.colorScheme.onPrimary)
-                )
-            },
-        )
-
-    }
-
 }
 
 @Composable
@@ -331,6 +312,6 @@ private fun getPeriod(hour: Int) = when (hour) {
     }
 
     else -> {
-        "Morning"
+        "Night For A Night Owl"
     }
 }

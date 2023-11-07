@@ -17,7 +17,7 @@ import com.example.scodd.objects.ScoddSuggestions
 fun ScoddModeHeader(onNavigateBack: () -> Unit, mode : String, description : String, suggestions: List<ScoddSuggestions>,) {
     val horizontalPadding = 13.dp
     ElevatedCard(
-        colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.inversePrimary),
+        colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary),
         shape = RoundedCornerShape(0.dp, 0.dp, 18.dp, 18.dp)
     ){
         Row(
@@ -56,8 +56,8 @@ fun ScoddSuggestionChip(title : String){
         onClick = {},
         icon = { Icon(Icons.Default.Check,"check") },
         colors = SuggestionChipDefaults.suggestionChipColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            labelColor = MaterialTheme.colorScheme.onSecondaryContainer),
-        border = SuggestionChipDefaults.suggestionChipBorder(borderColor = MaterialTheme.colorScheme.outlineVariant)
+            labelColor = MaterialTheme.colorScheme.onSecondaryContainer, iconContentColor = MaterialTheme.colorScheme.onSecondary),
+        border = SuggestionChipDefaults.suggestionChipBorder(borderColor = MaterialTheme.colorScheme.onSecondary)
     )
 
 }

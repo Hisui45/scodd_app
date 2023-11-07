@@ -16,5 +16,77 @@
 
     //Chore
     <string name="search_bar_placeholder">Find Chore</string>
+    <string name="workflow_title">Workflow</string>
+    <string name="workflow_desc">Collection of chores routinely done together.</string>
+    <string name="chore_title">Chore</string>
+    <string name="workflow_label">Workflows</string>
+    <string name="chore_label">Chores</string>
+
+
+    //Select Chore
+    <string name="fab_create_chore">Create Chore</string>
+    <string name="fab_quick_create">Quick Add</string>
+    <string name="select_chore_title">Select Chores</string>
+    <string name="check_button_contDesc">Done</string>
+    <string name="selected_label">Selected</string>
+    <string name="select_all_label">Select All</string>
+    <string name="dialog_quick_title">Quick-Add Chore</string>
+
+    //Workflow
+    <string name="workflow_view_button_contDesc">View Chores</string>
+    <string name="workflow_complete_button_contDesc">Complete Chores</string>
+
+    //Create Chore
+    <string name="room_title">Room</string>
+    <string name="create_workflow_label">Create workflow</string>
+    <string name="routine_label">Routine</string>
+    <string name="date_label">Date</string>
+    <string name="start_date_label">Start Date</string>
+    <string name="date_button_contDesc">Choose Date</string>
+    <string name="time_button_contDesc">Choose Time</string>
+    <string name="date_label_conj">at</string>
+    <string name="one_time_label">One-Time</string>
+    <string name="schedule_label">Schedule</string>
+    <string name="freq_label">Every</string>
+    <string name="time_duration_label">Timer Duration</string>
+    <string name="bank_amount">Amount</string>
+    <string name="dialog_option_cancel">Cancel</string>
+    <string name="dialog_option_ok">Okay</string>
+    <string name="dialog_select_time_label">Select time</string>
+
+    //Create Workflow
+    <string name="instructions_text">Add chores routinely done together into a workflow</string>
+
+
+    //Mode
+    <string name="mode_label">Modes</string>
+
+    //Time Crunch
+    <string name="time_mode_title">Time Crunch</string>
+
+    //Piggy Bank
+    <string name="bank_mode_title">Piggy Bank</string>
+
+
+    //Sand Mode
+    <string name="sand_option_one">Countdown Only</string>
+    <string name="sand_option_two">Countdown and Chores</string>
+    <string name="button_switch">Switch</string>
+    <string name="mode_option_label">Mode Option:</string>
+    <string name="sand_mode_title">Sand Glass</string>
+    <string name="sand_mode_desc">Transforms your cleaning routine into a thrilling and productive adventure, enabling you to make progress on your chores without feeling overwhelmed. Set a time frame and embark on a task-driven journey. During this period, you can approach your chores at your own pace or use a checklist to conquer tasks, experiencing a triumphant feeling of accomplishment and completion along the way.</string>
+    <string name="sand_time_placeholder">00</string>
+    <string name="sand_picker_hr_label">h</string>
+    <string name="sand_picker_min_label">m</string>
+    <string name="sand_picker_sec_label">s</string>
+    <string name="sand_time_label_conj"> and </string>
+    <string name="sand_time_hr">hour</string>
+    <string name="sand_time_hr_plural">hours</string>
+    <string name="sand_time_min">minute</string>
+    <string name="sand_time_min_plural">minutes</string>
+    <string name="sand_time_sec">second</string>
+    <string name="sand_time_sec_plural">seconds</string>
+    <string name="sand_time_label">Cleaning Time:</string>
+
 
 </resources>

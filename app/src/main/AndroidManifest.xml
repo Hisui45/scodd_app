@@ -14,15 +14,6 @@
         tools:targetApi="33">
         <activity
             android:name=".ScoddActivity"
-            android:exported="false"
-            android:label="@string/title_activity_scodd"
-            android:theme="@style/Theme.Scodd">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
-            android:name=".login.LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Scodd">
@@ -31,7 +22,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

@@ -8,18 +8,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.scodd.components.ScoddBottomBar
-import com.example.scodd.components.ScoddMainTopBar
-import com.example.scodd.components.ScoddSmallTopBar
-import com.example.scodd.components.StatusBar
-import com.example.scodd.objects.Dashboard
-import com.example.scodd.objects.scoddChoreScreens
-import com.example.scodd.objects.scoddModeScreens
-import com.example.scodd.objects.scoddScreens
+import com.example.scodd.components.*
+import com.example.scodd.objects.*
+import com.example.scodd.ui.theme.Burgundy40
 import com.example.scodd.ui.theme.Marigold40
 import com.example.scodd.ui.theme.ScoddTheme
 import com.example.scodd.ui.theme.White40
@@ -37,6 +31,8 @@ class ScoddActivity : ComponentActivity() {
 fun ScoddApp(){
 
     ScoddTheme {
+        val WORKFLOW_CREATE = 1
+        var createType = 0
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
@@ -44,27 +40,26 @@ fun ScoddApp(){
             scoddScreens.find { it.route == currentDestination?.route } ?:
             scoddModeScreens.find { it.route == currentDestination?.route } ?:
             scoddChoreScreens.find { it.route == currentDestination?.route } ?: Dashboard
+//            scoddWorkflowScreens.find { it.route == currentDestination?.route } ?:
         val isMainDestination = scoddScreens.any { it.route == currentDestination?.route }
         val isModeDestination = scoddModeScreens.any { it.route == currentDestination?.route }
         val isChoreDestination = scoddChoreScreens.any { it.route == currentDestination?.route }
+//        val isWorkflowDestination = scoddWorkflowScreens.any { it.route == currentDestination?.route }
         val focusManager = LocalFocusManager.current
-
-        if(isMainDestination || isChoreDestination){
-            StatusBar(White40)
-        }else if(isModeDestination){
-            StatusBar(Marigold40)
-        }
 
         Scaffold(
             topBar = {
                 if (isMainDestination) {
                     ScoddMainTopBar()
                 }else if(isChoreDestination){
+                    if(currentScreen.route == Chore.CreateWorkflow.route){
+                        createType = WORKFLOW_CREATE
+                    }
                     ScoddSmallTopBar(currentScreen.route,
                         onNavigateBack = {
                             navController.popBackStack()
                         },
-                        focusManager
+                        focusManager, createType
                     )
                 }
             },
@@ -76,6 +71,8 @@ fun ScoddApp(){
                             navController.navigateSingleTopTo(newScreen.route)},
                         currentScreen = currentScreen
                     )
+                }else if(isModeDestination){
+                    ModeBottomBar(onStartClick = {})
                 }
             }
         ) { innerPadding ->
@@ -84,6 +81,13 @@ fun ScoddApp(){
                 modifier = Modifier.padding(innerPadding),
                 focusManager
             )
+//            if(isMainDestination || isChoreDestination){ //Organize these
+//                StatusBar(White40)
+//            }else if(isModeDestination){ // of all destinations for bar color once all screens are made
+//                StatusBar(Marigold40)
+//            }else{
+//                StatusBar(Burgundy40)
+//            }
         }
 
     }

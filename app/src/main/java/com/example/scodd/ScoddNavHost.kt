@@ -10,15 +10,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.scodd.chore.ChoreScreen
-import com.example.scodd.chore.CreateChoreScreen
-import com.example.scodd.chore.CreateWorkflowScreen
+import com.example.scodd.chore.*
 import com.example.scodd.dashboard.DashboardScreen
+import com.example.scodd.login.LoginScreen
 import com.example.scodd.mode.*
-import com.example.scodd.objects.Chore
-import com.example.scodd.objects.Dashboard
-import com.example.scodd.objects.Mode
-import com.example.scodd.objects.scoddModeScreens
+import com.example.scodd.objects.*
 
 @Composable
 fun ScoddNavHost(
@@ -28,10 +24,13 @@ fun ScoddNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Dashboard.route,
+        startDestination = Authorize.route,
         modifier = modifier,
 
     ) {
+
+        authorizeGraph(navController)
+
         composable(route = Dashboard.route) {
             DashboardScreen(
 //                onClickSeeAllAccounts = {
@@ -63,6 +62,28 @@ fun ScoddNavHost(
     }
 }
 
+fun NavGraphBuilder.authorizeGraph(navController: NavController){
+
+    navigation(route = Authorize.route, startDestination = Authorize.Login.route){
+
+        composable(route = Authorize.Login.route) {
+            LoginScreen(
+                onRegisterClick ={
+
+                },
+                onLoginClick = {
+                    //After authorization succeeds
+                    navController.navigate(Dashboard.route)
+                }
+            )
+        }
+
+        composable(route = Authorize.Register.route){
+
+        }
+
+    }
+}
 fun NavGraphBuilder.choreGraph(navController: NavController, focusManager: FocusManager){
 
     navigation(route = Chore.route, startDestination = Chore.Chores.route){
@@ -74,6 +95,9 @@ fun NavGraphBuilder.choreGraph(navController: NavController, focusManager: Focus
                 },
                 onCreateChoreClick = {
                     navController.navigate(Chore.CreateChore.route)
+                },
+                onWorkflowClick = {
+                    navController.navigate(Chore.Workflow.route + "/${it.title}")
                 }
             )
         }
@@ -83,7 +107,40 @@ fun NavGraphBuilder.choreGraph(navController: NavController, focusManager: Focus
         }
 
         composable(route = Chore.CreateWorkflow.route){
-            CreateWorkflowScreen()
+            CreateWorkflowScreen(
+                onAddChoreButtonClick = {navController.navigate(Chore.SelectChore.route + "/{hey}")}
+            )
+        }
+
+        composable(route = Chore.SelectChore.route + "/{workflowID}"){ navBackStack ->
+            val workflow = navBackStack.arguments?.getString("workflowID")
+            SelectChoreScreen(
+                onSelectFinish = {
+                    //Take list
+                    //Use workflow ID to add chores to
+                    navController.popBackStack()
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                navigateToChoreCreate = {
+                    navController.navigate(Chore.CreateChore.route)
+                }
+            )
+        }
+
+        composable(route = Chore.Workflow.route + "/{workflowID}") { navBackStack ->
+
+            // Extracting the argument
+            val workflow = navBackStack.arguments?.getString("workflowID")
+
+            // Setting screen,
+            // Pass the extracted Counter
+            WorkflowScreen(
+                workflowTitle = workflow,
+                onNavigateBack = {navController.popBackStack()},
+                onAddChoreClick = {navController.navigate(route = Chore.SelectChore.route + "/${it.title}")} //Change to id
+                )
         }
 
     }
@@ -107,6 +164,9 @@ fun NavGraphBuilder.modeGraph(navController: NavController){
             TimeModeScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onAddChoreToModeClick = {
+                    navController.navigate(Chore.SelectChore.route + "/${it.title}") //Should send list object with selected chores
                 }
             )
         }
@@ -115,7 +175,8 @@ fun NavGraphBuilder.modeGraph(navController: NavController){
             QuestModeScreen(
                 onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
+
             )
         }
 
@@ -123,6 +184,9 @@ fun NavGraphBuilder.modeGraph(navController: NavController){
             SpinModeScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onAddChoreToModeClick = {
+                    navController.navigate(Chore.SelectChore.route + "/${it.title}") //Should send list object with selected chores
                 }
             )
         }
@@ -131,6 +195,9 @@ fun NavGraphBuilder.modeGraph(navController: NavController){
             SandModeScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onAddChoreToModeClick = {
+                    navController.navigate(Chore.SelectChore.route + "/${it.title}") //Should send list object with selected chores
                 }
             )
         }
@@ -139,6 +206,9 @@ fun NavGraphBuilder.modeGraph(navController: NavController){
             BankModeScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onAddChoreToModeClick = {
+                    navController.navigate(Chore.SelectChore.route + "/${it.title}") //Should send list object with selected chores
                 }
             )
         }

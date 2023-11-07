@@ -6,9 +6,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,30 +18,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.scodd.*
 import com.example.scodd.R
-import com.example.scodd.components.AddWorkflowCard
-import com.example.scodd.components.CustomFloatingActionButton
-import com.example.scodd.components.LabelText
-import com.example.scodd.components.FilterChip
-import com.example.scodd.objects.ScoddChore
+import com.example.scodd.components.*
+import com.example.scodd.objects.ScoddWorkflow
 import com.example.scodd.objects.scoddChores
 import com.example.scodd.objects.scoddFlows
 import com.example.scodd.objects.scoddRooms
+import com.example.scodd.ui.theme.White40
 
 
 @Composable
 fun ChoreScreen(
     onCreateWorkflowClick : () -> Unit,
     onCreateChoreClick : () -> Unit,
+    onWorkflowClick: (ScoddWorkflow) -> Unit
 
 ) {
+    StatusBar(White40)
     val isVisible = rememberSaveable { mutableStateOf(true) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -72,15 +66,27 @@ fun ChoreScreen(
                     exit = slideOutVertically(targetOffsetY = { it * 2 }),
                 ) {
                     CustomFloatingActionButton(true,
-                        onWorkflowFabClick ={onCreateWorkflowClick()},
-                        onChoreFabClick = {onCreateChoreClick()},
+                        topFloatingActionButton ={
+                            ExpandableFABButtonItem(
+                                onButtonClick = { onCreateWorkflowClick()},
+                                title = stringResource(R.string.workflow_title),
+                                Icons.Default.List
+                            )
+                           },
+                        bottomFloatingActionButton = {
+                            ExpandableFABButtonItem(
+                                onButtonClick = {onCreateChoreClick()},
+                                title = stringResource(R.string.chore_title),
+                                Icons.Default.Email
+                            )
+                            },
                         Icons.Default.Add)
                 }
             }
         ) {
             Column(Modifier.padding(it)){
                 Search()
-                Workflow(onCreateWorkflowClick)
+                Workflow(onCreateWorkflowClick, onWorkflowClick)
                 Divider()
                 Chore(nestedScrollConnection)
             }
@@ -95,10 +101,13 @@ fun ChoreScreen(
 fun Search(){
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
-
+    val textColor = MaterialTheme.colorScheme.onSecondary
     SearchBar(
         modifier = Modifier.fillMaxWidth().padding(10.dp, 0.dp),
-        colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.secondaryContainer),
+        colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.secondaryContainer,
+            inputFieldColors = TextFieldDefaults.colors(focusedPlaceholderColor = textColor,
+                unfocusedPlaceholderColor = textColor, focusedTextColor = textColor,
+                unfocusedTextColor = textColor)),
         query = text,
         onQueryChange = { text = it },
         onSearch = { active = false },
@@ -106,7 +115,7 @@ fun Search(){
         onActiveChange = {
 //            active = it  Change this to show results on the screen
         },
-        placeholder = { Text("Find Chore") },
+        placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null,
             tint = MaterialTheme.colorScheme.onSecondaryContainer) },
         trailingIcon = {  },
@@ -117,43 +126,42 @@ fun Search(){
 }
 
 @Composable
-fun Workflow(onCreateWorkflowClick : () -> Unit){
+fun Workflow(onCreateWorkflowClick : () -> Unit, onWorkflowClick: (ScoddWorkflow) -> Unit){
     Column(
         Modifier.padding(15.dp,8.dp, 0.dp, 0.dp)
     ) {
-        LabelText("Workflows")
-        Row(Modifier.padding(0.dp, 6.dp)){
-            WorkflowRow(onCreateWorkflowClick)
+        LabelText(stringResource(R.string.workflow_label))
+    }
+    Row(Modifier.padding(0.dp, 6.dp)){
+        val colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            contentPadding = PaddingValues(horizontal = 15.dp)
+        ) {
+            item {
+                WorkflowTitleCard()
+            }
+            items(scoddFlows){ workflow ->
+                WorkflowCard(workflow.title,colors, onWorkflowClick = {
+                    onWorkflowClick(workflow)
+                } )
+            }
+
+            item{
+                AddWorkflowCard(onCreateWorkflowClick, colors)
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkflowRow(onCreateWorkflowClick : () -> Unit){
-    val colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        contentPadding = PaddingValues(end = 15.dp)
-    ) {
-        item {
-            WorkflowTitleCard()
-        }
-        items(scoddFlows){ workflow ->
-            WorkflowCard(workflow.title)
-        }
-
-        item{
-            AddWorkflowCard(onCreateWorkflowClick, colors)
-        }
-    }
-}
-
-@Composable
-fun WorkflowCard(workflow : String){
+fun WorkflowCard(workflow : String, colors: CardColors, onWorkflowClick : () -> Unit){
     Card(
-        modifier = Modifier.width(120.dp).height(110.dp),
+        modifier = Modifier.width(170.dp).height(110.dp),
         shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
+        colors = colors,
+        onClick = {onWorkflowClick()}
     ){
         Column(
             Modifier.fillMaxSize(),
@@ -167,8 +175,6 @@ fun WorkflowCard(workflow : String){
     }
 }
 
-
-
 @Composable
 fun WorkflowTitleCard(){
     Card(
@@ -179,8 +185,8 @@ fun WorkflowTitleCard(){
         Column(
             Modifier.padding(16.dp)
         ){
-            Text("Workflow", style = MaterialTheme.typography.headlineMedium)
-            Text("Collection of chores routinely done together.", style = MaterialTheme.typography.labelSmall)
+            Text(stringResource(R.string.workflow_title), style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.workflow_desc), style = MaterialTheme.typography.labelSmall)
         }
 
     }
@@ -191,71 +197,8 @@ fun Chore(nestedScrollConnection : NestedScrollConnection){
     Column(
         Modifier.padding(15.dp,8.dp, 15.dp, 8.dp)
     ) {
-        LabelText("Chores")
-        ChoreFilters()
-        ChoreGrid(nestedScrollConnection)
+        LabelText(stringResource(R.string.chore_label))
     }
+    ChoreView(scoddRooms, onChipSelected = {}, chores = scoddChores, onChoreSelected = {}, nestedScrollConnection = nestedScrollConnection  )
+
 }
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun ChoreFilters(){
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        scoddRooms.forEach { room ->
-            var selected = remember { mutableStateOf(room.selected) }
-            FilterChip(room.title,
-                selected,
-                onClick = {}
-            )
-
-        }
-    }
-}
-
-@Composable
-fun ChoreCard(chore : ScoddChore){
-    Card(
-        Modifier.size(175.dp).padding(0.dp, 8.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer,MaterialTheme.colorScheme.onSecondaryContainer)
-    ){
-        Column(
-            Modifier.padding(12.dp, 0.dp, 0.dp, 12.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                val resource = if (chore.favorites) R.drawable.filled_star_24 else R.drawable.star_24
-                Text(chore.room.title,
-                    modifier = Modifier.width(120.dp).height(30.dp),
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Light)
-                Spacer(Modifier.weight(1f))
-                IconButton(onClick = {}){
-                    Icon(painterResource(id = resource)
-                        , "favorites", tint = MaterialTheme.colorScheme.outline)
-                }
-            }
-            Spacer(Modifier.weight(1f))
-            Text(chore.title,
-                textAlign = TextAlign.End,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth().padding(16.dp, 0.dp), fontWeight = FontWeight.Light, style = MaterialTheme.typography.titleLarge)
-        }
-
-    }
-}
-
-@Composable
-fun ChoreGrid(nestedScrollConnection : NestedScrollConnection){
-    LazyVerticalGrid(columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(15.dp),
-        modifier = Modifier.nestedScroll(nestedScrollConnection)){
-        items(scoddChores){ chore ->
-            ChoreCard(chore)
-        }
-    }
-}
-
