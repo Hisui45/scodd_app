@@ -21,6 +21,9 @@
     <string name="chore_title">Chore</string>
     <string name="workflow_label">Workflows</string>
     <string name="chore_label">Chores</string>
+    <string name="no_chores_message">You don\'t have any chores!</string>
+    <string name="error_chores">There was a problem with loading the chores</string>
+    <string name="error_rooms">There was a problem with loading the rooms</string>
 
 
     //Select Chore
@@ -87,6 +90,23 @@
     <string name="sand_time_sec">second</string>
     <string name="sand_time_sec_plural">seconds</string>
     <string name="sand_time_label">Cleaning Time:</string>
+    <string name="loading_tasks_error">There was a problem with loading the tasks.</string>
+    <string name="chore_marked_complete">Chore Complete!</string>
+    <string name="completed_chores_cleared">Completed Chores Cleared</string>
+    <string name="label_all">All</string>
+    <string name="no_tasks_all">No Tasks All</string>
+    <string name="label_active">Active</string>
+    <string name="no_tasks_active">No Tasks Active</string>
+    <string name="label_completed">Complete</string>
+    <string name="no_tasks_completed">No Tasks Complete</string>
+    <string name="chore_no_title_message">Please give this chore a title</string>
+    <string name="chore_unmarked_favorite">Favorite Removed!</string>
+    <string name="chore_marked_favorite">Favorite Added!</string>
+    <string name="save_buttton">Save</string>
+    <string name="title_hint">Title</string>
+    <string name="value_missing_error">Must have a value</string>
+    <string name="greater_value_error">Greater than 0</string>
+    <string name="loading_date_error">There was a problem with loading the date.</string>
 
 
 </resources>
