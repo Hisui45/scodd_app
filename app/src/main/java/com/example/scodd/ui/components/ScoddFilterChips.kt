@@ -1,18 +1,11 @@
 package com.example.scodd.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import com.example.scodd.data.scoddRooms
-import com.example.scodd.model.Room
 import com.example.scodd.model.ScoddTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,26 +23,6 @@ fun SelectableRoomFilterChip(title : String, selected:Boolean, onSelectedChanged
         border = FilterChipDefaults.filterChipBorder(selectedBorderColor = Color.Transparent)
     )
 }
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun SelectableRoomFilterChips(rooms : List<Room>, onSelectedChanged: (Room) -> Unit){
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        scoddRooms.forEachIndexed{index,room -> //Use index to know what room was selected
-//            val selected = remember { mutableStateOf(false) } //Input pre-filled here
-            val selected = rooms.any { it == room }
-            SelectableRoomFilterChip(room.title,selected,
-                onSelectedChanged = {
-                    onSelectedChanged(room)
-                },
-                animateModifier = Modifier)
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwitchableFilterChip(scoddTime : ScoddTime, selected: ScoddTime, onSelectedChanged: () -> Unit) {

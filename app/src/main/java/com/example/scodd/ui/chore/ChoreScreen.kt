@@ -1,11 +1,9 @@
 package com.example.scodd.ui.chore
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,18 +20,13 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.scodd.*
 import com.example.scodd.R
-import com.example.scodd.data.scoddFlows
 import com.example.scodd.model.Workflow
 import com.example.scodd.ui.theme.White40
 import com.example.scodd.ui.components.*
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.scodd.model.Chore
-import com.example.scodd.model.Room
 import kotlinx.coroutines.*
 
 
@@ -42,7 +35,7 @@ fun ChoreScreen(
     onCreateWorkflowClick : () -> Unit,
     onCreateChoreClick : () -> Unit,
     onEditChore : (String) -> Unit,
-    onWorkflowClick: (Workflow) -> Unit,
+    onViewWorkflow : (String) -> Unit,
     viewModel: ChoreViewModel = hiltViewModel()
 ) {
     StatusBar(White40)
@@ -64,7 +57,6 @@ fun ChoreScreen(
             }
         }
     }
-
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -96,22 +88,34 @@ fun ChoreScreen(
             },
 
         ) {
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val uiRoomState by viewModel.uiRoomState.collectAsStateWithLifecycle()
+            val uiState by viewModel.uiState.collectAsState()
+            var selectionActive = false
+            var isInSelectionMode = remember { mutableStateOf(false) }
+            val selectedItems = remember { mutableStateListOf<String>()}
+            if(selectedItems.size == 0){ isInSelectionMode.value = false }
+
             Surface{
                 Column(Modifier.padding(it)){
                     Search()
-                    Workflow(onCreateWorkflowClick, onWorkflowClick)
+                    WorkflowContent(
+                        workflows = uiState.workflows,
+                        onCreateWorkflowClick = {onCreateWorkflowClick()},
+                        onWorkflowClick = {onViewWorkflow(it)}
+                    )
                     Divider()
                     ChoreContent(
-                        roomChips = uiRoomState.rooms,
+                        roomChips = uiState.rooms,
                         nestedScrollConnection = nestedScrollConnection,
-                        items = uiState.items,
+                        chores = uiState.items,
                         toggleChip = viewModel :: toggleRoom,
                         onFavoriteChipSelected = viewModel :: setFavoriteFilterType,
-                        favoriteSelected = uiRoomState.favoriteSelected,
+                        favoriteSelected = viewModel.getFavorite(),
                         onFavoriteChanged = viewModel::favoriteChore,
-                        onChoreClick = {onEditChore(it)}
+                        onChoreSelected = {onEditChore(it)},
+                        getRoomTitle = viewModel :: getRoomTitle,
+                        isSelectionActive = selectionActive,
+                        isInSelectionMode = isInSelectionMode,
+                        selectedItems = selectedItems
                     )
                 }
             }
@@ -127,7 +131,6 @@ fun ChoreScreen(
 
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -159,7 +162,7 @@ fun Search(){
 }
 
 @Composable
-fun Workflow(onCreateWorkflowClick : () -> Unit, onWorkflowClick: (Workflow) -> Unit){
+fun WorkflowContent(workflows : List<Workflow>, onCreateWorkflowClick : () -> Unit, onWorkflowClick: (String) -> Unit){
     Column(
         Modifier.padding(15.dp,8.dp, 0.dp, 6.dp)
     ) {
@@ -174,9 +177,9 @@ fun Workflow(onCreateWorkflowClick : () -> Unit, onWorkflowClick: (Workflow) -> 
             item {
                 WorkflowTitleCard()
             }
-            items(scoddFlows){ workflow ->
+            items(workflows){ workflow ->
                 WorkflowCard(workflow.title,colors, onWorkflowClick = {
-                    onWorkflowClick(workflow)
+                    onWorkflowClick(workflow.id)
                 } )
             }
 
@@ -228,74 +231,4 @@ fun WorkflowTitleCard(){
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ChoreContent(onChoreClick : (String) -> Unit,roomChips: List<Room>, nestedScrollConnection : NestedScrollConnection,
-                 items : List<Chore>, toggleChip : (Room) -> Unit, onFavoriteChipSelected : () -> Unit,
-                 favoriteSelected : Boolean, onFavoriteChanged : (Chore) -> Unit){
-    Column(
-        Modifier.padding(15.dp,8.dp, 15.dp, 0.dp)
-    ) {
-        LabelText(stringResource(R.string.chore_label))
-    }
-    val animateSpecs:FiniteAnimationSpec<IntOffset> = tween(
-        durationMillis = 500,
-        easing = LinearEasing,
-    )
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-    var doAnimation by remember { mutableStateOf(false) }
-    LazyRow(
-        state = listState,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        contentPadding = PaddingValues(horizontal = 12.dp)
-    ){
-        item(key = "0") {}
-        itemsIndexed(
-            items = roomChips,
-            key = { _, item -> item.id },)
-        { _,room ->
-            val modifier = Modifier.animateItemPlacement(animateSpecs)
-            SelectableRoomFilterChip(room.title, room.selected,
-                onSelectedChanged = {
-                    toggleChip(room)
-                    doAnimation = true
-                },
-                animateModifier = modifier)
-            /**
-             * TODO: restart animation delay if user toggles another chip priority = 5
-             */
-        }
-        item {
-            val modifier = Modifier.animateItemPlacement()
-            SelectableRoomFilterChip("Favorites", favoriteSelected,
-                onSelectedChanged = {
-                    onFavoriteChipSelected()
-                },
-                animateModifier = modifier)
-        }
-    }
 
-    ChoreViewChores(chores = items, onChoreSelected = {onChoreClick(it)},
-        onFavoriteChanged = {onFavoriteChanged(it)},
-        nestedScrollConnection = nestedScrollConnection
-    )
-
-    scrollToPosition(listState, coroutineScope, doAnimation, whenFinished = {doAnimation = false} )
-
-}
-
-
-@Composable
-private fun scrollToPosition(listState: LazyListState, coroutineScope: CoroutineScope, doAnimation : Boolean, whenFinished: () -> Unit){
-    if(doAnimation){
-        LaunchedEffect(key1 = listState) {
-            coroutineScope.launch {
-                delay(800)
-                listState.animateScrollToItem(0)
-                whenFinished()
-//                            state = !state // Toggle the state to trigger the recomposition
-            }
-        }
-    }
-}

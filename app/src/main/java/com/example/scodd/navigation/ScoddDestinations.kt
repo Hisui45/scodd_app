@@ -65,11 +65,13 @@ object ChoreNav : ScoddBottomNavDestination {
 
     object SelectChore : ScoddDestination {
         override val route = "select_chores_screen"
+        override val routeWithArgs = "${route}/{incomingSelectedChores}/{workflowId}"
         override val parentRoute = "chores_screen"
     }
 
     object Workflow : ScoddDestination {
         override val route = "workflow_screen"
+        override val routeWithArgs = "$route?workflowId={workflowId}"
         override val parentRoute = "chores_screen"
     }
 
@@ -79,7 +81,7 @@ object ChoreNav : ScoddBottomNavDestination {
         override val parentRoute = "chores_screen"
     }
 }
-object Mode : ScoddBottomNavDestination {
+object ModeNav : ScoddBottomNavDestination {
     override val icon = R.drawable.burst_mode_24
     override val route = "mode_nav"
     override val label = "Mode"
@@ -120,6 +122,6 @@ object Mode : ScoddBottomNavDestination {
     }
 }
 
-val scoddBottomNavScreens = listOf(ChoreNav.Chores, DashboardNav, Mode.Modes)
+val scoddBottomNavScreens = listOf(ChoreNav.Chores, DashboardNav, ModeNav.Modes)
 val scoddChoreScreens = listOf(ChoreNav.CreateChore, ChoreNav.CreateWorkflow)
-val scoddModeScreens = listOf(Mode.TimeMode, Mode.SpinMode, Mode.BankMode, Mode.QuestMode, Mode.SandMode)
+val scoddModeScreens = listOf(ModeNav.TimeMode, ModeNav.SpinMode, ModeNav.BankMode, ModeNav.QuestMode, ModeNav.SandMode)

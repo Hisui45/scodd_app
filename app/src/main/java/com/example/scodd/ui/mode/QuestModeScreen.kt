@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.scodd.data.scoddRooms
 import com.example.scodd.ui.theme.Marigold40
-import com.example.scodd.ui.components.ChoreListItem
 import com.example.scodd.ui.components.LabelText
 import com.example.scodd.ui.components.ScoddModeHeader
 import com.example.scodd.ui.components.StatusBar
@@ -57,10 +56,10 @@ fun QuestModeScreen(
 
             itemsIndexed(scoddRooms){index, room ->
                 val checked = remember { mutableStateOf(false) }
-                ChoreListItem("", room.title, checked.value,
-                    onCheckChanged = {
-                    checked.value = !checked.value
-                }, true)
+//                ChoreListItem(listOf(), room.title, checked.value,
+//                    onCheckChanged = {
+//                    checked.value = !checked.value
+//                }, true)
 
                 if (index < scoddRooms.lastIndex)
                     Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)

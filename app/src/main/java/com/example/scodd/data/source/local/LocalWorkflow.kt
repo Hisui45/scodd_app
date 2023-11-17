@@ -12,6 +12,6 @@ import com.example.scodd.model.RoutineInfo
 data class LocalWorkflow(
     @PrimaryKey val id: String,
     var title : String,
-    var chores : List<ChoreItem> = emptyList(),
+    var isCheckList: Boolean,
     var routineInfo: RoutineInfo
 )

@@ -14,9 +14,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,31 +36,44 @@ import com.example.scodd.utils.*
 
 @Composable
 fun CreateChoreScreen(
-        onTaskUpdate: () -> Unit,
-        onNavigateBack : () -> Unit,
-        viewModel: CreateChoreViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
+    viewModel: CreateChoreViewModel = hiltViewModel(),
+    choreId: String? = "Steven",
     ){
     StatusBar(Burgundy40)
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val createTypeChore = 0
-
+    var showDeleteDialog = remember { mutableStateOf(false) }
+    /**
+     * TODO: use interface for colors
+     */
+    val contentColor = MaterialTheme.colorScheme.onSecondary
     Scaffold(
         topBar = {
-            ScoddSmallTopBar(
+            TextFieldTopBar(
                 onNavigateBack = onNavigateBack,
                 focusManager = focusManager,
                 title = uiState.title,
-                createType = createTypeChore,
+                type = TextFieldTopBarType.CHORE,
+                contentColor = contentColor,
                 onTitleChanged = viewModel :: updateTitle,
-                onCreateClicked = viewModel :: saveChore
+                actions = {
+                    TextButton(onClick = viewModel :: saveChore){Text(stringResource(R.string.save_buttton), color = contentColor)}
+                    if(choreId!=null){
+                        ChoreContextMenu(onAddClicked = {
+                            /**
+                             * TODO: add to round up
+                             */
+                        }, onDeleteClicked = {showDeleteDialog.value = true}, tint = contentColor)
+                    }
+                }
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)  }
     ) {
-        Surface(Modifier.fillMaxHeight(1f).padding(it)
+        Surface(Modifier.fillMaxHeight(1f).padding(it).testTag("ChoreScreen")
             .pointerInput(Unit) {
             detectTapGestures(onPress = { focusManager.clearFocus()})}
         ){
@@ -70,8 +85,16 @@ fun CreateChoreScreen(
                 }
             }
 
+            LaunchedEffect(uiState.isChoreDeleted) {
+                if (uiState.isChoreDeleted) {
+                    onNavigateBack()
+                }
+            }
+
+            DeleteConfirmationDialog(onConfirm = {viewModel.deleteChore();showDeleteDialog.value = false},
+                onDismiss = {showDeleteDialog.value = false}, showDeleteDialog.value)
             /**
-             * TODO: Design Snack Bar
+             * TODO: Design Snack Bar priority: 5
              */
 //          Check for user messages to display on the screen
             uiState.userMessage?.let { userMessage ->
@@ -86,6 +109,7 @@ fun CreateChoreScreen(
 
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CreateChoreContent(viewModel: CreateChoreViewModel, uiState: CreateChoreUiState){
     val horizontalPadding = 12.dp
@@ -96,7 +120,16 @@ private fun CreateChoreContent(viewModel: CreateChoreViewModel, uiState: CreateC
          */
         Column(Modifier.padding(horizontal = horizontalPadding)){
             LabelText(stringResource(R.string.room_title))
-            SelectableRoomFilterChips(uiState.rooms) {viewModel.selectRoom(it)}
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                uiState.rooms.forEach{ room -> //Use index to know what room was selected
+                    SelectableRoomFilterChip(room.title,viewModel.isRoomSelected(room),
+                        onSelectedChanged = {viewModel.selectRoom(room.id)},
+                        animateModifier = Modifier)
+                }
+            }
         }
         ChoreDivider()
 
@@ -105,19 +138,22 @@ private fun CreateChoreContent(viewModel: CreateChoreViewModel, uiState: CreateC
         Column(Modifier.padding(horizontal = horizontalPadding)){
             LabelText(stringResource(R.string.workflow_title))
         }
-        WorkflowSelectAddRow(onCreateWorkflowClick = { createWorkflowDialog.value = true } )
+        WorkflowSelectAddRow(
+            uiState.workflows,
+            viewModel :: isWorkflowSelected,
+            viewModel :: selectWorkflow,
+            onCreateWorkflowClick = { createWorkflowDialog.value = true } )
         ChoreDivider()
 
         CreateDialog(
-            stringResource(R.string.create_workflow_label),
-            onDismissRequest = {
-                createWorkflowDialog.value = false
-            },
-            onCreateClick = {
-                createWorkflowDialog.value = false
-                //Push to data model to create new object
+            stringResource(R.string.create_workflow_label), onDismissRequest = {createWorkflowDialog.value = false},
+            onCreateClick = { title ->
+                viewModel.createWorkflow(title)
+                createWorkflowDialog.value = false //Push to data model to create new object
             },
             createWorkflowDialog)
+
+
 
         RoutineSection(horizontalPadding,
             showSchedule = uiState.routineInfo.isOneTime,
@@ -458,7 +494,26 @@ fun ScoddTimePickerDialog(timePickerState: TimePickerState, saveChanges : () -> 
         }
 
     }
-
-
 }
+@Composable
+fun ChoreContextMenu(
+    onAddClicked : () -> Unit,
+    onDeleteClicked: () -> Unit,
+    tint: Color
+){
+    ContextMenu(
+        tint = tint
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.add_roundup)) },
+            onClick = { onAddClicked();it.value = false }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.delete)) },
+            onClick = { onDeleteClicked();it.value = false }
+        )
+
+    }
+}
+
 

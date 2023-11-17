@@ -50,17 +50,31 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
         NetworkWorkflow(
             id = "1",
             title = "Quick Room Clean",
-            chores = emptyList(),
+            isCheckList = false,
             routineInfo = RoutineInfo()
         ),
         NetworkWorkflow(
             id = "2",
             title = "Deep Room Clean",
-            chores = emptyList(),
+            isCheckList = false,
             routineInfo = RoutineInfo()
         )
     )
 
+    private var choreItems = listOf(
+        NetworkChoreItem(
+            id = "1",
+            parentChoreId = "6S",
+            parentWorkflowId = "2",
+            isComplete = false,
+        ),
+        NetworkChoreItem(
+            id = "1",
+            parentChoreId = "6S",
+            parentWorkflowId = "5",
+            isComplete = false,
+        )
+    )
     override suspend fun loadChores(): List<NetworkChore> = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
         return chores
@@ -89,6 +103,16 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
     override suspend fun saveWorkflows(newWorkflows: List<NetworkWorkflow>) = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
         workflows = newWorkflows
+    }
+
+    override suspend fun loadChoreItems(): List<NetworkChoreItem> = accessMutex.withLock {
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        return choreItems
+    }
+
+    override suspend fun saveChoreItems(newChoreItems: List<NetworkChoreItem>) = accessMutex.withLock {
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        choreItems = newChoreItems
     }
 }
 

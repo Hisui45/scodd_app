@@ -12,7 +12,7 @@ import com.example.scodd.model.ScoddTime
 data class LocalChore(
     @PrimaryKey val id: String,
     var title: String,
-    var rooms : List<Room>,
+    var rooms : List<String>,
     var routineInfo: RoutineInfo,
     val isTimeModeActive: Boolean,
     var timerModeValue: Int,

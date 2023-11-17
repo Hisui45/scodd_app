@@ -1,4 +1,4 @@
-package com.example.scodd.ui.chore
+package com.example.scodd.ui.workflow
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -7,24 +7,22 @@ import com.example.scodd.R
 import com.example.scodd.data.ChoreRepository
 import com.example.scodd.model.Chore
 import com.example.scodd.model.Room
-import com.example.scodd.model.Workflow
-import kotlinx.coroutines.launch
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import com.example.scodd.utils.WhileUiSubscribed
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-data class ChoreUiState(
+data class SelectChoreUiState(
     val items: List<Chore> = listOf(),
-    val workflows: List<Workflow> = listOf(),
     val rooms: List<Room> = listOf(),
     val isLoading: Boolean = false,
     val userMessage: Int? = null,
     val favoriteSelected: Boolean = false
 )
 @HiltViewModel
-class ChoreViewModel @Inject constructor(
+class SelectChoreViewModel @Inject constructor(
     private val choreRepository: ChoreRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -57,12 +55,6 @@ class ChoreViewModel @Inject constructor(
             emit(emptyList())
         }
 
-    private val _workflows = choreRepository.getWorkflowsStream()
-        .catch { cause ->
-            handleError(cause)
-            emit(emptyList())
-        }
-
     private val _rooms = combine(choreRepository.getRoomsStream(), _myRooms) { chores, selectedRooms ->
         arrangeRooms(chores, selectedRooms)
     }
@@ -71,19 +63,18 @@ class ChoreViewModel @Inject constructor(
             emit(emptyList())
         }
 
-    val uiState: StateFlow<ChoreUiState> = combine(_isLoading, _userMessage, _filteredChores, _rooms, _workflows) { isLoading, userMessage, chores, rooms, workflows ->
-        ChoreUiState(
+    val uiState: StateFlow<SelectChoreUiState> = combine(_isLoading, _userMessage, _filteredChores, _rooms) { isLoading, userMessage, chores, rooms ->
+        SelectChoreUiState(
             isLoading = isLoading,
             userMessage = if (chores.isEmpty()) R.string.error_chores else userMessage,
             items = chores,
             rooms = rooms,
-            workflows = workflows
         )
     }
         .stateIn(
             scope = viewModelScope,
             started = WhileUiSubscribed,
-            initialValue = ChoreUiState(isLoading = true)
+            initialValue = SelectChoreUiState(isLoading = true)
         )
 
     private fun handleError(cause: Throwable) {
@@ -104,15 +95,15 @@ class ChoreViewModel @Inject constructor(
     /**
      * TODO: Decide if we're showing snackbars and come up with appropriate messages
      */
-        fun favoriteChore(chore: Chore) = viewModelScope.launch {
-            if(chore.isFavorite){
-                choreRepository.unFavoriteChore(chore.id)
-                showSnackbarMessage(R.string.chore_unmarked_favorite)
-            }else{
-                choreRepository.favoriteChore(chore.id)
-                showSnackbarMessage(R.string.chore_marked_favorite)
-            }
+    fun favoriteChore(chore: Chore) = viewModelScope.launch {
+        if(chore.isFavorite){
+            choreRepository.unFavoriteChore(chore.id)
+            showSnackbarMessage(R.string.chore_unmarked_favorite)
+        }else{
+            choreRepository.favoriteChore(chore.id)
+            showSnackbarMessage(R.string.chore_marked_favorite)
         }
+    }
 
     fun snackbarMessageShown() {
         _userMessage.value = null
@@ -175,6 +166,12 @@ class ChoreViewModel @Inject constructor(
             ""
         }
         return roomText
+    }
+
+    fun createChore(title: String) {
+        viewModelScope.launch {
+            choreRepository.createChore(title)
+        }
     }
 
 }

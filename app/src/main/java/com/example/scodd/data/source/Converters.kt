@@ -8,11 +8,17 @@ import com.example.scodd.model.ScoddTime
 import com.google.gson.Gson
 
 class Converters {
-    @TypeConverter
-    fun roomToString(room: List<Room>): String = Gson().toJson(room)
+//    @TypeConverter
+//    fun roomToString(room: List<Room>): String = Gson().toJson(room)
+//
+//    @TypeConverter
+//    fun stringToRoom(string: String) = Gson().fromJson(string, Array<Room>::class.java).toList()
 
     @TypeConverter
-    fun stringToRoom(string: String) = Gson().fromJson(string, Array<Room>::class.java).toList()
+    fun stringListToString(strings: List<String>): String = Gson().toJson(strings)
+
+    @TypeConverter
+    fun stringToStringList(string: String) = Gson().fromJson(string, Array<String>::class.java).toList()
 
     @TypeConverter
     fun routineInfoToString(routineInfo: RoutineInfo): String = Gson().toJson(routineInfo)

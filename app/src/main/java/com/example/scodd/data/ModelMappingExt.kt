@@ -1,12 +1,16 @@
 package com.example.scodd.data
 
+import androidx.room.PrimaryKey
 import com.example.scodd.data.source.local.LocalChore
+import com.example.scodd.data.source.local.LocalChoreItem
 import com.example.scodd.data.source.local.LocalRoom
 import com.example.scodd.data.source.local.LocalWorkflow
 import com.example.scodd.data.source.network.NetworkChore
+import com.example.scodd.data.source.network.NetworkChoreItem
 import com.example.scodd.data.source.network.NetworkRoom
 import com.example.scodd.data.source.network.NetworkWorkflow
 import com.example.scodd.model.Chore
+import com.example.scodd.model.ChoreItem
 import com.example.scodd.model.Room
 import com.example.scodd.model.Workflow
 
@@ -34,7 +38,6 @@ fun Chore.toLocalChore() = LocalChore(
     id = id,
     title = title,
     rooms = rooms,
-//    workflows = workflows,
     routineInfo = routineInfo,
     isTimeModeActive = isTimeModeActive,
     timerModeValue = timerModeValue,
@@ -51,7 +54,6 @@ fun LocalChore.toExternalChore() = Chore(
     id = id,
     title = title,
     rooms = rooms,
-//    workflows = workflows,
     routineInfo = routineInfo,
     isTimeModeActive = isTimeModeActive,
     timerModeValue = timerModeValue,
@@ -72,7 +74,6 @@ fun NetworkChore.toLocalChore() = LocalChore(
     id = id,
     title = title,
     rooms = rooms,
-//    workflows = workflows,
     routineInfo = routineInfo,
     isTimeModeActive = isTimeModeActive,
     timerModeValue = timerModeValue,
@@ -98,7 +99,6 @@ fun LocalChore.toNetworkChore() = NetworkChore(
     id = id,
     title = title,
     rooms = rooms,
-//    workflows = workflows,
     routineInfo = routineInfo,
     isTimeModeActive = isTimeModeActive,
     timerModeValue = timerModeValue,
@@ -123,7 +123,6 @@ fun List<NetworkChore>.toExternalChore() = map(NetworkChore::toExternalChore)
 /**
  * Room
  */
-
 // External to local
 fun Room.toLocalRoom() = LocalRoom(
     id = id,
@@ -184,7 +183,7 @@ fun List<NetworkRoom>.toExternalRoom() = map(NetworkRoom::toExternalRoom)
 fun Workflow.toLocalWorkflow() = LocalWorkflow(
     id = id,
     title = title,
-    chores = chores,
+    isCheckList = isCheckList,
     routineInfo = routineInfo
 )
 
@@ -194,7 +193,7 @@ fun List<Workflow>.toLocalWorkflow() = map(Workflow::toLocalWorkflow)
 fun LocalWorkflow.toExternalWorkflow() = Workflow(
     id = id,
     title = title,
-    chores = chores,
+    isCheckList = isCheckList,
     routineInfo = routineInfo
 )
 
@@ -208,7 +207,7 @@ fun List<LocalWorkflow>.toExternalWorkflow() = map(LocalWorkflow::toExternalWork
 fun NetworkWorkflow.toLocalWorkflow() = LocalWorkflow(
     id = id,
     title = title,
-    chores = chores,
+    isCheckList = isCheckList,
     routineInfo = routineInfo
 )
 
@@ -219,7 +218,7 @@ fun List<NetworkWorkflow>.toLocalWorkflow() = map(NetworkWorkflow::toLocalWorkfl
 fun LocalWorkflow.toNetworkWorkflow() = NetworkWorkflow(
     id = id,
     title = title,
-    chores = chores,
+    isCheckList = isCheckList,
     routineInfo = routineInfo
 )
 
@@ -236,3 +235,64 @@ fun NetworkWorkflow.toExternalWorkflow() = toLocalWorkflow().toExternalWorkflow(
 
 @JvmName("networkWorkflowToExternalWorkflow")
 fun List<NetworkWorkflow>.toExternalWorkflow() = map(NetworkWorkflow::toExternalWorkflow)
+
+/**
+ * ChoreItem
+ */
+
+// External to local
+fun ChoreItem.toLocalChoreItem() = LocalChoreItem(
+    id = id,
+    parentChoreId = parentChoreId,
+    parentWorkflowId = parentWorkflowId,
+    isComplete = isComplete,
+)
+
+fun List<ChoreItem>.toLocalChoreItem() = map(ChoreItem::toLocalChoreItem)
+
+//Local to External
+fun LocalChoreItem.toExternalChoreItem() = ChoreItem(
+    id = id,
+    parentChoreId = parentChoreId,
+    parentWorkflowId = parentWorkflowId,
+    isComplete = isComplete,
+)
+
+// Note: JvmName is used to provide a unique name for each extension function with the same name.
+// Without this, type erasure will cause compiler errors because these methods will have the same
+// signature on the JVM.
+@JvmName("localChoreItemToExternalChoreItem")
+fun List<LocalChoreItem>.toExternalChoreItem() = map(LocalChoreItem::toExternalChoreItem)
+
+// Network to Local
+fun NetworkChoreItem.toLocalChoreItem() = LocalChoreItem(
+    id = id,
+    parentChoreId = parentChoreId,
+    parentWorkflowId = parentWorkflowId,
+    isComplete = isComplete,
+)
+
+@JvmName("networkChoreItemToLocalChoreItem")
+fun List<NetworkChoreItem>.toLocalChoreItem() = map(NetworkChoreItem::toLocalChoreItem)
+
+// Local to Network
+fun LocalChoreItem.toNetworkChoreItem() = NetworkChoreItem(
+    id = id,
+    parentChoreId = parentChoreId,
+    parentWorkflowId = parentWorkflowId,
+    isComplete = isComplete,
+)
+
+fun List<LocalChoreItem>.toNetworkChoreItem() = map(LocalChoreItem::toNetworkChoreItem)
+
+// External to Network
+fun ChoreItem.toNetworkChoreItem() = toLocalChoreItem().toNetworkChoreItem()
+
+@JvmName("externalChoreItemToNetworkChoreItem")
+fun List<ChoreItem>.toNetworkChoreItem() = map(ChoreItem::toNetworkChoreItem)
+
+// Network to External
+fun NetworkChoreItem.toExternalChoreItem() = toLocalChoreItem().toExternalChoreItem()
+
+@JvmName("networkChoreItemToExternalChoreItem")
+fun List<NetworkChoreItem>.toExternalChoreItem() = map(NetworkChoreItem::toExternalChoreItem)

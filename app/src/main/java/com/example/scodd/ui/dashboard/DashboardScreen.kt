@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scodd.R
-import com.example.scodd.ui.components.ChoreListItem
 import com.example.scodd.ui.components.SelectableRoomFilterChip
 import com.example.scodd.ui.components.StatusBar
 import com.example.scodd.data.scoddChores
@@ -90,7 +89,7 @@ fun Header(time : String){
 
         Column{
             Text(
-                text = "Today’s Roundup",
+                text = stringResource(R.string.roundup_header),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.drawBehind {
                     val strokeWidthPx = 1.dp.toPx()
@@ -240,14 +239,14 @@ fun ChoreList(){
                 state = rememberDismissState(),
                 background = {},
                 dismissContent = {
-                    Column{
-                        ChoreListItem(chore.rooms[0].title, chore.title,checked.value,
-                            onCheckChanged = {
-                                checked.value = !checked.value
-                            }, true)
-                        if (index < scoddChores.lastIndex)
-                            Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
-                    }
+//                    Column{//chore.rooms
+//                        ChoreListItem(listOf(),chore.title,checked.value,
+//                            onCheckChanged = {
+//                                checked.value = !checked.value
+//                            }, true)
+//                        if (index < scoddChores.lastIndex)
+//                            Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+//                    }
                 })
 
 

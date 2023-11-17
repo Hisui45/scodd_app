@@ -8,15 +8,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.scodd.navigation.*
 import com.example.scodd.ui.theme.ScoddTheme
-import com.example.scodd.ui.components.ModeBottomBar
-import com.example.scodd.ui.components.ScoddBottomBar
+import com.example.scodd.navigation.ModeBottomBar
+import com.example.scodd.navigation.ScoddBottomBar
 import com.example.scodd.ui.components.ScoddMainTopBar
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class ScoddActivity : ComponentActivity() {
@@ -60,7 +60,7 @@ fun ScoddApp(){
                 }
             }
         ) { innerPadding ->
-            ScoddNavHost(
+            ScoddNavGraph(
                 navController = navController,
                 modifier = Modifier.padding(innerPadding)
             )

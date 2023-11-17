@@ -14,4 +14,8 @@ interface NetworkDataSource {
 
     suspend fun saveWorkflows(chores: List<NetworkWorkflow>)
 
+    suspend fun loadChoreItems(): List<NetworkChoreItem>
+
+    suspend fun saveChoreItems(chores: List<NetworkChoreItem>)
+
 }

@@ -2,10 +2,7 @@ package com.example.scodd.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -63,54 +61,43 @@ fun ScoddMainTopBar(){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScoddSmallTopBar(title : String,
-                     onNavigateBack : () -> Unit,
-                     focusManager: FocusManager,
-                     createType : Int,
-                     onTitleChanged : (String) -> Unit,
-                     onCreateClicked : () -> Unit
+fun TextFieldTopBar(title : String,
+                    onNavigateBack : () -> Unit,
+                    focusManager: FocusManager,
+                    type : TextFieldTopBarType,
+                    onTitleChanged : (String) -> Unit,
+                    actions: @Composable() () -> Unit,
+                    contentColor: Color
 ){
 
     val isError = remember { mutableStateOf(false) }
-    var colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary,
-        navigationIconContentColor = MaterialTheme.colorScheme.onSecondary
-    )
-    var contentColor = MaterialTheme.colorScheme.onSecondary
+    fun validate(value : String){isError.value = value.isEmpty()}
 
-    if (createType == 1){
-        contentColor = MaterialTheme.colorScheme.onPrimary
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-        )
+    var colors: TopAppBarColors = when(type){
+        TextFieldTopBarType.CHORE->{
+            TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary,
+                navigationIconContentColor = MaterialTheme.colorScheme.onSecondary)
+        }
+        TextFieldTopBarType.WORKFLOW->{
+            TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary,
+                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary, actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            )
+        }
     }
-
-    fun validate(value : String){
-        isError.value = value.isEmpty()
-    }
-
     TopAppBar(
         title = {
-                AppBarTextField(
-                    value = title,
-                    onValueChange = {onTitleChanged(it)
-                                    validate(it)},
-                    hint = stringResource(R.string.title_hint),
-                    focusManager = focusManager,
-                    isError = isError.value,
-                    contentColor = contentColor
-                    )
-                },
+            AppBarTextField(
+                value = title,
+                onValueChange = {onTitleChanged(it) ; validate(it)},
+                hint = stringResource(R.string.title_hint),
+                focusManager = focusManager,
+                isError = isError.value,
+                contentColor = contentColor,
+                )
+            },
         navigationIcon = { NavigationButton(onNavigateBack) },
         colors = colors,
-        actions = {
-            TextButton(
-                onClick = {
-                    onCreateClicked()
-                }
-            ){
-                Text(stringResource(R.string.save_buttton), color = contentColor)
-            }
-        }
+        actions = {actions()}
     )
 }
 
@@ -210,9 +197,25 @@ fun AppBarTextField(
         )
     }
 }
+@Composable
+fun ContextMenu(
+    tint: Color,
+    dropDownItems: @Composable() (expanded: MutableState<Boolean>) -> Unit
 
-
-
+){
+    val expanded = remember { mutableStateOf(false) }
+    Row{
+        IconButton(onClick = {expanded.value = !expanded.value}){Icon(Icons.Default.MoreVert, stringResource(R.string.options), tint = tint) }
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = {
+                expanded.value = false
+            }
+        ) {
+            dropDownItems(expanded)
+        }
+    }
+}
 
 @Composable
 fun NavigationButton(onNavigateBack: () -> Unit){
@@ -221,4 +224,9 @@ fun NavigationButton(onNavigateBack: () -> Unit){
     ){
         Icon(Icons.Default.ArrowBack, "back")
     }
+}
+
+enum class TextFieldTopBarType{
+    WORKFLOW,
+    CHORE
 }

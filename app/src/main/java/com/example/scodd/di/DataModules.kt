@@ -5,10 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.scodd.data.*
-import com.example.scodd.data.source.local.ChoreDao
-import com.example.scodd.data.source.local.LocalChore
-import com.example.scodd.data.source.local.LocalRoom
-import com.example.scodd.data.source.local.ScoddDatabase
+import com.example.scodd.data.source.local.*
 import com.example.scodd.data.source.network.ChoreNetworkDataSource
 import com.example.scodd.data.source.network.NetworkDataSource
 import com.example.scodd.model.RoutineInfo
@@ -20,9 +17,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import timber.log.Timber
 import java.time.Instant
 import java.util.concurrent.Executors
 import javax.inject.Singleton
+import kotlin.random.Random
 
 
 @Module
@@ -32,10 +31,6 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindChoreRepository(repository: DefaultChoreRepository): ChoreRepository
-
-    @Singleton
-    @Binds
-    abstract fun bindWorkflowRepository(repository: DefaultWorkflowRepository): WorkflowRepository
 }
 
 @Module
@@ -47,6 +42,9 @@ abstract class DataSourceModule {
     abstract fun bindNetworkDataSource(dataSource: ChoreNetworkDataSource): NetworkDataSource
 }
 
+/**
+ * TODO: have room and choreItem lists store arrays of ids priority : 1
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
@@ -62,36 +60,22 @@ object DatabaseModule {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 Executors.newSingleThreadScheduledExecutor()
                     .execute {
-                        provideDataBase(context).choreDao().insertAllRooms(listOf(
-                        LocalRoom("1RS","Kitchen", false),
-                        LocalRoom("2RS", "Bedroom", false),
-                        LocalRoom("3RS", "Living Room", false),
-                        LocalRoom("4RS", "Bathroom", false),
-                        LocalRoom("5RS", "Personal", false),
-                        LocalRoom("6RS", "Home Office", false)
-                    ))
+                        provideDataBase(context).choreDao().insertAllWorkflows(dummyWorkflows)
                     }
 
                 Executors.newSingleThreadScheduledExecutor()
                     .execute {
-                        provideDataBase(context).choreDao().insertAllChores(listOf(
-                            LocalChore("1", "Wash Dishes", listOf(Room1), RoutineInfo(Instant.now().toEpochMilli(), 3, 8, false, ScoddTime.DAILY, 4, ScoddTime.WEEK, ScoddTime.FRIDAY), false, 5, ScoddTime.MINUTE, false, 2, true),
-                            LocalChore("2", "Clean Counter", listOf(Room2), RoutineInfo(Instant.now().toEpochMilli(), 2, 4, true, ScoddTime.WEEKLY, 2, ScoddTime.WEEK, ScoddTime.SATURDAY), true, 10, ScoddTime.HOUR, true, 3, false),
-                            LocalChore("3", "Vacuum", listOf(Room3), RoutineInfo(Instant.now().toEpochMilli(), 1, 2, false, ScoddTime.MONTHLY, 1, ScoddTime.MONTH, ScoddTime.SUNDAY), false, 15, ScoddTime.MINUTE, false, 1, true),
-                            LocalChore("4", "Dust Furniture", listOf(Room1), RoutineInfo(Instant.now().toEpochMilli(), 4, 6, true, ScoddTime.YEARLY, 1, ScoddTime.YEAR, ScoddTime.MONDAY), true, 8, ScoddTime.HOUR, false, 2, true),
-                            LocalChore("5", "Sweep Porch", listOf(Room2), RoutineInfo(Instant.now().toEpochMilli(), 5, 3, false, ScoddTime.CUSTOM, 2, ScoddTime.DAY, ScoddTime.FRIDAY), false, 6, ScoddTime.MINUTE, true, 2, false),
-                            LocalChore("6", "Mop Floors", listOf(Room3), RoutineInfo(Instant.now().toEpochMilli(), 3, 5, true, ScoddTime.DAILY, 1, ScoddTime.DAY, ScoddTime.MONDAY), true, 7, ScoddTime.MINUTE, false, 3, true),
-                            LocalChore("7", "Make Bed", listOf(Room4), RoutineInfo(Instant.now().toEpochMilli(), 6, 7, false, ScoddTime.WEEKLY, 2, ScoddTime.WEEK, ScoddTime.WEDNESDAY), false, 2, ScoddTime.MINUTE, true, 2, false),
-                            LocalChore("8", "Wash Clothes", listOf(Room1), RoutineInfo(Instant.now().toEpochMilli(), 2, 4, true, ScoddTime.MONTHLY, 1, ScoddTime.MONTH, ScoddTime.SATURDAY), true, 5, ScoddTime.HOUR, false, 5, false),
-                            LocalChore("9", "Clean Toilet", listOf(Room2), RoutineInfo(Instant.now().toEpochMilli(), 1, 2, false, ScoddTime.YEARLY, 1, ScoddTime.YEAR, ScoddTime.MONDAY), false, 8, ScoddTime.MINUTE, true, 4, true),
-                            LocalChore("10", "Brush Teeth", listOf(Room3), RoutineInfo(Instant.now().toEpochMilli(), 5, 8, true, ScoddTime.DAILY, 3, ScoddTime.WEEK, ScoddTime.SUNDAY), true, 2, ScoddTime.MINUTE, false, 2, true),
-                            LocalChore("11", "Shred Papers", listOf(Room4), RoutineInfo(Instant.now().toEpochMilli(), 4, 6, false, ScoddTime.CUSTOM, 2, ScoddTime.DAY, ScoddTime.FRIDAY), false, 6, ScoddTime.MINUTE, true, 2, false),
-                            LocalChore("12", "Organize Closet", listOf(Room1), RoutineInfo(Instant.now().toEpochMilli(), 3, 5, true, ScoddTime.DAILY, 1, ScoddTime.DAY, ScoddTime.MONDAY), true, 10, ScoddTime.MINUTE, false, 3, true),
-                            LocalChore("13", "Water Plants", listOf(Room2), RoutineInfo(Instant.now().toEpochMilli(), 6, 7, false, ScoddTime.WEEKLY, 2, ScoddTime.WEEK, ScoddTime.WEDNESDAY), false, 4, ScoddTime.MINUTE, true, 2, false),
-                            LocalChore("14", "Empty Trash", listOf(Room3), RoutineInfo(Instant.now().toEpochMilli(), 2, 4, true, ScoddTime.MONTHLY, 1, ScoddTime.MONTH, ScoddTime.SATURDAY), true, 3, ScoddTime.MINUTE, false, 5, false),
-                        ))
+                        provideDataBase(context).choreDao().insertAllChoreItems(dummyLocalChoreItems)
                     }
 
+                Executors.newSingleThreadScheduledExecutor()
+                    .execute {
+                        provideDataBase(context).choreDao().insertAllRooms(dummyRooms)
+                    }
+                Executors.newSingleThreadScheduledExecutor()
+                    .execute {
+                        provideDataBase(context).choreDao().insertAllChores(dummyLocalChores)
+                    }
             }
         }).build()
     }
@@ -128,7 +112,7 @@ object DatabaseModule {
         for (i in 1..15) {
             val id = i.toString()
             val title = choreTitles[i]
-            val rooms = listOf(Room1) // Replace with actual rooms
+            val rooms = listOf("1RS") // Replace with actual rooms
             val routineInfo = RoutineInfo(
                 date = Instant.now().toEpochMilli(),
                 hour = i % 23, // Hours (0 to 23)
@@ -150,6 +134,139 @@ object DatabaseModule {
 
         return dummyData
     }
+    fun generateRandomDate(startMillis: Long, endMillis: Long): Long {
+        return Random.nextLong(startMillis, endMillis)
+    }
+
+    fun generateRandomHour(): Int {
+        return Random.nextInt(0, 24)
+    }
+
+    fun generateRandomMinute(): Int {
+        return Random.nextInt(0, 60)
+    }
+
+    val dummyRooms = listOf(
+        LocalRoom("1RS","Kitchen", false),
+        LocalRoom("2RS", "Bedroom", false),
+        LocalRoom("3RS", "Living Room", false),
+        LocalRoom("4RS", "Bathroom", false),
+        LocalRoom("5RS", "Personal", false),
+        LocalRoom("6RS", "Home Office", false)
+    )
+
+    val dummyLocalChores = listOf(
+        LocalChore("1", "Wash Dishes", listOf("1RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), false, ScoddTime.DAILY, 4, ScoddTime.WEEK, ScoddTime.FRIDAY), false, 5, ScoddTime.MINUTE, false, 2, true),
+        LocalChore("2", "Wipe Counter", listOf("1RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), true, ScoddTime.WEEKLY, 2, ScoddTime.WEEK, ScoddTime.SATURDAY), true, 10, ScoddTime.HOUR, true, 3, false),
+        LocalChore("3", "Vacuum Living Room", listOf("3RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), false, ScoddTime.MONTHLY, 1, ScoddTime.MONTH, ScoddTime.SUNDAY), false, 15, ScoddTime.MINUTE, false, 1, true),
+        LocalChore("4", "Dust Furniture", listOf("3RS","2RS","6RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), true, ScoddTime.YEARLY, 1, ScoddTime.YEAR, ScoddTime.MONDAY), true, 8, ScoddTime.HOUR, false, 2, true),
+        LocalChore("5", "Sweep Porch", listOf(), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), false, ScoddTime.CUSTOM, 2, ScoddTime.DAY, ScoddTime.FRIDAY), false, 6, ScoddTime.MINUTE, true, 2, false),
+        LocalChore("6", "Mop Floors", listOf("1RS","4RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), true, ScoddTime.DAILY, 1, ScoddTime.DAY, ScoddTime.MONDAY), true, 7, ScoddTime.MINUTE, false, 3, true),
+        LocalChore("7", "Make Bed", listOf("2RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), false, ScoddTime.WEEKLY, 2, ScoddTime.WEEK, ScoddTime.WEDNESDAY), false, 2, ScoddTime.MINUTE, true, 2, false),
+        LocalChore("8", "Wash Clothes", listOf("2RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), true, ScoddTime.MONTHLY, 1, ScoddTime.MONTH, ScoddTime.SATURDAY), true, 5, ScoddTime.HOUR, false, 5, false),
+        LocalChore("9", "Clean Toilet", listOf("4RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), false, ScoddTime.YEARLY, 1, ScoddTime.YEAR, ScoddTime.MONDAY), false, 8, ScoddTime.MINUTE, true, 4, true),
+        LocalChore("10", "Brush Teeth", listOf("5RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), true, ScoddTime.DAILY, 3, ScoddTime.WEEK, ScoddTime.SUNDAY), true, 2, ScoddTime.MINUTE, false, 2, true),
+        LocalChore("11", "Shred Papers", listOf("6RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), false, ScoddTime.CUSTOM, 2, ScoddTime.DAY, ScoddTime.FRIDAY), false, 6, ScoddTime.MINUTE, true, 2, false),
+        LocalChore("12", "Organize Closet", listOf("2RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), true, ScoddTime.DAILY, 1, ScoddTime.DAY, ScoddTime.MONDAY), true, 10, ScoddTime.MINUTE, false, 3, true),
+        LocalChore("13", "Water Plants", listOf("6RS","5RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), false, ScoddTime.WEEKLY, 2, ScoddTime.WEEK, ScoddTime.WEDNESDAY), false, 4, ScoddTime.MINUTE, true, 2, false),
+        LocalChore("14", "Empty Trash", listOf("1RS","2RS","3RS","4RS","6RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), true, ScoddTime.MONTHLY, 1, ScoddTime.MONTH, ScoddTime.SATURDAY), true, 3, ScoddTime.MINUTE, false, 5, false),
+        LocalChore("15", "Eat Breakfast", listOf("1RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), false, ScoddTime.DAILY, 3, ScoddTime.WEEK, ScoddTime.SUNDAY), true, 2, ScoddTime.MINUTE, false, 2, true),
+        LocalChore("16", "Fold Laundry", listOf("2RS"), RoutineInfo(Instant.now().toEpochMilli(), generateRandomHour(), generateRandomMinute(), true, ScoddTime.MONTHLY, 1, ScoddTime.MONTH, ScoddTime.SATURDAY), true, 5, ScoddTime.HOUR, false, 5, false),
+        )
+
+    val dummyLocalChoreItems = listOf(
+        LocalChoreItem("1", "7" ,"1", false),
+        LocalChoreItem("2", "10","2", false),
+        LocalChoreItem("3", "15", "1", false),
+        LocalChoreItem("4", "8", "2", false),
+        LocalChoreItem("5",  "16","2", false),
+        LocalChoreItem("6", "3","3", false),
+        LocalChoreItem("7",  "4","3", false),
+        LocalChoreItem("8",  "2","3", false),
+        LocalChoreItem("9",  "9","4", false),
+        LocalChoreItem("10",  "2","4", false),
+        LocalChoreItem("11",  "11","5", false),
+        LocalChoreItem("12",  "12","5", false),
+
+    )
+
+    val dummyWorkflows = listOf(
+        LocalWorkflow(
+            id = "1",
+            title = "Morning Routine",
+            false,
+            routineInfo = RoutineInfo(
+                date = generateRandomDate(System.currentTimeMillis(), System.currentTimeMillis() + 2592000000),
+                hour = generateRandomHour(),
+                minute = generateRandomMinute(),
+                isOneTime = true,
+                scheduleType = ScoddTime.DAILY,
+                frequencyValue = 1,
+                frequencyOption = ScoddTime.DAY,
+                weeklyDay = ScoddTime.SUNDAY
+            )
+        ),
+        LocalWorkflow(
+            id = "2",
+            title = "Laundry Day"
+            ,false,
+            routineInfo = RoutineInfo(
+                date = generateRandomDate(System.currentTimeMillis(), System.currentTimeMillis() + 2592000000),
+                hour = generateRandomHour(),
+                minute = generateRandomMinute(),
+                isOneTime = true,
+                scheduleType = ScoddTime.WEEKLY,
+                frequencyValue = 1,
+                frequencyOption = ScoddTime.WEEK,
+                weeklyDay = ScoddTime.MONDAY
+            )
+        ),
+        LocalWorkflow(
+            id = "3",
+            title = "Cleaning Day",
+            true,
+            routineInfo = RoutineInfo(
+                date = generateRandomDate(System.currentTimeMillis(), System.currentTimeMillis() + 2592000000),
+                hour = generateRandomHour(),
+                minute = generateRandomMinute(),
+                isOneTime = true,
+                scheduleType = ScoddTime.MONTHLY,
+                frequencyValue = 1,
+                frequencyOption = ScoddTime.MONTH,
+                weeklyDay = ScoddTime.DAY
+            )
+        ),
+        LocalWorkflow(
+            id = "4",
+            title = "Weekly Chores"
+            ,false,
+            routineInfo = RoutineInfo(
+                date = generateRandomDate(System.currentTimeMillis(), System.currentTimeMillis() + 2592000000),
+                hour = generateRandomHour(),
+                minute = generateRandomMinute(),
+                isOneTime = true,
+                scheduleType = ScoddTime.WEEKLY,
+                frequencyValue = 1,
+                frequencyOption = ScoddTime.WEEK,
+                weeklyDay = ScoddTime.FRIDAY
+            )
+        ),
+        LocalWorkflow(
+            id = "5",
+            title = "Night Routine"
+            ,false,
+            routineInfo = RoutineInfo(
+                date = generateRandomDate(System.currentTimeMillis(), System.currentTimeMillis() + 2592000000),
+                hour = generateRandomHour(),
+                minute = generateRandomMinute(),
+                isOneTime = true,
+                scheduleType = ScoddTime.DAILY,
+                frequencyValue = 1,
+                frequencyOption = ScoddTime.DAY,
+                weeklyDay = ScoddTime.SATURDAY
+            )
+        )
+    )
 
 
 }

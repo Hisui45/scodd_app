@@ -4,8 +4,8 @@ import com.example.scodd.model.ChoreItem
 import com.example.scodd.model.RoutineInfo
 
 data class NetworkWorkflow(
-    val id: String,
-    val title : String,
-    val chores : List<ChoreItem> = emptyList(),
+    var id: String,
+    var title : String,
+    var isCheckList: Boolean,
     var routineInfo: RoutineInfo
 )

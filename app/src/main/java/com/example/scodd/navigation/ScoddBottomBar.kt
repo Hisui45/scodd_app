@@ -1,4 +1,4 @@
-package com.example.scodd.ui.components
+package com.example.scodd.navigation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -7,8 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import com.example.scodd.navigation.ScoddBottomNavDestination
-import com.example.scodd.navigation.ScoddDestination
 
 
 @Composable

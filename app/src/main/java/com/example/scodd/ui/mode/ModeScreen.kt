@@ -7,8 +7,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.scodd.R
 import com.example.scodd.ui.components.StatusBar
 import com.example.scodd.navigation.ScoddDestination
 import com.example.scodd.ui.theme.White40
@@ -34,12 +37,13 @@ fun ModeTitleCard(){
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.onSecondary),
-        modifier = Modifier.fillMaxWidth(1f).padding(bottom = 8.dp)
+        modifier = Modifier.fillMaxWidth(1f).padding(bottom = 8.dp).testTag(stringResource(R.string.modes_title))
     ){
         Column(
             Modifier.padding(24.dp)
         ){
-            Text("Modes",
+            Text(
+                stringResource(R.string.modes_title),
                 style = MaterialTheme.typography.displaySmall)
             Text("Utilize different techniques to work through chores and workflows.",
                 style = MaterialTheme.typography.titleMedium,

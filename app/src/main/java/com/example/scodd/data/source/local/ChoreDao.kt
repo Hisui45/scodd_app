@@ -230,4 +230,90 @@ interface ChoreDao {
      */
     @Query("DELETE FROM workflow")
     suspend fun deleteAllWorkflows()
+
+    /**
+     * Update the list type of workflow
+     *
+     * @param workflowId id of the task
+     * @param checkList status to be updated
+     */
+    @Query("UPDATE workflow SET isCheckList = :checkList WHERE id = :workflowId")
+    suspend fun toggleListType(workflowId: String, checkList: Boolean)
+
+    //Chore Item
+    /**
+     * Observes list of choreItems.
+     *
+     * @return all choreItems.
+     */
+    @Query("SELECT * FROM choreItem")
+    fun observeAllChoreItems(): Flow<List<LocalChoreItem>>
+
+    /**
+     * Observes a single choreItem.
+     *
+     * @param choreItemId the choreItem id.
+     * @return the choreItem with choreId.
+     */
+    @Query("SELECT * FROM choreItem WHERE id = :choreItemId")
+    fun observeChoreItemById(choreItemId: String): Flow<LocalChoreItem>
+
+    /**
+     * Select all choreItems from the choreItems table.
+     *
+     * @return all choreItems.
+     */
+    @Query("SELECT * FROM choreItem")
+    suspend fun getAllChoreItems(): List<LocalChoreItem>
+
+    /**
+     * Select a choreItem by id.
+     *
+     * @param choreItemId the choreItem id.
+     * @return the choreItem with choreItemId.
+     */
+    @Query("SELECT * FROM choreItem WHERE id = :choreItemId")
+    suspend fun getChoreItemById(choreItemId: String): LocalChoreItem?
+
+    /**
+     * Insert or update a choreItem in the database. If a choreItem already exists, replace it.
+     *
+     * @param choreItem the choreItem to be inserted or updated.
+     */
+    @Upsert
+    suspend fun upsertChoreItem(choreItem: LocalChoreItem)
+
+    /**
+     * Insert or update choreItems in the database. If a choreItem already exists, replace it.
+     *
+     * @param choreItems the choreItems to be inserted or updated.
+     */
+    @Upsert
+    suspend fun upsertAllChoreItems(choreItems: List<LocalChoreItem>)
+
+    @Insert
+    fun insertAllChoreItems(choreItems: List<LocalChoreItem>)
+    /**
+     * Delete a choreItem by id.
+     *
+     * @return the number of choreItems deleted. This should always be 1.
+     */
+    @Query("DELETE FROM choreItem WHERE id = :choreItemId")
+    suspend fun deleteChoreItemById(choreItemId: String): Int
+
+    /**
+     * Delete all choreItems.
+     */
+    @Query("DELETE FROM choreItem")
+    suspend fun deleteAllChoreItems()
+
+    /**
+     * Update the list type of choreItem
+     *
+     * @param choreItemId id of the task
+     * @param complete status to be updated
+     */
+    @Query("UPDATE choreItem SET isComplete = :complete WHERE id = :choreItemId")
+    suspend fun updateChoreItem(choreItemId: String, complete: Boolean)
+
 }

@@ -6,8 +6,7 @@ import androidx.compose.runtime.Immutable
 data class Chore(
     val id: String,
     val title: String,
-    val rooms: List<Room> = emptyList(),
-    val workflows: List<String> = emptyList(), //Might change to ids
+    val rooms: List<String> = emptyList(),
     val routineInfo: RoutineInfo = RoutineInfo(),
     val isTimeModeActive: Boolean = false,
     val timerModeValue: Int = 0,
@@ -17,9 +16,3 @@ data class Chore(
     val isFavorite: Boolean = false
 )
 
-@Immutable
-data class Room(
-    val id: String,
-    val title : String,
-    val selected: Boolean = false
-)
