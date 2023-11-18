@@ -142,9 +142,9 @@ class ScoddNavigationTest{
 
         Thread.sleep(5000)
 
-//        // Check that create chore screen was opened.
-//        composeTestRule.onNodeWithTag("ChoreScreen", useUnmergedTree = true)
-//            .assertIsDisplayed()
+        // Check that create chore screen was opened.
+        composeTestRule.onNodeWithTag("ChoreScreen", useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
 

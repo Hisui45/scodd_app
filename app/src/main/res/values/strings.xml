@@ -123,6 +123,11 @@
     <string name="roundup_header">Today’s Roundup</string>
     <string name="modes_title">Modes</string>
     <string name="fab_create"><![CDATA[Create Chores & Workflows]]></string>
+    <string name="chore_source">From Workflows</string>
+    <string name="warning">Warning</string>
+    <string name="chore_no_value">This chore has a value of zero</string>
+    <string name="add_chore_items">Add Chores</string>
+    <string name="edit_chore_items">Edit Chores</string>
 
 
 </resources>

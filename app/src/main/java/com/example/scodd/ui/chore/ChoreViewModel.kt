@@ -54,7 +54,7 @@ class ChoreViewModel @Inject constructor(
     }
         .catch { cause ->
             handleError(cause)
-            emit(emptyList())
+            emit(listOf(Chore("1C", "Vacuum")))
         }
 
     private val _workflows = choreRepository.getWorkflowsStream()

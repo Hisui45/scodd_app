@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -11,11 +13,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.scodd.R
+import com.example.scodd.data.ChoreRepository
+import com.example.scodd.model.Chore
+import com.example.scodd.ui.chore.ChoreViewModel
 import com.example.scodd.ui.components.LoginButton
 import com.example.scodd.ui.components.StatusBar
 import com.example.scodd.ui.theme.Burgundy40
 import com.example.scodd.ui.theme.ScoddTheme
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun Logo(){
@@ -47,7 +54,14 @@ fun LogInButton(onClick: () -> Unit){
 }
 
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick : () -> Unit) {
+fun LoginScreen(
+    onLoginClick: () -> Unit,
+    onRegisterClick : () -> Unit,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
+
+    val uiState by viewModel.uiState.collectAsState()
+
     StatusBar(Burgundy40)
     // A surface container using the 'secondaryContainer' color from the theme
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.secondaryContainer) {

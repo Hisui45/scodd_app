@@ -163,7 +163,7 @@ fun SandModeScreen(
             fontSize = 17.sp)
 
         if(showGuided.value){
-            WorkflowSelectModeRow()
+//            WorkflowSelectModeRow()
             ChoreSelectModeHeaderRow("", "")
             LazyColumn {
                 itemsIndexed(scoddChores){ index, chore ->
@@ -172,10 +172,10 @@ fun SandModeScreen(
                         Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
                 }
                 item{
-                    AddChoreButton(onClick = {
-                        onAddChoreToModeClick(Workflow1) //So take list of chores for the mode and pass it through, the id
-
-                    })
+//                    AddChoreButton(onClick = {
+//                        onAddChoreToModeClick(Workflow1) //So take list of chores for the mode and pass it through, the id
+//
+//                    })
                 }
             }
         }

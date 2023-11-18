@@ -8,14 +8,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -38,12 +38,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.scodd.R
-import com.example.scodd.data.scoddFlows
 import com.example.scodd.model.*
 import com.example.scodd.model.ScoddTime
 import com.example.scodd.utils.LazyAnimations
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.reflect.KFunction1
 
 
 @Composable
@@ -510,53 +510,34 @@ fun ChoreSelectModeHeaderRow(prefix : String, value : String){
     }
 }
 
-@Composable
-fun WorkflowSelectModeRow() {
-    val showWorkflows = remember { mutableStateOf(true) }
-    Row(
-        modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 0.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("Workflows")
-        Spacer(Modifier.weight(1f))
-        IconButton(
-            onClick = {
-                showWorkflows.value = !showWorkflows.value
-            }
-        ) {
-            val iconResource = if (showWorkflows.value) R.drawable.expand_less_24 else R.drawable.expand_more_24
-            Icon(ImageVector.vectorResource(iconResource), "workflow dropdown")
-        }
-    }
-    if (showWorkflows.value){
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            contentPadding = PaddingValues(horizontal = 12.dp),
-            modifier = Modifier.padding(vertical = 8.dp)
-        ) {
-            itemsIndexed(scoddFlows) { index, workflow -> //Use the index value to know what workflow to get chores from
-                val selected = remember { mutableStateOf(false) } //If user has used mode before pre-fill
-//                WorkflowSelectCard(workflow.title, selected.value, onClick = {
-//                    selected.value = !selected.value
-//                    //Update workflow selected value here
-//                })
-            }
-        }
-}
-}
+
 
 @Composable
-fun AddChoreButton(onClick : () -> Unit){
+fun AddChoreButton(onClick : () -> Unit, choreNumber: Int){
+    /**
+     * TODO: consider re-designing
+     */
     Row(
         Modifier.fillMaxWidth().background(Color.Transparent),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.End
     ) {
         TextButton(
             onClick = {onClick()},
             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
         ){
-            Icon(Icons.Default.Add, "add")
-            Text("Add Chore")
+            var contentDescription = stringResource(R.string.add_chore_items)
+            var text = stringResource(R.string.add_chore_items)
+
+            if(choreNumber > 0){
+                text = stringResource(R.string.edit_chore_items)
+                contentDescription = stringResource(R.string.edit_chore_items)
+            }
+
+            Text(text,
+//                style = MaterialTheme.typography.bodyLarge
+            )
+            Icon(Icons.Default.AddCircle, contentDescription )
+
         } }
 
 }

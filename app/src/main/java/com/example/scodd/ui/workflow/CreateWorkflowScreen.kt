@@ -119,7 +119,7 @@ fun WorkflowContent(
                         Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
                 }
                 item {
-                    AddChoreButton(onClick = {onAddChoreButtonClick()}) //Should create a temp object and pass it through
+                    AddChoreButton(onClick = {onAddChoreButtonClick()}, chores.count()) //Should create a temp object and pass it through
                 }
             }
 
@@ -130,7 +130,7 @@ fun WorkflowContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(stringResource(R.string.instructions_text))
-            AddChoreButton(onClick = { onAddChoreButtonClick() }) //Should create a temp object and pass it through
+            AddChoreButton(onClick = { onAddChoreButtonClick() }, 0) //Should create a temp object and pass it through
         }
     }
 }

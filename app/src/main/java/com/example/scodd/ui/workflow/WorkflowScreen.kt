@@ -168,7 +168,7 @@ fun WorkflowContent(
                 Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
         }
         item{
-            AddChoreButton(onClick = {onAddChoreClick() })
+            AddChoreButton(onClick = {onAddChoreClick() }, choreItems.count())
         }
     }
 

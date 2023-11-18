@@ -28,7 +28,7 @@ fun SpinModeScreen(
                 "daily routine. Instead of manually selecting your next chore, you can leave it up to chance with a fun spin of " +
                 "the wheel. Just like spinning a roulette wheel, Chore Spin randomly selects a task from your list of chores, " +
                 "adding an element of excitement and unpredictability to your daily chores.",suggestions)
-        WorkflowSelectModeRow()
+//        WorkflowSelectModeRow()
 
         ChoreSelectModeHeaderRow("", "")
         LazyColumn {
@@ -42,10 +42,10 @@ fun SpinModeScreen(
 
             }
             item{
-                AddChoreButton(onClick = {
-                    onAddChoreToModeClick(Workflow1) //So take list of chores for the mode and pass it through, the id
-
-                })
+//                AddChoreButton(onClick = {
+//                    onAddChoreToModeClick(Workflow1) //So take list of chores for the mode and pass it through, the id
+//
+//                })
             }
         }
     }

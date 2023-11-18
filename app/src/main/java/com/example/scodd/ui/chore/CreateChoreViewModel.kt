@@ -155,8 +155,8 @@ class CreateChoreViewModel @Inject constructor(
         _uiState.update { it.copy(choreRooms = updatedRooms.toList()) }
     }
 
-    fun isWorkflowSelected(workflow: Workflow): Boolean {
-        return _uiState.value.choreWorkflows.any{it == workflow.id}
+    fun isWorkflowSelected(workflowId: String): Boolean {
+        return _uiState.value.choreWorkflows.any{it == workflowId}
     }
 
     fun selectWorkflow(workflow: Workflow) {

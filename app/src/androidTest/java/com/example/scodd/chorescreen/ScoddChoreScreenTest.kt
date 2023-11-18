@@ -2,6 +2,7 @@ package com.example.scodd.chorescreen
 
 import com.example.scodd.HiltTestActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.compose.material3.Surface
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.lifecycle.SavedStateHandle
@@ -16,6 +17,7 @@ import com.example.scodd.ui.theme.ScoddTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -55,23 +57,35 @@ class ScoddChoreTest{
     }
 
     @Test
-    fun scoddNavHost_verifyStartDestination() {
-        assertEquals(ChoreNav.Chores.label, navController.currentBackStackEntry?.destination?.route)
+    fun displayTask_whenRepositoryHasData() = runTest {
+        // GIVEN - One task already in the repository
+        choreRepository.createChore("Vacuum")
+
+
+        // WHEN - On startup
+        setContent()
+
+        Thread.sleep(5000)
+
+        // THEN - Verify task is displayed on screen
+        composeTestRule.onNodeWithText("Vacuum").assertIsDisplayed()
     }
     
 
-    private fun setContent(choreRepository: ChoreRepository) {
+    private fun setContent() {
         composeTestRule.setContent {
             ScoddTheme {
-                ChoreScreen(
-                    onCreateWorkflowClick = {},
-                    onCreateChoreClick = {},
-                    onEditChore = {},
-                    onViewWorkflow = {},
-                    viewModel = ChoreViewModel(choreRepository = choreRepository,
-                                                savedStateHandle = SavedStateHandle()
+                Surface{
+                    ChoreScreen(
+                        onCreateWorkflowClick = {},
+                        onCreateChoreClick = {},
+                        onEditChore = {},
+                        onViewWorkflow = {},
+                        viewModel = ChoreViewModel(choreRepository = choreRepository,
+                            savedStateHandle = SavedStateHandle()
+                        )
                     )
-                )
+                }
             }
         }
     }

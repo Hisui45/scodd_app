@@ -56,7 +56,8 @@ object DatabaseModule {
             context.applicationContext,
             ScoddDatabase::class.java,
             "Scodd.db"
-        ).addCallback(object : RoomDatabase.Callback() {
+        )
+            .addCallback(object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 Executors.newSingleThreadScheduledExecutor()
                     .execute {
@@ -77,7 +78,8 @@ object DatabaseModule {
                         provideDataBase(context).choreDao().insertAllChores(dummyLocalChores)
                     }
             }
-        }).build()
+        }
+            ).build()
     }
 
 //    private var dbCallback: RoomDatabase.Callback = object : RoomDatabase.Callback() {

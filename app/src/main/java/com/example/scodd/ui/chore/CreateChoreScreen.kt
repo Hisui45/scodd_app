@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.scodd.R
 import com.example.scodd.model.*
 import com.example.scodd.ui.theme.Burgundy40
@@ -38,13 +37,13 @@ import com.example.scodd.utils.*
 fun CreateChoreScreen(
     onNavigateBack: () -> Unit,
     viewModel: CreateChoreViewModel = hiltViewModel(),
-    choreId: String? = "Steven",
+    choreId: String? ,
     ){
     StatusBar(Burgundy40)
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog = remember { mutableStateOf(false) }
     /**
      * TODO: use interface for colors
@@ -138,11 +137,11 @@ private fun CreateChoreContent(viewModel: CreateChoreViewModel, uiState: CreateC
         Column(Modifier.padding(horizontal = horizontalPadding)){
             LabelText(stringResource(R.string.workflow_title))
         }
-        WorkflowSelectAddRow(
+        WorkflowSelectRow(
             uiState.workflows,
             viewModel :: isWorkflowSelected,
-            viewModel :: selectWorkflow,
-            onCreateWorkflowClick = { createWorkflowDialog.value = true } )
+            viewModel :: selectWorkflow
+        ) { createWorkflowDialog.value = true }
         ChoreDivider()
 
         CreateDialog(
