@@ -99,7 +99,7 @@ fun SelectChoreScreen(
                 title = { Text(stringResource(R.string.select_chore_title)) },
                 navigationIcon = { NavigationButton(onNavigateBack) },
                 actions = {
-                    if(selectedItems.isNotEmpty()) {
+                    if(selectedItems.isNotEmpty() || incomingSelectedChores.isNotEmpty()) {
                         IconButton(
                             onClick = { onSelectFinish(selectedItems.toMutableList()) }
                         ) {

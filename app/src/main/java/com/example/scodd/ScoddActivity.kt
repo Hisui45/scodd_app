@@ -55,8 +55,6 @@ fun ScoddApp(){
                             navController.navigateSingleTopTo(newScreen.route)},
                         currentScreen = currentScreen
                     )
-                }else if(isModeDestination){
-                    ModeBottomBar(onStartClick = {})
                 }
             }
         ) { innerPadding ->

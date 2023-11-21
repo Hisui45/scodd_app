@@ -56,7 +56,7 @@ class LoginViewModel @Inject constructor(
     private fun handleError(cause: Throwable) {
         // Handle the error, for example, log it or emit a default value
         Timber.e(cause, "Error loading data")
-        _userMessage.value = R.string.error_chores
+        _userMessage.value = R.string.loading_chores_error
         // Additional error handling logic if needed
     }
 

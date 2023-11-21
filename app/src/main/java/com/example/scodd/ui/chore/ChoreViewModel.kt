@@ -74,7 +74,7 @@ class ChoreViewModel @Inject constructor(
     val uiState: StateFlow<ChoreUiState> = combine(_isLoading, _userMessage, _filteredChores, _rooms, _workflows) { isLoading, userMessage, chores, rooms, workflows ->
         ChoreUiState(
             isLoading = isLoading,
-            userMessage = if (chores.isEmpty()) R.string.error_chores else userMessage,
+            userMessage = if (chores.isEmpty()) R.string.loading_chores_error else userMessage,
             items = chores,
             rooms = rooms,
             workflows = workflows
@@ -89,7 +89,7 @@ class ChoreViewModel @Inject constructor(
     private fun handleError(cause: Throwable) {
         // Handle the error, for example, log it or emit a default value
         Timber.e(cause, "Error loading data")
-        _userMessage.value = R.string.error_chores
+        _userMessage.value = R.string.loading_chores_error
         // Additional error handling logic if needed
     }
 

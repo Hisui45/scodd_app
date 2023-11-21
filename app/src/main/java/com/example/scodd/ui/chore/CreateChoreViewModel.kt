@@ -32,7 +32,7 @@ data class CreateChoreUiState(
     val routineInfo: RoutineInfo = RoutineInfo(),
     val frequencyErrorMessage: Int? = null,
     val isTimeModeActive: Boolean = false,
-    val timerModeValue: Int = 5,
+    val timerModeValue: Int = -1,
     val timerOption: ScoddTime = ScoddTime.MINUTE,
     val timerErrorMessage: Int? = null,
     val isBankModeActive: Boolean = false,

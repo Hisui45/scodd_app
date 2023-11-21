@@ -347,12 +347,24 @@ class DefaultChoreRepository @Inject constructor(
         workflowId: String,
         selectedItems: List<String>
     ){
-
+        //Chores Already in Workflow
         val existingChoreItems = getChoreItems().filter { it.parentWorkflowId == workflowId }
 
+        // Find parent chore IDs to add
         val parentChoreIdsToAdd = selectedItems.subtract(existingChoreItems.map { it.parentChoreId }.toSet())
+
+        // Find parent chore IDs to delete
+        val parentChoreIdsToDelete = existingChoreItems.map { it.parentChoreId }.subtract(selectedItems.toSet())
+
+        // Add chore items for new parent chore IDs
         parentChoreIdsToAdd.forEach { parentChoreId ->
             createChoreItem(parentChoreId = parentChoreId, parentWorkflowId = workflowId)
+        }
+
+        // Delete chore items for removed parent chore IDs
+        parentChoreIdsToDelete.forEach { parentChoreId ->
+            val choreItemToDelete = existingChoreItems.find { it.parentChoreId == parentChoreId }
+            choreItemToDelete?.let { deleteChoreItem(it.id) }
         }
 
     }

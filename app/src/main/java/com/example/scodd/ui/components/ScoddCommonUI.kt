@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,13 +21,11 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,7 +40,6 @@ import com.example.scodd.model.ScoddTime
 import com.example.scodd.utils.LazyAnimations
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.reflect.KFunction1
 
 
 @Composable
@@ -93,7 +89,7 @@ fun ChoreDropdownNumberInput(value : Int, selectedOption : ScoddTime, onOptionSe
                              onValueChange : (String) -> Unit, errorMessage : Int?){
     var expanded by remember { mutableStateOf(false) }
 
-    val text = if (value== -1) "" else value.toString()
+    val text = if (value == -1) "" else value.toString()
 
     var errorText = ""
     errorMessage?.let { message ->
@@ -111,6 +107,7 @@ fun ChoreDropdownNumberInput(value : Int, selectedOption : ScoddTime, onOptionSe
             onValueChange = {onValueChange(it)},
             modifier = Modifier.width(150.dp),
             singleLine = true,
+            placeholder = {Text("Timer Value")},
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             keyboardActions = KeyboardActions{focusManager.clearFocus()},
             colors = OutlinedTextFieldDefaults.colors(
@@ -330,7 +327,7 @@ fun ChoreContent(
                     toggleChip(room)
                     doAnimation = true
                 },
-                animateModifier = modifier)
+                modifier = modifier)
             /**
              * TODO: restart animation delay if user toggles another chip priority = 5
              */
@@ -342,7 +339,7 @@ fun ChoreContent(
                 onSelectedChanged = {
                     onFavoriteChipSelected()
                 },
-                animateModifier = modifier)
+                modifier = modifier)
         }
     }
     /**
@@ -487,12 +484,89 @@ fun ChoreListItem(
 }
 
 @Composable
-fun ModeChoreListItem(title: String, trailingContent : @Composable () -> Unit){
+fun TimeModeChoreListItem(
+        title: String,
+        timerValue: Int,
+        isDistinct : Boolean,
+        timeUnit: String,
+        onErrorClick:(Int) -> Unit
+){
     ListItem(
         headlineContent = {
             Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis)
         },
-        trailingContent = {trailingContent()},
+        trailingContent = {
+            if(timerValue > 0 && isDistinct){
+            LabelText("$timerValue $timeUnit")
+        }else if(!isDistinct){
+            IconButton(
+                onClick = {onErrorClick(R.string.chore_repeat) }
+            ){
+                Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
+            }
+        }else{
+            IconButton(
+                onClick = {onErrorClick(R.string.chore_timer_mode_not_active) }
+            ){
+                Icon(Icons.Default.Warning, stringResource(R.string.chore_timer_mode_not_active), tint = MaterialTheme.colorScheme.error)
+            }
+
+        }
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+    )
+
+}
+
+@Composable
+fun BankModeChoreListItem(
+    title: String,
+    bankValue: Int,
+    isDistinct : Boolean,
+    onErrorClick:(Int) -> Unit
+){
+    ListItem(
+        headlineContent = {
+            Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis)
+        },
+        trailingContent = {
+            if(bankValue > 0 && isDistinct){
+                LabelText("$$bankValue")
+            }else if(!isDistinct){
+                IconButton(
+                    onClick = {onErrorClick(R.string.chore_repeat) }
+                ){
+                    Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
+                }
+            }else{
+                IconButton(
+                    onClick = {onErrorClick(R.string.chore_bank_mode_not_active) }
+                ){
+                    Icon(Icons.Default.Warning, stringResource(R.string.chore_bank_mode_not_active), tint = MaterialTheme.colorScheme.error)
+                }
+
+            }
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+    )
+
+}
+
+@Composable
+fun ModeChoreListItem(title: String, isDistinct: Boolean, onErrorClick: (Int) -> Unit){
+    ListItem(
+        headlineContent = {
+            Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis)
+        },
+        trailingContent = {
+            if(!isDistinct){
+                IconButton(
+                    onClick = {onErrorClick(R.string.chore_repeat) }
+                ){
+                    Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
+                }
+            }
+        },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent)
     )
 
@@ -502,7 +576,7 @@ fun ModeChoreListItem(title: String, trailingContent : @Composable () -> Unit){
 fun ChoreSelectModeHeaderRow(prefix : String, value : String){
     Row(
         Modifier.padding(start = 12.dp, end = 23.dp, top = 12.dp),
-        verticalAlignment = Alignment.Bottom
+        verticalAlignment = Alignment.CenterVertically
     ){
         Text("Chores", modifier = Modifier.padding(bottom = 4.dp))
         Spacer(Modifier.weight(1f))

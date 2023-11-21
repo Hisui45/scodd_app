@@ -26,7 +26,7 @@ import com.example.scodd.utils.LazyAnimations
 
 @Composable
 fun CreateWorkflowScreen(
-    selectedItems: State<List<String>>,
+    selectedItems: State<List<String>?>,
     onAddChoreButtonClick: (List<String>) -> Unit,
     onNavigateBack: () -> Unit,
     viewModel: CreateWorkflowViewModel = hiltViewModel()
@@ -41,6 +41,7 @@ fun CreateWorkflowScreen(
 
     /**
      * TODO: use interface for colors
+     * TODO: prevent creation with no chores
      */
     val contentColor = MaterialTheme.colorScheme.onPrimary
     Scaffold(
@@ -52,7 +53,7 @@ fun CreateWorkflowScreen(
                 type = TextFieldTopBarType.WORKFLOW,
                 contentColor = contentColor,
                 onTitleChanged = viewModel :: updateTitle,
-                actions = { TextButton(onClick = viewModel :: saveWorkflow){Text(stringResource(R.string.save_buttton), color = contentColor)}
+                actions = { TextButton(onClick = viewModel :: saveWorkflow){Text(stringResource(R.string.save_button), color = contentColor)}
                 }
             )
         },
@@ -78,11 +79,14 @@ fun CreateWorkflowScreen(
                 viewModel.snackbarMessageShown()
             }
         }
+
+        selectedItems.value?.let { selectedItems ->
+            LaunchedEffect(selectedItems) {
+                viewModel.selectedItems(selectedItems)
+            }
+        }
     }
 
-    if(selectedItems.value.isNotEmpty()) run {
-        viewModel.selectedItems(selectedItems.value)
-    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

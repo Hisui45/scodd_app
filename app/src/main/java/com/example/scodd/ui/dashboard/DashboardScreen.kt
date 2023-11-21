@@ -29,6 +29,10 @@ import com.example.scodd.ui.theme.*
 import kotlinx.coroutines.delay
 import java.util.*
 
+/**
+ * TODO: display chores for Today's Roundup
+ * TODO: hide/show completed
+ */
 @Composable
 fun DashboardScreen(){
     Surface{
@@ -221,7 +225,7 @@ fun FocusArea(){
 
 
                 },
-                animateModifier = Modifier)
+                modifier = Modifier)
         }
     }
 

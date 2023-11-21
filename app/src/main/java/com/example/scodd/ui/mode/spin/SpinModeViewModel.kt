@@ -1,17 +1,19 @@
-package com.example.scodd.ui.mode.bank
+package com.example.scodd.ui.mode.spin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scodd.R
 import com.example.scodd.data.ChoreRepository
-import com.example.scodd.model.*
+import com.example.scodd.model.Chore
+import com.example.scodd.model.ChoreItem
+import com.example.scodd.model.Workflow
 import com.example.scodd.utils.WhileUiSubscribed
-import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-data class BankUiState(
+data class SpinUiState(
     val parentWorkflows: List<Workflow> = emptyList(),
     val parentChores: List<Chore> = emptyList(),
     val choreItems: List<ChoreItem> = emptyList(),
@@ -27,12 +29,12 @@ data class BankUiState(
     var userMessage: Int? = null,
     val choreItemError: String? = null
 
-)
+    )
 /**
  * ViewModel for the Details screen.
  */
 @HiltViewModel
-class BankModeViewModel @Inject constructor(
+class SpinModeViewModel @Inject constructor(
     private val choreRepository: ChoreRepository
 ) : ViewModel() {
 
@@ -71,23 +73,22 @@ class BankModeViewModel @Inject constructor(
         return workflows
     }
 
-    //    private val _uiState = MutableStateFlow(BankUiState())
-    val uiState: StateFlow<BankUiState> = combine(
-        _parentChores, _choresFromWorkflow, _selectedChores, _choreItems, _userMessage
+    val uiState: StateFlow<SpinUiState> = combine(
+         _parentChores, _choresFromWorkflow, _selectedChores, _choreItems, _userMessage
     ){parentChores, choresFromWorkflow,selectedChores, choreItems, userMessage  ->
-        BankUiState(
-            parentWorkflows = _parentWorkflows.value,
-            choreItems = choreItems,
-            parentChores = parentChores,
-            choresFromWorkflow = choresFromWorkflow,
-            selectedChores = selectedChores,
-            userMessage = userMessage,
-            choreItemError = _choreItemError.value
-        )
+            SpinUiState(
+                parentWorkflows = _parentWorkflows.value,
+                choreItems = choreItems,
+                parentChores = parentChores,
+                choresFromWorkflow = choresFromWorkflow,
+                selectedChores = selectedChores,
+                userMessage = userMessage,
+                choreItemError = _choreItemError.value
+            )
     }.stateIn(
         scope = viewModelScope,
         started = WhileUiSubscribed,
-        initialValue = BankUiState()
+        initialValue = SpinUiState()
     )
 
 
@@ -98,34 +99,6 @@ class BankModeViewModel @Inject constructor(
             loadWorkflows()
         }
     }
-
-    fun calculatePotentialPayout(): Int {
-        val parentChores = uiState.value.parentChores
-        val selectedChores = uiState.value.selectedChores
-
-
-        val potentialPayoutFromWorkflow = uiState.value.choresFromWorkflow.sumOf { parentChoreId ->
-            if(parentChores.find { it.id == parentChoreId }?.isBankModeActive == true){
-                parentChores.find { it.id == parentChoreId }?.bankModeValue?: 0
-            }else{
-                0
-            }
-        }
-
-        val potentialPayoutFromSelectedChores = selectedChores.sumOf { parentChoreId ->
-            if(parentChores.find { it.id == parentChoreId }?.isBankModeActive == true){
-                parentChores.find { it.id == parentChoreId }?.bankModeValue?: 0
-            }else{
-                0
-            }
-        }
-
-        return potentialPayoutFromWorkflow + potentialPayoutFromSelectedChores
-    }
-
-//    fun getChoreBankModeValue(parentChoreId: String): Int {
-//        return uiState.value.parentChores.find { it.id == parentChoreId }?.bankModeValue ?: 0
-//    }
 
     private fun handleChoreStreamError() {
         _userMessage.value = R.string.loading_chores_error
@@ -174,18 +147,6 @@ class BankModeViewModel @Inject constructor(
         return uiState.value.parentChores.find { it.id == parentChoreId }?.title?: ""
     }
 
-    fun getChoreBankModeValue(parentChoreId: String): Int {
-        val choreItem = uiState.value.parentChores.find { it.id == parentChoreId }
-        if (choreItem != null) {
-            return if(choreItem.isBankModeActive){
-                choreItem.bankModeValue
-            }else{
-                -1
-            }
-        }
-        return -1
-    }
-
 //    fun refresh() {
 //        _isLoading.value = true
 //        viewModelScope.launch {
@@ -199,8 +160,8 @@ class BankModeViewModel @Inject constructor(
     }
 
     fun itemErrorMessageShown() {
-        _choreItemError.value = null
         _userMessage.value = null
+        _choreItemError.value = null
     }
 
     fun showItemErrorMessage(message: Int, choreId: String){
@@ -235,5 +196,6 @@ class BankModeViewModel @Inject constructor(
 
         }
     }
+
 }
 

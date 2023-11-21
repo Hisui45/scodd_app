@@ -59,7 +59,10 @@ fun CreateChoreScreen(
                 contentColor = contentColor,
                 onTitleChanged = viewModel :: updateTitle,
                 actions = {
-                    TextButton(onClick = viewModel :: saveChore){Text(stringResource(R.string.save_buttton), color = contentColor)}
+                    /**
+                     * TODO: prevent save if there's an error with other inputs
+                     */
+                    TextButton(onClick = viewModel :: saveChore){Text(stringResource(R.string.save_button), color = contentColor)}
                     if(choreId!=null){
                         ChoreContextMenu(onAddClicked = {
                             /**
@@ -92,9 +95,7 @@ fun CreateChoreScreen(
 
             DeleteConfirmationDialog(onConfirm = {viewModel.deleteChore();showDeleteDialog.value = false},
                 onDismiss = {showDeleteDialog.value = false}, showDeleteDialog.value)
-            /**
-             * TODO: Design Snack Bar priority: 5
-             */
+
 //          Check for user messages to display on the screen
             uiState.userMessage?.let { userMessage ->
                 val snackbarText = stringResource(userMessage)
@@ -126,7 +127,7 @@ private fun CreateChoreContent(viewModel: CreateChoreViewModel, uiState: CreateC
                 uiState.rooms.forEach{ room -> //Use index to know what room was selected
                     SelectableRoomFilterChip(room.title,viewModel.isRoomSelected(room),
                         onSelectedChanged = {viewModel.selectRoom(room.id)},
-                        animateModifier = Modifier)
+                        modifier = Modifier)
                 }
             }
         }

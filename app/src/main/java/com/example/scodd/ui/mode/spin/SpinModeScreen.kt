@@ -1,4 +1,4 @@
-package com.example.scodd.ui.mode.time
+package com.example.scodd.ui.mode.spin
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,31 +18,30 @@ import com.example.scodd.ui.theme.Marigold40
 import com.example.scodd.ui.components.*
 import com.example.scodd.utils.ADHD
 import com.example.scodd.utils.Game
-import com.example.scodd.utils.Motivation
+
 
 @Composable
-fun TimeModeScreen(
+fun SpinModeScreen(
     selectedItems: State<List<String>?>,
     onNavigateBack: () -> Unit,
     onAddChoreClick : (List<String>) -> Unit,
-    onEditChore: (String) -> Unit,
-    viewModel: TimeModeViewModel = hiltViewModel()
-    ){
-
-    val suggestions = listOf(ADHD, Game, Motivation)
+    viewModel: SpinModeViewModel = hiltViewModel()
+){
+    StatusBar(Marigold40)
+    val suggestions = listOf(ADHD, Game)
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    StatusBar(Marigold40)
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)  },
         bottomBar = {ModeBottomBar(onStartClick = {})}
-    ){
+    ) {
         Column(Modifier.padding(it)) {
-            ScoddModeHeader(onNavigateBack, stringResource(R.string.time_mode_title),
-                stringResource(R.string.time_mode_desc),
-                suggestions
-            )
+            ScoddModeHeader(onNavigateBack,
+                stringResource(R.string.spin_mode_title),
+                stringResource(R.string.spin_mode_desc),
+                suggestions)
 
             val uiState by viewModel.uiState.collectAsState()
 
@@ -51,19 +50,15 @@ fun TimeModeScreen(
                 isSelected = viewModel :: isWorkflowSelected,
                 onWorkflowSelect = viewModel :: selectWorkflow
             )
-            val estimatedTime = viewModel.calculateEstimatedTime()
-            ChoreSelectModeHeaderRow("Estimated Time:", estimatedTime)
+
+            ChoreSelectModeHeaderRow("", "")
             LazyColumn {
                 itemsIndexed(uiState.selectedChores){ index, choreId ->
-                    val timerValue = viewModel.getChoreTimeModeValue(choreId)
-                    val timeUnit = viewModel.getChoreTimeUnit(choreId)
                     val isDistinct = viewModel.checkIsDistinct(choreId)
-                    TimeModeChoreListItem(
+                    ModeChoreListItem(
                         title = viewModel.getChoreTitle(choreId),
-                        timerValue = timerValue,
                         isDistinct = isDistinct,
-                        timeUnit = timeUnit,
-                        onErrorClick = { errorMessage ->
+                        onErrorClick = {errorMessage ->
                             viewModel.showItemErrorMessage(errorMessage, choreId)
                         }
                     )
@@ -85,15 +80,11 @@ fun TimeModeScreen(
                     }
                 }
                 itemsIndexed(uiState.choresFromWorkflow){ index, choreId ->
-                    val timerValue = viewModel.getChoreTimeModeValue(choreId)
-                    val timeUnit = viewModel.getChoreTimeUnit(choreId)
                     val isDistinct = viewModel.checkIsDistinct(choreId)
-                    TimeModeChoreListItem(
+                    ModeChoreListItem(
                         title = viewModel.getChoreTitle(choreId),
-                        timerValue = timerValue,
                         isDistinct = isDistinct,
-                        timeUnit = timeUnit,
-                        onErrorClick = { errorMessage ->
+                        onErrorClick = {errorMessage ->
                             viewModel.showItemErrorMessage(errorMessage, choreId)
                         }
                     )
@@ -101,23 +92,9 @@ fun TimeModeScreen(
                         Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
                 }
             }
-
             uiState.userMessage?.let { userMessage ->
                 val snackbarText = stringResource(userMessage)
                 LaunchedEffect(scope, viewModel, userMessage, snackbarText) {
-                    if(userMessage == R.string.chore_timer_mode_not_active){
-                        snackbarHostState.showSnackbar(
-                            message = snackbarText,
-                            duration = SnackbarDuration.Short,
-                            actionLabel = "Edit"
-                        ).let { result ->
-                            if(result == SnackbarResult.ActionPerformed){
-                                uiState.choreItemError?.let { choreItem ->
-                                    onEditChore(choreItem)
-                                }
-                            }
-                        }
-                    }else if(userMessage == R.string.chore_repeat){
                         snackbarHostState.showSnackbar(
                             message = snackbarText,
                             duration = SnackbarDuration.Short,
@@ -127,24 +104,17 @@ fun TimeModeScreen(
                                 uiState.choreItemError?.let { choreItem ->
                                     viewModel.removeDuplicateItem(choreItem)
                                 }
-
                             }
                         }
-                    }
-                    viewModel.itemErrorMessageShown()
+                        viewModel.itemErrorMessageShown()
                 }
             }
         }
     }
 
-
-
-
-    selectedItems.value?.let {
+    selectedItems.value?.let { it ->
         LaunchedEffect(it) {
             viewModel.selectedItems(it)
         }
     }
 }
-
-

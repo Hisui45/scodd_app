@@ -21,7 +21,8 @@ private val LightColorScheme = lightColorScheme(
     onPrimaryContainer = Black40,
 
 
-    inversePrimary = Black40,
+    //SnackBar action colors
+    inversePrimary = LightMarigold40,
 
     secondary = Burgundy40,
     onSecondary = White40,

@@ -16,6 +16,12 @@ import com.example.scodd.ui.components.StatusBar
 import com.example.scodd.navigation.ScoddDestination
 import com.example.scodd.ui.theme.White40
 
+
+/**
+ * TODO: save/load user's mode selections
+ * TODO: functioning modes (sand,bank, timer, quest, spin)
+ * TODO: show money earned from Piggy Bank Mode
+ */
 @Composable
 fun ModeScreen(
     modeScreens: List<ScoddDestination>,

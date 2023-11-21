@@ -1,20 +1,16 @@
 package com.example.scodd.ui.workflow
 
-import android.text.BoringLayout
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scodd.R
 import com.example.scodd.data.ChoreRepository
 import com.example.scodd.model.*
-import com.example.scodd.utils.Async
 import com.example.scodd.utils.WhileUiSubscribed
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 data class WorkflowUiState(
     val title: String = "",
@@ -69,7 +65,7 @@ class WorkflowViewModel @Inject constructor(
             emit(emptyList())
         }
     private fun handleChoreStreamError() {
-        _userMessage.value = R.string.error_chores
+        _userMessage.value = R.string.loading_chores_error
     }
     private fun handleChoreItems(allChoreItems: List<ChoreItem>, workflow: Workflow?): List<ChoreItem> {
         if (workflow != null) {

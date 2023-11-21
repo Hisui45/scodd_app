@@ -12,6 +12,7 @@
     <string name="title_activity_dashboard">DashboardActivity</string>
     <string name="sun_content_desc">bright sun</string>
     <string name="title_activity_scodd">ScoddActivity</string>
+    <string name="roundup_header">Today’s Roundup</string>
 
 
     //Chore
@@ -22,8 +23,9 @@
     <string name="workflow_label">Workflows</string>
     <string name="chore_label">Chores</string>
     <string name="no_chores_message">You don\'t have any chores!</string>
-    <string name="error_chores">There was a problem with loading the chores</string>
-    <string name="error_rooms">There was a problem with loading the rooms</string>
+    <string name="chore_unmarked_favorite">Favorite Removed!</string>
+    <string name="chore_marked_favorite">Favorite Added!</string>
+    <string name="fab_create">Create Chores &amp; Workflows</string>
 
 
     //Select Chore
@@ -38,6 +40,9 @@
     //Workflow
     <string name="workflow_view_button_contDesc">View Chores</string>
     <string name="workflow_complete_button_contDesc">Complete Chores</string>
+    <string name="lock">Lock</string>
+    <string name="chore_marked_complete">Chore Complete!</string>
+    <string name="completed_chores_cleared">Completed Chores Cleared</string>
 
     //Create Chore
     <string name="room_title">Room</string>
@@ -56,19 +61,44 @@
     <string name="dialog_option_cancel">Cancel</string>
     <string name="dialog_option_ok">Okay</string>
     <string name="dialog_select_time_label">Select time</string>
+    <string name="chore_no_title_message">Please give this chore a title</string>
+    <string name="save_button">Save</string>
+    <string name="title_hint">Title</string>
+    <string name="value_missing_error">Must have a value</string>
+    <string name="greater_value_error">Greater than 0</string>
+    <string name="loading_date_error">There was a problem with loading the date.</string>
+    <string name="workflow_not_found">Workflow could not be found</string>
 
     //Create Workflow
     <string name="instructions_text">Add chores routinely done together into a workflow</string>
+    <string name="workflow_no_title_message">Please give this workflow a title</string>
+    <string name="no_title_message">Must have a title.</string>
 
 
     //Mode
     <string name="mode_label">Modes</string>
+    <string name="modes_title">Modes</string>
+    <string name="chore_source">From Workflows</string>
+    <string name="chore_repeat">This chore is already in the list</string>
 
     //Time Crunch
     <string name="time_mode_title">Time Crunch</string>
+    <string name="chore_timer_mode_not_active">Timer mode is not active</string>
+    <string name="time_mode_desc">The ultimate solution for those seeking a fun and motivating way to complete household tasks efficiently. This mode transforms the mundane into the thrilling by using a specific time limit to each chore in your workflow. It\'s like turning your cleaning routine into a high-stakes game where you race against the clock to conquer clutter and chaos</string>
+
+    //Chore Spin
+    <string name="spin_mode_title">Chore Spin</string>
+    <string name="spin_mode_desc">Injects an element of surprise into your daily routine. Instead of manually selecting your next chore, you can leave it up to chance with a fun spin of the wheel. Just like spinning a roulette wheel, Chore Spin randomly selects a task from your list of chores, adding an element of excitement and unpredictability to your daily chores.</string>
+
 
     //Piggy Bank
     <string name="bank_mode_title">Piggy Bank</string>
+    <string name="chore_bank_mode_not_active">Bank mode is not active.</string>
+    <string name="bank_mode_desc">Adds an exciting twist to your daily routine. It associates a virtual cash value with each chore on your to-do list. As you successfully complete your chores, you\'ll see your \"Piggy Bank\" grow. It\'s like granting yourself a personal budget for guilt-free indulgence in treats and small luxuries as a well-deserved reward, all while maintaining a sense of accomplishment.</string>
+
+    //Quest Mode
+    <string name="quest_mode_title">Chore Quest</string>
+    <string name="quest_mode_desc">Your trusted method for maintaining a clean and organized home without overwhelm. Inspired by the 5 Things method, it\'s time to bid farewell to the stress of chores and say hello to a more organized, goal-oriented approach to your cleaning routine. With clear guidance and achievable steps, you\'ll work through each room, making chore management a breeze.</string>
 
 
     //Sand Mode
@@ -90,44 +120,25 @@
     <string name="sand_time_sec">second</string>
     <string name="sand_time_sec_plural">seconds</string>
     <string name="sand_time_label">Cleaning Time:</string>
+
+    //Errors
+    <string name="loading_rooms_error">There was a problem with loading the rooms</string>
     <string name="loading_items_error">There was a problem with loading the items.</string>
-    <string name="chore_marked_complete">Chore Complete!</string>
-    <string name="completed_chores_cleared">Completed Chores Cleared</string>
-    <string name="label_all">All</string>
-    <string name="no_tasks_all">No Tasks All</string>
-    <string name="label_active">Active</string>
-    <string name="no_tasks_active">No Tasks Active</string>
-    <string name="label_completed">Complete</string>
-    <string name="no_tasks_completed">No Tasks Complete</string>
-    <string name="chore_no_title_message">Please give this chore a title</string>
-    <string name="chore_unmarked_favorite">Favorite Removed!</string>
-    <string name="chore_marked_favorite">Favorite Added!</string>
-    <string name="save_buttton">Save</string>
-    <string name="title_hint">Title</string>
-    <string name="value_missing_error">Must have a value</string>
-    <string name="greater_value_error">Greater than 0</string>
-    <string name="loading_date_error">There was a problem with loading the date.</string>
     <string name="loading_workflow_error">There was a problem with loading with workflow</string>
-    <string name="workflow_not_found">Workflow could not be found</string>
     <string name="loading_chores_error">There was a problem with loading the chores.</string>
-    <string name="workflow_no_title_message">Please give this workflow a title</string>
-    <string name="chore_selected">chore selected</string>
-    <string name="no_title_message">Must have a title.</string>
-    <string name="options">More Options</string>
+    <string name="warning">Warning</string>
+
+
+    //Context Options
     <string name="add_roundup">Add To Today\'s Roundup</string>
+    <string name="chore_selected">Chore Selected</string>
+    <string name="options">More Options</string>
     <string name="delete">Delete</string>
-    <string name="lock">Lock</string>
     <string name="delete_item">Delete Item</string>
     <string name="confirm_delete_message">Are you sure you want to delete this item?</string>
     <string name="cancel">Cancel</string>
-    <string name="roundup_header">Today’s Roundup</string>
-    <string name="modes_title">Modes</string>
-    <string name="fab_create"><![CDATA[Create Chores & Workflows]]></string>
-    <string name="chore_source">From Workflows</string>
-    <string name="warning">Warning</string>
-    <string name="chore_no_value">This chore has a value of zero</string>
     <string name="add_chore_items">Add Chores</string>
     <string name="edit_chore_items">Edit Chores</string>
-
+    <string name="remove">Remove</string>
 
 </resources>

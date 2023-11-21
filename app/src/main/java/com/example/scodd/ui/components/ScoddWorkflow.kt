@@ -20,18 +20,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.scodd.R
 import com.example.scodd.model.Workflow
-import kotlin.reflect.KFunction1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkflowSelectCard(workflow : String, selected : Boolean, onClick : () -> Unit, animateModifier: Modifier ){
+fun WorkflowSelectCard(workflow : String, selected : Boolean, onClick : () -> Unit, modifier: Modifier ){
     var colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant)
 
     if(selected){
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
     }
     Card(
-        modifier = Modifier.width(189.dp).height(110.dp).then(animateModifier),
+        modifier = Modifier.width(189.dp).height(110.dp).then(modifier),
         shape = RoundedCornerShape(28.dp),
         colors = colors,
         onClick = { onClick() }

@@ -77,6 +77,11 @@ class CreateWorkflowViewModel @Inject constructor(
                 choresToShow.add(chore)
             }
         }
+        choresToShow.forEach{chore ->
+            if(!selectedItems.any { selectedItemId -> selectedItemId == chore.id }){
+                choresToShow.remove(chore)
+            }
+        }
         _uiState.update {
             it.copy(selectedChores = selectedItems, parentChores = choresToShow)
         }

@@ -22,19 +22,18 @@ import com.example.scodd.model.Workflow
 import com.example.scodd.ui.components.*
 import com.example.scodd.ui.theme.Marigold40
 import com.example.scodd.utils.LazyAnimations
+import timber.log.Timber
 
 /**
  * TODO: options: to clear completed priority: 5
- * TODO: add chores to workflow priority: 2
- * TODO: edit workflow title priority : 3
- * TODO: delete choreitem kinda
+ * TODO: prompt workflow deletion when there's no chores, require at least one
  */
 @Composable
 fun WorkflowScreen(
-        selectedItems: State<List<String>>,
-        onNavigateBack : () -> Unit,
-        onAddChoreClick : (String, List<String>) -> Unit,
-        viewModel: WorkflowViewModel = hiltViewModel()
+    selectedItems: State<List<String>?>,
+    onNavigateBack: () -> Unit,
+    onAddChoreClick: (String, List<String>) -> Unit,
+    viewModel: WorkflowViewModel = hiltViewModel()
 ){
     StatusBar(Marigold40)
 
@@ -50,6 +49,7 @@ fun WorkflowScreen(
     val contentColor = MaterialTheme.colorScheme.onPrimary
 
     val workflow = uiState.workflow
+    var addedItems by remember { mutableStateOf(false) }
 
     if(workflow != null){
         val title = remember { mutableStateOf(workflow.title) }
@@ -91,7 +91,8 @@ fun WorkflowScreen(
             Column(Modifier.padding(it)){
                 WorkflowContent(
                     workflow = workflow,
-                    onAddChoreClick = {onAddChoreClick(workflow.id, uiState.choreItems.map { choreItem -> choreItem.parentChoreId })},
+                    onAddChoreClick = {onAddChoreClick(workflow.id, uiState.choreItems.map { choreItem -> choreItem.parentChoreId })
+                        addedItems = true},
                     choreItems = uiState.choreItems,
                     choreTitle = viewModel::getChoreTitle,
                     roomTitle = viewModel::getRoomTitle,
@@ -111,7 +112,6 @@ fun WorkflowScreen(
     }
 
 
-
     uiState.userMessage?.let { userMessage ->
         val snackbarText = stringResource(userMessage)
         LaunchedEffect(scope, viewModel, userMessage, snackbarText) {
@@ -120,11 +120,9 @@ fun WorkflowScreen(
         }
     }
 
-    var addedItems by remember { mutableStateOf(false) }
-    LaunchedEffect(key1 = Unit) {
-        if (!addedItems) {
-            viewModel.selectedItems(selectedItems.value)
-            addedItems = true
+    selectedItems.value?.let { selectedItems ->
+        LaunchedEffect(selectedItems) {
+            viewModel.selectedItems(selectedItems)
         }
     }
 
