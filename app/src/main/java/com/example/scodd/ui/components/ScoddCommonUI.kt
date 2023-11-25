@@ -484,6 +484,52 @@ fun ChoreListItem(
 }
 
 @Composable
+fun ModeChoreListItem(
+    title: String,
+    isDistinct: Boolean,
+    existsInWorkflow: Boolean,
+    onErrorClick: (Int) -> Unit,
+    timerValue: Int? = null,
+    timeUnit: String? = null,
+    bankValue: Int? = null
+) {
+    ListItem(
+        headlineContent = {
+            Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        },
+        trailingContent = {
+            when {
+                timerValue != null && isDistinct && existsInWorkflow -> {
+                    LabelText("$timerValue $timeUnit")
+                }
+                bankValue != null && isDistinct && existsInWorkflow -> {
+                    LabelText("$$bankValue")
+                }
+                !existsInWorkflow -> {
+                    IconButton(
+                        onClick = { onErrorClick(R.string.chore_not_found_workflow) }
+                    ) {
+                        Icon(
+                            Icons.Default.Warning,
+                            stringResource(R.string.chore_not_found_workflow),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+                !isDistinct -> {
+                    IconButton(
+                        onClick = { onErrorClick(R.string.chore_repeat) }
+                    ) {
+                        Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
+                    }
+                }
+            }
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+    )
+}
+
+@Composable
 fun TimeModeChoreListItem(
         title: String,
         timerValue: Int,
@@ -523,6 +569,7 @@ fun BankModeChoreListItem(
     title: String,
     bankValue: Int,
     isDistinct : Boolean,
+    existsInWorkflow: Boolean,
     onErrorClick:(Int) -> Unit
 ){
     ListItem(
@@ -530,8 +577,15 @@ fun BankModeChoreListItem(
             Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis)
         },
         trailingContent = {
-            if(bankValue > 0 && isDistinct){
+            if(bankValue > 0 && isDistinct && existsInWorkflow) {
                 LabelText("$$bankValue")
+
+            }else if(!existsInWorkflow){
+                IconButton(
+                    onClick = {onErrorClick(R.string.chore_not_found_workflow) }
+                ){
+                    Icon(Icons.Default.Warning, stringResource(R.string.chore_not_found_workflow), tint = MaterialTheme.colorScheme.error)
+                }
             }else if(!isDistinct){
                 IconButton(
                     onClick = {onErrorClick(R.string.chore_repeat) }
@@ -553,7 +607,7 @@ fun BankModeChoreListItem(
 }
 
 @Composable
-fun ModeChoreListItem(title: String, isDistinct: Boolean, onErrorClick: (Int) -> Unit){
+fun ModeChoreListItem(title: String, isDistinct: Boolean, existsInWorkflow: Boolean, onErrorClick: (Int) -> Unit){
     ListItem(
         headlineContent = {
             Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis)
@@ -564,6 +618,12 @@ fun ModeChoreListItem(title: String, isDistinct: Boolean, onErrorClick: (Int) ->
                     onClick = {onErrorClick(R.string.chore_repeat) }
                 ){
                     Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
+                }
+            }else if(!existsInWorkflow){
+                IconButton(
+                    onClick = {onErrorClick(R.string.chore_not_found_workflow) }
+                ){
+                    Icon(Icons.Default.Warning, stringResource(R.string.chore_not_found_workflow), tint = MaterialTheme.colorScheme.error)
                 }
             }
         },

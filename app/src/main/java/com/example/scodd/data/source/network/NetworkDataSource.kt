@@ -18,4 +18,8 @@ interface NetworkDataSource {
 
     suspend fun saveChoreItems(chores: List<NetworkChoreItem>)
 
+    suspend fun loadModes(): List<NetworkMode>
+
+    suspend fun saveModes(chores: List<NetworkMode>)
+
 }

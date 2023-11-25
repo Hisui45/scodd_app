@@ -1,18 +1,8 @@
 package com.example.scodd.data
 
-import androidx.room.PrimaryKey
-import com.example.scodd.data.source.local.LocalChore
-import com.example.scodd.data.source.local.LocalChoreItem
-import com.example.scodd.data.source.local.LocalRoom
-import com.example.scodd.data.source.local.LocalWorkflow
-import com.example.scodd.data.source.network.NetworkChore
-import com.example.scodd.data.source.network.NetworkChoreItem
-import com.example.scodd.data.source.network.NetworkRoom
-import com.example.scodd.data.source.network.NetworkWorkflow
-import com.example.scodd.model.Chore
-import com.example.scodd.model.ChoreItem
-import com.example.scodd.model.Room
-import com.example.scodd.model.Workflow
+import com.example.scodd.data.source.local.*
+import com.example.scodd.data.source.network.*
+import com.example.scodd.model.*
 
 /**
  * Data model mapping extension functions. There are three model types:
@@ -296,3 +286,67 @@ fun NetworkChoreItem.toExternalChoreItem() = toLocalChoreItem().toExternalChoreI
 
 @JvmName("networkChoreItemToExternalChoreItem")
 fun List<NetworkChoreItem>.toExternalChoreItem() = map(NetworkChoreItem::toExternalChoreItem)
+
+/**
+ * Mode
+ */
+// External to local
+fun Mode.toLocalMode() = LocalMode(
+    id = id,
+    selectedWorkflows = selectedWorkflows,
+    workflowChores = workflowChores,
+    chores = chores,
+    rooms = rooms
+)
+
+fun List<Mode>.toLocalMode() = map(Mode::toLocalMode)
+
+//Local to External
+fun LocalMode.toExternalMode() = Mode(
+    id = id,
+    selectedWorkflows = selectedWorkflows,
+    workflowChores = workflowChores,
+    chores = chores,
+    rooms = rooms
+)
+
+// Note: JvmName is used to provide a unique name for each extension function with the same name.
+// Without this, type erasure will cause compiler errors because these methods will have the same
+// signature on the JVM.
+@JvmName("localModeToExternalMode")
+fun List<LocalMode>.toExternalMode() = map(LocalMode::toExternalMode)
+
+// Network to Local
+fun NetworkMode.toLocalMode() = LocalMode(
+    id = id,
+    selectedWorkflows = selectedWorkflows,
+    workflowChores = workflowChores,
+    chores = chores,
+    rooms = rooms
+)
+
+@JvmName("networkModeToLocalMode")
+fun List<NetworkMode>.toLocalMode() = map(NetworkMode::toLocalMode)
+
+// Local to Network
+fun LocalMode.toNetworkMode() = NetworkMode(
+    id = id,
+    selectedWorkflows = selectedWorkflows,
+    workflowChores = workflowChores,
+    chores = chores,
+    rooms = rooms
+)
+
+fun List<LocalMode>.toNetworkMode() = map(LocalMode::toNetworkMode)
+
+// External to Network
+fun Mode.toNetworkMode() = toLocalMode().toNetworkMode()
+
+@JvmName("externalModeToNetworkMode")
+fun List<Mode>.toNetworkMode() = map(Mode::toNetworkMode)
+
+// Network to External
+fun NetworkMode.toExternalMode() = toLocalMode().toExternalMode()
+
+@JvmName("networkModeToExternalMode")
+fun List<NetworkMode>.toExternalMode() = map(NetworkMode::toExternalMode)

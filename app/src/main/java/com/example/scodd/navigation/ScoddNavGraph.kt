@@ -211,12 +211,44 @@ fun NavGraphBuilder.modeGraph(navController: NavController){
 
         composable(route = ModeNav.Modes.route) {
             ModeScreen(
-                modeScreens = scoddModeScreens,
                 onModeClick = { mode ->
-                    navController.navigate(mode.route)
+                    navController.navigate(
+                        ModeNav.StartMode.route.let {
+                            "$it?modeId=${mode.modeId}"
+                        }
+                    )
                 }
             )
         }
+
+        composable(route = ModeNav.StartMode.routeWithArgs, arguments = listOf(
+            navArgument("modeId") { type = NavType.StringType}
+        )
+        ){navBackStack ->
+            val selectedItems =
+                navBackStack.savedStateHandle.
+                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
+            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
+            StartModeScreen(
+                selectedItems = selectedItems,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onEditChore = { choreId ->
+                    navController.navigate(
+                        ChoreNav.CreateChore.route.let {
+                            "$it?choreId=$choreId"
+                        }
+                    )
+                },
+                onAddChoreClick = { incomingSelectedChores ->
+                    val converted = Gson().toJson(incomingSelectedChores)
+                    navController.navigate(
+                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
+                    )}
+            )
+        }
+
 
         composable(route = ModeNav.TimeMode.route){navBackStack ->
             val selectedItems =

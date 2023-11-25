@@ -6,6 +6,7 @@ import com.example.scodd.R
 import com.example.scodd.data.ChoreRepository
 import com.example.scodd.model.Chore
 import com.example.scodd.model.ChoreItem
+import com.example.scodd.model.ScoddModes
 import com.example.scodd.model.Workflow
 import com.example.scodd.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -124,6 +125,7 @@ class SandModeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             loadWorkflows()
+            loadMode()
         }
     }
 
@@ -135,6 +137,32 @@ class SandModeViewModel @Inject constructor(
         return _selectedWorkflows.value.any{it == workflowId}
     }
 
+    private fun updateSandModeWorkflow() {
+        viewModelScope.launch {
+            choreRepository.updateModeWorkflows(
+                modeId = ScoddModes.SAND_MODE,
+                selectedWorkflows = _selectedWorkflows.value,
+                workflowChores = _choresFromWorkflow.value
+            )
+        }
+    }
+
+    private fun updateSandModeWorkflowChores() {
+        viewModelScope.launch {
+            choreRepository.updateModeWorkflowChores(
+                modeId = ScoddModes.SAND_MODE,
+                workflowChores = _choresFromWorkflow.value
+            )
+        }
+    }
+    private fun updateSandModeChores() {
+        viewModelScope.launch {
+            choreRepository.updateModeChores(
+                modeId = ScoddModes.SAND_MODE,
+                chores = _selectedChores.value
+            )
+        }
+    }
     fun selectWorkflow(workflow: Workflow) {
         val selectedWorkflows = _selectedWorkflows.value.toMutableList()
         val choresFromWorkflow = _choresFromWorkflow.value.toMutableList()
@@ -150,6 +178,7 @@ class SandModeViewModel @Inject constructor(
         }
         _selectedWorkflows.value = selectedWorkflows.toList()
         _choresFromWorkflow.value = choresFromWorkflow.toList()
+        updateSandModeWorkflow()
     }
 
     private fun workflowChores(workflowId: String): Set<String>{
@@ -168,6 +197,15 @@ class SandModeViewModel @Inject constructor(
             return false
         }
         return true
+    }
+
+    fun checkExistInWorkflow(choreId: String): Boolean{
+        uiState.value.choreItems.forEach {choreItem ->
+            if(choreItem.parentChoreId == choreId && _selectedWorkflows.value.any { it == choreItem.parentWorkflowId }){
+                return true
+            }
+        }
+        return false
     }
 
     fun getChoreTitle(parentChoreId: String): String {
@@ -208,6 +246,7 @@ class SandModeViewModel @Inject constructor(
             }
         }
         _choresFromWorkflow.value = choresFromWorkflow
+        updateSandModeWorkflowChores()
     }
 
     fun selectedItems(selectedItems: List<String>) {
@@ -215,6 +254,7 @@ class SandModeViewModel @Inject constructor(
         selectedChores.clear()
         selectedChores.addAll(selectedItems)
         _selectedChores.value = selectedChores.toList()
+        updateSandModeChores()
 
     }
     private suspend fun loadWorkflows(){
@@ -238,6 +278,17 @@ class SandModeViewModel @Inject constructor(
 
     fun switchShowGuided() {
         _showGuided.value = !_showGuided.value
+    }
+
+    private suspend fun loadMode() {
+        choreRepository.getMode(ScoddModes.SAND_MODE).let {
+                mode ->
+            if (mode != null) {
+                _selectedWorkflows.value = mode.selectedWorkflows
+                _choresFromWorkflow.value = mode.workflowChores
+                _selectedChores.value = mode.chores
+            }
+        }
     }
 
 }

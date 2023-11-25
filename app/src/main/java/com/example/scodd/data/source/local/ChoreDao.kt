@@ -316,4 +316,70 @@ interface ChoreDao {
     @Query("UPDATE choreItem SET isComplete = :complete WHERE id = :choreItemId")
     suspend fun updateChoreItem(choreItemId: String, complete: Boolean)
 
+    /**
+     * Observes list of modes.
+     *
+     * @return all modes.
+     */
+    @Query("SELECT * FROM mode")
+    fun observeAllModes(): Flow<List<LocalMode>>
+
+    /**
+     * Observes a single mode.
+     *
+     * @param id the mode id.
+     * @return the mode with choreId.
+     */
+    @Query("SELECT * FROM mode WHERE id = :id")
+    fun observeModeById(id: String): Flow<LocalMode>
+
+    /**
+     * Select all modes from the modes table.
+     *
+     * @return all modes.
+     */
+    @Query("SELECT * FROM mode")
+    suspend fun getAllModes(): List<LocalMode>
+
+    /**
+     * Select a mode by id.
+     *
+     * @param id the mode id.
+     * @return the mode with mode.
+     */
+    @Query("SELECT * FROM mode WHERE id = :id")
+    suspend fun getModeById(id: String): LocalMode?
+
+    /**
+     * Insert or update a mode in the database. If a mode already exists, replace it.
+     *
+     * @param mode the mode to be inserted or updated.
+     */
+    @Upsert
+    suspend fun upsertMode(mode: LocalMode)
+
+    /**
+     * Insert or update modes in the database. If a mode already exists, replace it.
+     *
+     * @param modes the modes to be inserted or updated.
+     */
+    @Upsert
+    suspend fun upsertAllModes(modes: List<LocalMode>)
+
+    @Insert
+    fun insertAllModes(modes: List<LocalMode>)
+    /**
+     * Delete a mode by id.
+     *
+     * @return the number of modes deleted. This should always be 1.
+     */
+    @Query("DELETE FROM mode WHERE id = :id")
+    suspend fun deleteModeById(id: String): Int
+
+    /**
+     * Delete all modes.
+     */
+    @Query("DELETE FROM mode")
+    suspend fun deleteAllModes()
+
 }

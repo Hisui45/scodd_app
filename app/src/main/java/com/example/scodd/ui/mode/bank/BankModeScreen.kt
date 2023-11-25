@@ -61,6 +61,7 @@ fun BankModeScreen(
                         title = viewModel.getChoreTitle(choreId),
                         bankValue = bankValue,
                         isDistinct = isDistinct,
+                        existsInWorkflow = true,
                         onErrorClick = { errorMessage ->
                             viewModel.showItemErrorMessage(errorMessage, choreId)
                         }
@@ -85,10 +86,12 @@ fun BankModeScreen(
                 itemsIndexed(uiState.choresFromWorkflow){ index, choreId ->
                     val bankValue = viewModel.getChoreBankModeValue(choreId)
                     val isDistinct = viewModel.checkIsDistinct(choreId)
+                    val exists = viewModel.checkExistInWorkflow(choreId)
                     BankModeChoreListItem(
                         title = viewModel.getChoreTitle(choreId),
                         bankValue = bankValue,
                         isDistinct = isDistinct,
+                        existsInWorkflow = exists,
                         onErrorClick = { errorMessage ->
                             viewModel.showItemErrorMessage(errorMessage, choreId)
                         }
@@ -113,7 +116,7 @@ fun BankModeScreen(
                                 }
                             }
                         }
-                    }else if(userMessage == R.string.chore_repeat){
+                    }else if(userMessage == R.string.chore_repeat || userMessage == R.string.chore_not_found_workflow){
                         snackbarHostState.showSnackbar(
                             message = snackbarText,
                             duration = SnackbarDuration.Short,

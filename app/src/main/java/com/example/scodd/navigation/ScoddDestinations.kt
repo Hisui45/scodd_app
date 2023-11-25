@@ -91,6 +91,13 @@ object ModeNav : ScoddBottomNavDestination {
         override val route = "modes_screen"
         override val label = "Modes"
     }
+
+    object StartMode : ScoddDestination {
+        override val route = "start_mode_screen"
+        override val routeWithArgs = "$route?modeId={modeId}"
+        override val parentRoute = "modes_screen"
+    }
+
     object TimeMode : ScoddDestination {
         override val route = "time_crunch_screen"
         override val parentRoute = "modes_screen"

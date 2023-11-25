@@ -6,6 +6,7 @@ import com.example.scodd.R
 import com.example.scodd.data.ChoreRepository
 import com.example.scodd.model.Chore
 import com.example.scodd.model.ChoreItem
+import com.example.scodd.model.ScoddModes
 import com.example.scodd.model.Workflow
 import com.example.scodd.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -97,6 +98,7 @@ class SpinModeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             loadWorkflows()
+            loadMode()
         }
     }
 
@@ -106,6 +108,33 @@ class SpinModeViewModel @Inject constructor(
 
     fun isWorkflowSelected(workflowId: String): Boolean {
         return _selectedWorkflows.value.any{it == workflowId}
+    }
+
+    private fun updateSpinModeWorkflow() {
+        viewModelScope.launch {
+            choreRepository.updateModeWorkflows(
+                modeId = ScoddModes.SPIN_MODE,
+                selectedWorkflows = _selectedWorkflows.value,
+                workflowChores = _choresFromWorkflow.value
+            )
+        }
+    }
+
+    private fun updateSpinModeWorkflowChores() {
+        viewModelScope.launch {
+            choreRepository.updateModeWorkflowChores(
+                modeId = ScoddModes.SPIN_MODE,
+                workflowChores = _choresFromWorkflow.value
+            )
+        }
+    }
+    private fun updateSpinModeChores() {
+        viewModelScope.launch {
+            choreRepository.updateModeChores(
+                modeId = ScoddModes.SPIN_MODE,
+                chores = _selectedChores.value
+            )
+        }
     }
 
     fun selectWorkflow(workflow: Workflow) {
@@ -123,6 +152,7 @@ class SpinModeViewModel @Inject constructor(
         }
         _selectedWorkflows.value = selectedWorkflows.toList()
         _choresFromWorkflow.value = choresFromWorkflow.toList()
+        updateSpinModeWorkflow()
     }
 
     private fun workflowChores(workflowId: String): Set<String>{
@@ -141,6 +171,15 @@ class SpinModeViewModel @Inject constructor(
             return false
         }
         return true
+    }
+
+    fun checkExistInWorkflow(choreId: String): Boolean{
+        uiState.value.choreItems.forEach {choreItem ->
+            if(choreItem.parentChoreId == choreId && _selectedWorkflows.value.any { it == choreItem.parentWorkflowId }){
+                return true
+            }
+        }
+        return false
     }
 
     fun getChoreTitle(parentChoreId: String): String {
@@ -181,6 +220,7 @@ class SpinModeViewModel @Inject constructor(
             }
         }
         _choresFromWorkflow.value = choresFromWorkflow
+        updateSpinModeWorkflowChores()
     }
 
     fun selectedItems(selectedItems: List<String>) {
@@ -188,12 +228,23 @@ class SpinModeViewModel @Inject constructor(
         selectedChores.clear()
         selectedChores.addAll(selectedItems)
         _selectedChores.value = selectedChores.toList()
-
+        updateSpinModeChores()
     }
     private suspend fun loadWorkflows(){
         choreRepository.getWorkflows().let { workflows ->
             _parentWorkflows.value = workflows
 
+        }
+    }
+
+    private suspend fun loadMode() {
+        choreRepository.getMode(ScoddModes.SPIN_MODE).let {
+                mode ->
+            if (mode != null) {
+                _selectedWorkflows.value = mode.selectedWorkflows
+                _choresFromWorkflow.value = mode.workflowChores
+                _selectedChores.value = mode.chores
+            }
         }
     }
 

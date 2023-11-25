@@ -4,10 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scodd.R
 import com.example.scodd.data.ChoreRepository
-import com.example.scodd.model.Chore
-import com.example.scodd.model.ChoreItem
-import com.example.scodd.model.ScoddTime
-import com.example.scodd.model.Workflow
+import com.example.scodd.model.*
 import com.example.scodd.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -99,6 +96,7 @@ class TimeModeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             loadWorkflows()
+            loadMode()
         }
     }
 
@@ -281,6 +279,17 @@ class TimeModeViewModel @Inject constructor(
         choreRepository.getWorkflows().let { workflows ->
             _parentWorkflows.value = workflows
 
+        }
+    }
+
+    private suspend fun loadMode() {
+        choreRepository.getMode(ScoddModes.TIME_MODE).let {
+                mode ->
+            if (mode != null) {
+                _selectedWorkflows.value = mode.selectedWorkflows
+                _choresFromWorkflow.value = mode.workflowChores
+                _selectedChores.value = mode.chores
+            }
         }
     }
 }

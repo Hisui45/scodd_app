@@ -140,5 +140,12 @@
     <string name="add_chore_items">Add Chores</string>
     <string name="edit_chore_items">Edit Chores</string>
     <string name="remove">Remove</string>
+    <string name="chore_not_found_workflow">This chore cannot be found in the workflow.</string>
+    <string name="bank_payout">Potential Payout:</string>
+    <string name="time_esitmation">Estimated Time:</string>
+    <string name="quest_directions">This mode focuses on rooms rather than chores.</string>
+    <string name="quest_focus">Focus Areas</string>
+    <string name="snackbar_edit">Edit</string>
+    <string name="snackbar_remove">Remove</string>
 
 </resources>

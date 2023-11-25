@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.scodd.R
 import com.example.scodd.data.ChoreRepository
 import com.example.scodd.model.Room
+import com.example.scodd.model.ScoddModes
 import com.example.scodd.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -55,12 +56,9 @@ class QuestModeViewModel @Inject constructor(
         initialValue = QuestUiState()
     )
 
-
-//    private val _isLoading = MutableStateFlow(false)
-
     init {
         viewModelScope.launch {
-//            loadWorkflows()
+            loadMode()
         }
     }
 
@@ -80,19 +78,16 @@ class QuestModeViewModel @Inject constructor(
             selectedRooms.add(room.id)
         }
         _selectedRooms.value = selectedRooms.toList()
+        updateModeRooms()
     }
 
-
-//    fun checkIsDistinct(choreId: String): Boolean {
-//        val count = uiState.value.choresFromWorkflow.count { it == choreId } + uiState.value.selectedChores.count{ it == choreId}
-//        if(count > 1){
-//            return false
-//        }
-//        return true
-//    }
-
-    fun getChoreTitle(parentRoomId: String): String {
-        return uiState.value.rooms.find { it.id == parentRoomId }?.title?: ""
+    private fun updateModeRooms(){
+        viewModelScope.launch {
+            choreRepository.updateModeRooms(
+                modeId = ScoddModes.QUEST_MODE,
+                rooms = _selectedRooms.value
+            )
+        }
     }
 
 //    fun refresh() {
@@ -122,8 +117,18 @@ class QuestModeViewModel @Inject constructor(
             _selectedRooms.value = emptyList()
         }else{
             val selectedRooms = uiState.value.selectedRooms.toMutableList()
-                selectedRooms.addAll(uiState.value.rooms.map { it.id })
+            selectedRooms.addAll(uiState.value.rooms.map { it.id })
             _selectedRooms.value = selectedRooms
+        }
+        updateModeRooms()
+    }
+
+    private suspend fun loadMode() {
+        choreRepository.getMode(ScoddModes.QUEST_MODE).let {
+                mode ->
+            if (mode != null) {
+                _selectedRooms.value = mode.rooms
+            }
         }
     }
 

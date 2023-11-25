@@ -1,40 +1,58 @@
-package com.example.scodd.ui.mode.bank
+package com.example.scodd.ui.mode
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scodd.R
 import com.example.scodd.data.ChoreRepository
 import com.example.scodd.model.*
+import com.example.scodd.model.ScoddMode.*
 import com.example.scodd.utils.WhileUiSubscribed
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 
-data class BankUiState(
+data class ModeUiState(
     val parentWorkflows: List<Workflow> = emptyList(),
     val parentChores: List<Chore> = emptyList(),
     val choreItems: List<ChoreItem> = emptyList(),
+    val rooms: List<Room> = emptyList(),
 
     //Pre-load
     val selectedWorkflows: List<String> = emptyList(),
     //Individual Chores from Workflow
     val choresFromWorkflow: List<String> = emptyList(),
-    //Pre-load
     val selectedChores: List<String> = emptyList(),
+    val selectedRooms: List<String> = emptyList(),
 
     val isLoading: Boolean = false,
     var userMessage: Int? = null,
-    val choreItemError: String? = null
+    val choreItemError: String? = null,
+    
+    val mode: ScoddMode = BankMode
 
 )
 /**
  * ViewModel for the Details screen.
  */
 @HiltViewModel
-class BankModeViewModel @Inject constructor(
-    private val choreRepository: ChoreRepository
+class ModeViewModel @Inject constructor(
+    private val choreRepository: ChoreRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val modeId: String? = savedStateHandle["modeId"]
+
+
+    init {
+        viewModelScope.launch {
+            if(modeId != null){
+                loadMode(modeId)
+            }
+            loadWorkflows()
+        }
+    }
 
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _choreItemError: MutableStateFlow<String?> = MutableStateFlow(null)
@@ -64,6 +82,17 @@ class BankModeViewModel @Inject constructor(
             emit(emptyList())
         }
 
+    //Chores that show in UI
+    private val _selectedRooms: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
+
+    //Used to make items
+    private val _rooms = choreRepository.getRoomsStream()
+        .catch {
+            handleChoreStreamError()
+            emit(emptyList())
+        }
+
+
     private fun removeEmptyWorkflows(workflows: List<Workflow>): List<Workflow>{
         /**
          * TODO: REMOVE  empty workflows
@@ -71,59 +100,63 @@ class BankModeViewModel @Inject constructor(
         return workflows
     }
 
-    //    private val _uiState = MutableStateFlow(BankUiState())
-    val uiState: StateFlow<BankUiState> = combine(
-        _parentChores, _choresFromWorkflow, _selectedChores, _choreItems, _userMessage
-    ){parentChores, choresFromWorkflow,selectedChores, choreItems, userMessage  ->
-        BankUiState(
-            parentWorkflows = _parentWorkflows.value,
-            choreItems = choreItems,
-            parentChores = parentChores,
-            choresFromWorkflow = choresFromWorkflow,
-            selectedChores = selectedChores,
-            userMessage = userMessage,
-            choreItemError = _choreItemError.value
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = WhileUiSubscribed,
-        initialValue = BankUiState()
-    )
+    //    private val _uiState = MutableStateFlow(ModeUiState())
 
-
-//    private val _isLoading = MutableStateFlow(false)
-
-    init {
-        viewModelScope.launch {
-            loadMode()
-            loadWorkflows()
+    val uiState: StateFlow<ModeUiState> =
+        when(modeId){
+        QuestMode.modeId -> {
+            combine(
+                _rooms, _selectedRooms, _userMessage
+            ){rooms, selectedRooms, userMessage  ->
+                ModeUiState(
+                    rooms = rooms,
+                    userMessage = userMessage,
+                    selectedRooms = selectedRooms,
+                    mode = QuestMode,
+                    )
+            }.stateIn(
+                scope = viewModelScope,
+                started = WhileUiSubscribed,
+                initialValue = ModeUiState()
+            )
+        }
+        else -> {
+            combine(
+                _parentChores, _choresFromWorkflow, _selectedChores, _choreItems, _userMessage
+            ){parentChores, choresFromWorkflow,selectedChores, choreItems, userMessage  ->
+                ModeUiState(
+                    parentWorkflows = _parentWorkflows.value,
+                    choreItems = choreItems,
+                    parentChores = parentChores,
+                    choresFromWorkflow = choresFromWorkflow,
+                    selectedChores = selectedChores,
+                    userMessage = userMessage,
+                    choreItemError = _choreItemError.value,
+                    mode = when(modeId){
+                        BankMode.modeId ->{
+                            BankMode
+                        }
+                        TimeMode.modeId ->{
+                            TimeMode
+                        }
+                        SandMode.modeId ->{
+                            SandMode
+                        }
+                        SpinMode.modeId ->{
+                            SpinMode
+                        }
+                        else -> {
+                            BankMode
+                        }
+                    },
+                    )
+            }.stateIn(
+                scope = viewModelScope,
+                started = WhileUiSubscribed,
+                initialValue = ModeUiState()
+            )
         }
     }
-
-    fun calculatePotentialPayout(): Int {
-        val parentChores = uiState.value.parentChores
-        val selectedChores = uiState.value.selectedChores
-
-
-        val potentialPayoutFromWorkflow = uiState.value.choresFromWorkflow.sumOf { parentChoreId ->
-            if(parentChores.find { it.id == parentChoreId }?.isBankModeActive == true){
-                parentChores.find { it.id == parentChoreId }?.bankModeValue?: 0
-            }else{
-                0
-            }
-        }
-
-        val potentialPayoutFromSelectedChores = selectedChores.sumOf { parentChoreId ->
-            if(parentChores.find { it.id == parentChoreId }?.isBankModeActive == true){
-                parentChores.find { it.id == parentChoreId }?.bankModeValue?: 0
-            }else{
-                0
-            }
-        }
-
-        return potentialPayoutFromWorkflow + potentialPayoutFromSelectedChores
-    }
-
     private fun handleChoreStreamError() {
         _userMessage.value = R.string.loading_chores_error
     }
@@ -132,28 +165,28 @@ class BankModeViewModel @Inject constructor(
         return _selectedWorkflows.value.any{it == workflowId}
     }
 
-    private fun updateBankModeWorkflow() {
+    private fun updateModeWorkflows(modeId: String) {
         viewModelScope.launch {
             choreRepository.updateModeWorkflows(
-                modeId = ScoddModes.BANK_MODE,
+                modeId = modeId,
                 selectedWorkflows = _selectedWorkflows.value,
                 workflowChores = _choresFromWorkflow.value
             )
         }
     }
 
-    private fun updateBankModeWorkflowChores() {
+    private fun updateModeWorkflowChores(modeId: String) {
         viewModelScope.launch {
             choreRepository.updateModeWorkflowChores(
-                modeId = ScoddModes.BANK_MODE,
+                modeId = modeId,
                 workflowChores = _choresFromWorkflow.value
             )
         }
     }
-    private fun updateBankModeChores() {
+    private fun updateModeChores(modeId: String) {
         viewModelScope.launch {
             choreRepository.updateModeChores(
-                modeId = ScoddModes.BANK_MODE,
+                modeId = modeId,
                 chores = _selectedChores.value
             )
         }
@@ -173,7 +206,9 @@ class BankModeViewModel @Inject constructor(
         }
         _selectedWorkflows.value = selectedWorkflows.toList()
         _choresFromWorkflow.value = choresFromWorkflow.toList()
-        updateBankModeWorkflow()
+        if (modeId != null) {
+            updateModeWorkflows(modeId)
+        }
     }
 
     private fun workflowChores(workflowId: String): Set<String>{
@@ -191,7 +226,9 @@ class BankModeViewModel @Inject constructor(
         selectedChores.clear()
         selectedChores.addAll(selectedItems)
         _selectedChores.value = selectedChores.toList()
-        updateBankModeChores()
+        if (modeId != null) {
+            updateModeChores(modeId)
+        }
     }
 
     fun checkIsDistinct(choreId: String): Boolean {
@@ -213,18 +250,6 @@ class BankModeViewModel @Inject constructor(
 
     fun getChoreTitle(parentChoreId: String): String {
         return uiState.value.parentChores.find { it.id == parentChoreId }?.title?: ""
-    }
-
-    fun getChoreBankModeValue(parentChoreId: String): Int {
-        val choreItem = uiState.value.parentChores.find { it.id == parentChoreId }
-        if (choreItem != null) {
-            return if(choreItem.isBankModeActive){
-                choreItem.bankModeValue
-            }else{
-                -1
-            }
-        }
-        return -1
     }
 
 //    fun refresh() {
@@ -261,7 +286,9 @@ class BankModeViewModel @Inject constructor(
             }
         }
         _choresFromWorkflow.value = choresFromWorkflow
-        updateBankModeWorkflowChores()
+        if (modeId != null) {
+            updateModeWorkflowChores(modeId)
+        }
     }
 
     private suspend fun loadWorkflows(){
@@ -271,17 +298,57 @@ class BankModeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadMode() {
-        choreRepository.getMode(ScoddModes.BANK_MODE).let {
+    private suspend fun loadMode(modeId: String) {
+        choreRepository.getMode(modeId).let {
             mode ->
             if (mode != null) {
                 _selectedWorkflows.value = mode.selectedWorkflows
                 _choresFromWorkflow.value = mode.workflowChores
                 _selectedChores.value = mode.chores
+                _selectedRooms.value = mode.rooms
             }
         }
     }
 
+
+    /**
+     * BANK MODE
+     */
+    fun calculatePotentialPayout(): Int {
+        val parentChores = uiState.value.parentChores
+        val selectedChores = uiState.value.selectedChores
+
+
+        val potentialPayoutFromWorkflow = uiState.value.choresFromWorkflow.sumOf { parentChoreId ->
+            if(parentChores.find { it.id == parentChoreId }?.isBankModeActive == true){
+                parentChores.find { it.id == parentChoreId }?.bankModeValue?: 0
+            }else{
+                0
+            }
+        }
+
+        val potentialPayoutFromSelectedChores = selectedChores.sumOf { parentChoreId ->
+            if(parentChores.find { it.id == parentChoreId }?.isBankModeActive == true){
+                parentChores.find { it.id == parentChoreId }?.bankModeValue?: 0
+            }else{
+                0
+            }
+        }
+
+        return potentialPayoutFromWorkflow + potentialPayoutFromSelectedChores
+    }
+
+    fun getChoreBankModeValue(parentChoreId: String): Int {
+        val choreItem = uiState.value.parentChores.find { it.id == parentChoreId }
+        if (choreItem != null) {
+            return if(choreItem.isBankModeActive){
+                choreItem.bankModeValue
+            }else{
+                -1
+            }
+        }
+        return -1
+    }
 
     /**
      * TIME MODE
@@ -369,6 +436,94 @@ class BankModeViewModel @Inject constructor(
                 0
             }
         }
+    }
+
+    /**
+     * QUEST MODE
+     */
+
+    fun selectAll(selectAll: Boolean) {
+        if(selectAll){
+            _selectedRooms.value = emptyList()
+        }else{
+            val selectedRooms = uiState.value.selectedRooms.toMutableList()
+            selectedRooms.addAll(uiState.value.rooms.map { it.id })
+            _selectedRooms.value = selectedRooms
+        }
+        updateModeRooms()
+    }
+
+    private fun updateModeRooms(){
+        viewModelScope.launch {
+            choreRepository.updateModeRooms(
+                modeId = ScoddModes.QUEST_MODE,
+                rooms = _selectedRooms.value
+            )
+        }
+    }
+
+    fun isRoomSelected(roomId: String): Boolean {
+        return _selectedRooms.value.any{it == roomId}
+    }
+
+    fun selectRoom(room: Room) {
+        val selectedRooms = _selectedRooms.value.toMutableList()
+        if (room.id in selectedRooms) {
+            selectedRooms.remove(room.id)
+        } else {
+            selectedRooms.add(room.id)
+        }
+        _selectedRooms.value = selectedRooms.toList()
+        updateModeRooms()
+    }
+
+
+    /**
+     * SAND MODE
+     */
+
+    data class TimerUiState(
+        val hourValue: String = "",
+        val minuteValue: String = "",
+        val secondValue: String = "",
+        val showGuided: Boolean = false
+    )
+
+    private val _hourValue: MutableStateFlow<String> = MutableStateFlow("1")
+    private val _minuteValue: MutableStateFlow<String> = MutableStateFlow("15")
+    private val _secondValue: MutableStateFlow<String> = MutableStateFlow("30")
+
+    private val _showGuided: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    val uiTimerState: StateFlow<TimerUiState> = combine(
+        _hourValue, _minuteValue, _secondValue, _showGuided
+    ){hourValue, minuteValue, secondValue, showGuided  ->
+        TimerUiState(
+            hourValue = hourValue,
+            minuteValue = minuteValue,
+            secondValue = secondValue,
+            showGuided = showGuided
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileUiSubscribed,
+        initialValue = TimerUiState()
+    )
+
+    fun changeHrValue(newValue: String) {
+        if (newValue.length >= 2) _hourValue.value = newValue.substring(0, 2) else _hourValue.value = newValue
+    }
+
+    fun changeMinValue(newValue: String) {
+        if (newValue.length >= 2) _minuteValue.value = newValue.substring(0, 2) else _minuteValue.value = newValue
+    }
+
+    fun changeSecValue(newValue: String) {
+        if (newValue.length >= 2) _secondValue.value = newValue.substring(0, 2) else _secondValue.value = newValue
+    }
+
+    fun switchShowGuided() {
+        _showGuided.value = !_showGuided.value
     }
 }
 

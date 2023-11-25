@@ -58,6 +58,7 @@ fun SpinModeScreen(
                     ModeChoreListItem(
                         title = viewModel.getChoreTitle(choreId),
                         isDistinct = isDistinct,
+                        existsInWorkflow = true,
                         onErrorClick = {errorMessage ->
                             viewModel.showItemErrorMessage(errorMessage, choreId)
                         }
@@ -81,9 +82,11 @@ fun SpinModeScreen(
                 }
                 itemsIndexed(uiState.choresFromWorkflow){ index, choreId ->
                     val isDistinct = viewModel.checkIsDistinct(choreId)
+                    val exists = viewModel.checkExistInWorkflow(choreId)
                     ModeChoreListItem(
                         title = viewModel.getChoreTitle(choreId),
                         isDistinct = isDistinct,
+                        existsInWorkflow = exists,
                         onErrorClick = {errorMessage ->
                             viewModel.showItemErrorMessage(errorMessage, choreId)
                         }

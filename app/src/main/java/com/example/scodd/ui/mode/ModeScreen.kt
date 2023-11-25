@@ -12,8 +12,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.scodd.R
+import com.example.scodd.model.ScoddMode
 import com.example.scodd.ui.components.StatusBar
-import com.example.scodd.navigation.ScoddDestination
 import com.example.scodd.ui.theme.White40
 
 
@@ -21,18 +21,19 @@ import com.example.scodd.ui.theme.White40
  * TODO: save/load user's mode selections
  * TODO: functioning modes (sand,bank, timer, quest, spin)
  * TODO: show money earned from Piggy Bank Mode
+ * TODO: disable start button when nothing is selected
+ * TODO: better error management hiding calculated values when there are errors
  */
 @Composable
 fun ModeScreen(
-    modeScreens: List<ScoddDestination>,
-    onModeClick: (ScoddDestination) -> Unit) {
+    onModeClick: (ScoddMode) -> Unit) {
     Surface{
         StatusBar(White40)
         Column(
             Modifier.padding(12.dp, 0.dp)
         ){
             ModeTitleCard()
-            ModeList(modeScreens,onModeClick)
+            ModeList(onModeClick)
         }
 
     }
@@ -60,7 +61,7 @@ fun ModeTitleCard(){
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ModeCard(mode : ScoddDestination, onModeClick: (ScoddDestination) -> Unit ){
+fun ModeCard(mode : ScoddMode, onModeClick: (ScoddMode) -> Unit ){
 
     ElevatedCard(
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary,MaterialTheme.colorScheme.onPrimary),
@@ -78,7 +79,8 @@ fun ModeCard(mode : ScoddDestination, onModeClick: (ScoddDestination) -> Unit ){
 //
 //            }
             Spacer(Modifier.weight(1f))
-            Text(mode.label,
+            Text(
+                stringResource(mode.title),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(16.dp))
         }
@@ -86,16 +88,17 @@ fun ModeCard(mode : ScoddDestination, onModeClick: (ScoddDestination) -> Unit ){
     }
 }
 @Composable
-fun ModeList(modeScreens: List<ScoddDestination>,
-             onModeClick: (ScoddDestination) -> Unit,
+fun ModeList(
+    onModeClick: (ScoddMode) -> Unit,
 ){
     LazyColumn(
         contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ){
-        items(modeScreens){ mode ->
+        items(ScoddMode.allModes){ mode ->
             ModeCard(
                 mode, onModeClick)
         }
     }
 }
+

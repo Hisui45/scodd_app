@@ -75,6 +75,10 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
             isComplete = false,
         )
     )
+
+    private var modes = listOf(
+        NetworkMode("", emptyList(), emptyList(), emptyList(), emptyList())
+    )
     override suspend fun loadChores(): List<NetworkChore> = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
         return chores
@@ -113,6 +117,16 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
     override suspend fun saveChoreItems(newChoreItems: List<NetworkChoreItem>) = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
         choreItems = newChoreItems
+    }
+
+    override suspend fun loadModes(): List<NetworkMode> = accessMutex.withLock {
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        return modes
+    }
+
+    override suspend fun saveModes(newModes: List<NetworkMode>) = accessMutex.withLock {
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        modes = newModes
     }
 }
 

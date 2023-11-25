@@ -124,5 +124,38 @@ interface ChoreRepository {
 
     suspend fun deleteChoreItem(choreItemId: String)
 
+    /**
+     * Mode
+     */
+
+    fun getModesStream(): Flow<List<Mode>>
+
+    suspend fun getModes(forceUpdate: Boolean = false): List<Mode>
+
+    fun getModeStream(modeId: String): Flow<Mode?>
+
+    suspend fun getMode(modeId: String, forceUpdate: Boolean = false): Mode?
+
+//    suspend fun refreshMode(roomId: String)
+
+//    suspend fun createMode(mode: String, workflows: List<String>, chores: List<String>, rooms: List<String>): String
+
+    suspend fun updateMode(modeId: String, selectedWorkflows: List<String>, workflowChores: List<String>, chores: List<String>, rooms: List<String>)
+
+    suspend fun updateModeWorkflowChores(modeId: String,  workflowChores: List<String>)
+
+    suspend fun updateModeWorkflows(modeId: String,  selectedWorkflows: List<String>, workflowChores: List<String>)
+
+    suspend fun updateModeChores(modeId: String, chores: List<String>)
+
+    suspend fun updateModeRooms(modeId: String, rooms: List<String>)
+
+//    suspend fun switchCheckList(roomId: String)
+//
+//    suspend fun switchChoreList(roomId: String)
+
+//    suspend fun deleteAllModes()
+
+//    suspend fun deleteMode(mode: String)
 
 }

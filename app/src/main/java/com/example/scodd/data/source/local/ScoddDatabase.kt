@@ -12,7 +12,7 @@ import com.example.scodd.data.source.Converters
  * Note that exportSchema should be true in production databases.
  */
 
-@Database(entities = [LocalChore::class,LocalRoom::class,LocalWorkflow::class,LocalChoreItem::class], version = 1, exportSchema = false)
+@Database(entities = [LocalChore::class,LocalRoom::class,LocalWorkflow::class,LocalChoreItem::class, LocalMode::class], version = 1, exportSchema = false)
 
 @TypeConverters(Converters::class)
 abstract class ScoddDatabase : RoomDatabase() {

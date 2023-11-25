@@ -551,6 +551,150 @@ class DefaultChoreRepository @Inject constructor(
 
 
     /**
+     * Mode
+     */
+
+//    override suspend fun createMode(
+//        mode: String,
+//        workflows: List<String>,
+//        chores: List<String>,
+//        rooms: List<String>
+//    ): String {
+//        // ID creation might be a complex operation, so it's executed using the supplied
+//        // coroutine dispatcher
+//        val mode = withContext(dispatcher) {
+//            UUID.randomUUID().toString()
+//        }
+//        val room = Mode(
+//            mode = mode,
+//            workflows = workflows,
+//            chores = chores,
+//            rooms = rooms
+//        )
+//        localDataSource.upsertMode(room.toLocalMode())
+//        saveModesToNetwork()
+//        return roomId
+//    }
+
+    override suspend fun updateMode(
+        modeId: String,
+        selectedWorkflows: List<String>,
+        workflowChores: List<String>,
+        chores: List<String>,
+        rooms: List<String>
+    ) {
+        val updatedMode = getMode(modeId)?.copy(
+            id = modeId,
+            selectedWorkflows = selectedWorkflows,
+            workflowChores = workflowChores,
+            chores = chores,
+            rooms = rooms
+        ) ?: throw Exception("Mode (id $modeId) not found")
+
+        localDataSource.upsertMode(updatedMode.toLocalMode())
+        saveModesToNetwork()
+    }
+
+    override suspend fun updateModeWorkflows(
+        modeId: String,
+        selectedWorkflows: List<String>,
+        workflowChores: List<String>
+    ) {
+        val updatedMode = getMode(modeId)?.copy(
+            id = modeId,
+            selectedWorkflows = selectedWorkflows,
+            workflowChores = workflowChores
+        ) ?: throw Exception("Mode (id $modeId) not found")
+        localDataSource.upsertMode(updatedMode.toLocalMode())
+        saveModesToNetwork()
+    }
+
+    override suspend fun updateModeWorkflowChores(
+        modeId: String,
+        workflowChores: List<String>,
+    ) {
+        val updatedMode = getMode(modeId)?.copy(
+            id = modeId,
+            workflowChores = workflowChores,
+        ) ?: throw Exception("Mode (id $modeId) not found")
+
+        localDataSource.upsertMode(updatedMode.toLocalMode())
+        saveModesToNetwork()
+    }
+
+    override suspend fun updateModeChores(
+        modeId: String,
+        chores: List<String>,
+    ) {
+        val updatedMode = getMode(modeId)?.copy(
+            id = modeId,
+            chores = chores,
+        ) ?: throw Exception("Mode (id $modeId) not found")
+
+        localDataSource.upsertMode(updatedMode.toLocalMode())
+        saveModesToNetwork()
+    }
+
+    override suspend fun updateModeRooms(
+        modeId: String,
+        rooms: List<String>
+    ) {
+        val updatedMode = getMode(modeId)?.copy(
+            id = modeId,
+            rooms = rooms
+        ) ?: throw Exception("Mode (id $modeId) not found")
+
+        localDataSource.upsertMode(updatedMode.toLocalMode())
+        saveModesToNetwork()
+    }
+    override suspend fun getModes(forceUpdate: Boolean): List<Mode> {
+        if (forceUpdate) {
+            refresh()
+        }
+        return withContext(dispatcher) {
+            localDataSource.getAllModes().toExternalMode()
+        }
+    }
+    override fun getModesStream(): Flow<List<Mode>> {
+        return localDataSource.observeAllModes().map { modes ->
+            withContext(dispatcher) {
+                modes.toExternalMode()
+            }
+        }
+    }
+
+//    override suspend fun refreshMode(roomId: String) {
+//        refresh()
+//    }
+
+    override fun getModeStream(modeId: String): Flow<Mode?> {
+        return localDataSource.observeModeById(modeId).map { it.toExternalMode() }
+    }
+
+    /**
+     * Get a Mode with the given ID. Will return null if the room cannot be found.
+     *
+     * @param modeId - The ID of the room
+     * @param forceUpdate - true if the room should be updated from the network data source first.
+     */
+    override suspend fun getMode(modeId: String, forceUpdate: Boolean): Mode? {
+        if (forceUpdate) {
+            refresh()
+        }
+        return localDataSource.getModeById(modeId)?.toExternalMode()
+    }
+
+//    override suspend fun deleteAllModes() {
+//        localDataSource.deleteAllModes()
+//        saveModesToNetwork()
+//    }
+//
+//    override suspend fun deleteMode(roomId: String) {
+//        localDataSource.deleteModeById(roomId)
+//        saveModesToNetwork()
+//    }
+
+    /**
      * The following methods load chores from (refresh), and save chores to, the network.
      *
      * Real apps may want to do a proper sync, rather than the "one-way sync everything" approach
@@ -584,6 +728,10 @@ class DefaultChoreRepository @Inject constructor(
             val remoteChoreItems = networkDataSource.loadChoreItems()
             localDataSource.deleteAllChoreItems()
             localDataSource.upsertAllChoreItems(remoteChoreItems.toLocalChoreItem())
+
+            val remoteModes = networkDataSource.loadModes()
+            localDataSource.deleteAllModes()
+            localDataSource.upsertAllModes(remoteModes.toLocalMode())
         }
     }
 
@@ -673,6 +821,29 @@ class DefaultChoreRepository @Inject constructor(
                     localChoreItems.toNetworkChoreItem()
                 }
                 networkDataSource.saveChoreItems(networkChoreItems)
+            } catch (e: Exception) {
+                // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
+                // to an app level UI state holder which could then display a Toast message.
+            }
+        }
+    }
+
+    /**
+     * Send the mode from the local data source to the network data source
+     *
+     * Returns immediately after launching the job. Real apps may want to suspend here until the
+     * operation is complete or (better) use WorkManager to schedule this work. Both approaches
+     * should provide a mechanism for failures to be communicated back to the user so that
+     * they are aware that their data isn't being backed up.
+     */
+    private fun saveModesToNetwork() {
+        scope.launch {
+            try {
+                val localModes = localDataSource.getAllModes()
+                val networkModes = withContext(dispatcher) {
+                    localModes.toNetworkMode()
+                }
+                networkDataSource.saveModes(networkModes)
             } catch (e: Exception) {
                 // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
                 // to an app level UI state holder which could then display a Toast message.
