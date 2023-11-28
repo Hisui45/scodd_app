@@ -306,10 +306,17 @@ class ModeViewModel @Inject constructor(
                 _choresFromWorkflow.value = mode.workflowChores
                 _selectedChores.value = mode.chores
                 _selectedRooms.value = mode.rooms
+                when(modeId){
+                    SandMode.modeId ->{
+                        _hourValue.value = mode.rooms[0]
+                        _minuteValue.value = mode.rooms[1]
+                        _secondValue.value = mode.rooms[2]
+                        _showGuided.value = mode.rooms[3] == "1"
+                    }
+                }
             }
         }
     }
-
 
     /**
      * BANK MODE
@@ -403,17 +410,20 @@ class ModeViewModel @Inject constructor(
         val totalTimeInMinutes = potentialPayoutFromWorkflow + potentialPayoutFromSelectedChores
 
         if (totalTimeInMinutes < 0) {
-            return "?"  // Handle negative input as needed
+            return "< 1 min"  // Handle negative input as needed
         }
 
         val hours = totalTimeInMinutes / 60
         val remainingMinutes = totalTimeInMinutes % 60
 
+        val hourString = if (hours > 1) "hours" else "hour"
+        val minuteString = if (remainingMinutes > 1) "minutes" else "minute"
+
         return when {
-            hours > 0 && remainingMinutes > 0 -> "$hours hours and $remainingMinutes minutes"
-            hours > 0 -> "$hours hours"
-            remainingMinutes > 0 -> "$remainingMinutes minutes"
-            else -> "?"
+            hours > 0 && remainingMinutes > 0 -> "$hours $hourString and $remainingMinutes $minuteString"
+            hours > 0 -> "$hours $hourString"
+            remainingMinutes > 0 -> "$remainingMinutes $minuteString"
+            else -> "< 1 min"
         }
 
     }
@@ -438,6 +448,18 @@ class ModeViewModel @Inject constructor(
         }
     }
 
+    fun allSelectedChores(): List<String>{
+        return _selectedChores.value + _choresFromWorkflow.value
+    }
+    fun getFirstChoreTimeDuration(): Long {
+
+        val currentChore = uiState.value.parentChores.find { it.id ==  allSelectedChores()[0]}
+        val duration = currentChore?.timerModeValue?.toLong()?: -1
+        val unit = currentChore?.timerOption?: ScoddTime.SECOND
+
+        return TimeUtils.getChoreTimerDurationInSeconds(duration, unit)
+    }
+
     /**
      * QUEST MODE
      */
@@ -450,13 +472,13 @@ class ModeViewModel @Inject constructor(
             selectedRooms.addAll(uiState.value.rooms.map { it.id })
             _selectedRooms.value = selectedRooms
         }
-        updateModeRooms()
+        updateModeRooms(QuestMode.modeId)
     }
 
-    private fun updateModeRooms(){
+    private fun updateModeRooms(modeId: String){
         viewModelScope.launch {
             choreRepository.updateModeRooms(
-                modeId = ScoddModes.QUEST_MODE,
+                modeId = modeId,
                 rooms = _selectedRooms.value
             )
         }
@@ -474,7 +496,18 @@ class ModeViewModel @Inject constructor(
             selectedRooms.add(room.id)
         }
         _selectedRooms.value = selectedRooms.toList()
-        updateModeRooms()
+        updateModeRooms(QuestMode.modeId)
+    }
+
+    fun getRoomTitles(): List<String>{
+        val selectedTitles: MutableList<String> = mutableListOf()
+        _selectedRooms.value.forEach {
+            val title = uiState.value.rooms.find { room -> room.id == it }?.title
+            if(title != null){
+                selectedTitles.add(title)
+            }
+        }
+        return selectedTitles
     }
 
 
@@ -489,9 +522,9 @@ class ModeViewModel @Inject constructor(
         val showGuided: Boolean = false
     )
 
-    private val _hourValue: MutableStateFlow<String> = MutableStateFlow("1")
-    private val _minuteValue: MutableStateFlow<String> = MutableStateFlow("15")
-    private val _secondValue: MutableStateFlow<String> = MutableStateFlow("30")
+    private val _hourValue: MutableStateFlow<String> = MutableStateFlow("")
+    private val _minuteValue: MutableStateFlow<String> = MutableStateFlow("")
+    private val _secondValue: MutableStateFlow<String> = MutableStateFlow("")
 
     private val _showGuided: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -510,20 +543,49 @@ class ModeViewModel @Inject constructor(
         initialValue = TimerUiState()
     )
 
+    private fun updateTimeValue(index: Int){
+        val selectedRooms = _selectedRooms.value.toMutableList()
+        selectedRooms[index] =
+            when(index){
+                0 ->{
+                    _hourValue.value
+                }
+                1 ->{
+                    _minuteValue.value
+                }
+                2->{
+                    _secondValue.value
+                }
+                3->{
+                    if (_showGuided.value) "1" else "0"
+                }
+                else -> {
+                    ""
+                }
+            }
+        _selectedRooms.value = selectedRooms
+        updateModeRooms(SandMode.modeId)
+    }
+
     fun changeHrValue(newValue: String) {
         if (newValue.length >= 2) _hourValue.value = newValue.substring(0, 2) else _hourValue.value = newValue
+        updateTimeValue(0)
     }
 
     fun changeMinValue(newValue: String) {
         if (newValue.length >= 2) _minuteValue.value = newValue.substring(0, 2) else _minuteValue.value = newValue
+        updateTimeValue(1)
     }
 
     fun changeSecValue(newValue: String) {
         if (newValue.length >= 2) _secondValue.value = newValue.substring(0, 2) else _secondValue.value = newValue
+        updateTimeValue(2)
     }
 
     fun switchShowGuided() {
         _showGuided.value = !_showGuided.value
+        updateTimeValue(3)
     }
+
 }
 

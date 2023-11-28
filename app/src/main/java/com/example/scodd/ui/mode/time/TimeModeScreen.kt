@@ -36,7 +36,7 @@ fun TimeModeScreen(
     StatusBar(Marigold40)
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)  },
-        bottomBar = {ModeBottomBar(onStartClick = {})}
+        bottomBar = {ModeBottomBar(false, onStartClick = {})}
     ){
         Column(Modifier.padding(it)) {
             ScoddModeHeader(onNavigateBack, stringResource(R.string.time_mode_title),

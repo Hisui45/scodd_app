@@ -147,5 +147,44 @@
     <string name="quest_focus">Focus Areas</string>
     <string name="snackbar_edit">Edit</string>
     <string name="snackbar_remove">Remove</string>
+    <string name="close">Close</string>
+    <string name="skip">Skip</string>
+    <string name="time_remaining">Time Remaining</string>
+    <string name="done">Done</string>
+    <string name="complete">Complete</string>
+    <string name="finish">Finish</string>
+    <string name="amount_escrow">Amount In Escrow</string>
+    <string name="pause">Pause</string>
+    <string name="timer_cont">Continue</string>
+    <string name="resume">Resume</string>
+    <string name="time_up">Time\'s Up!</string>
+    <string name="more_time">+5 minutes</string>
+    <string name="spin_wheel">Spin the Wheel</string>
+    <string name="restart">Restart</string>
+    <string name="user_completing_spin">You\'ve worked through all the chores!</string>
+    <string name="chores_completed">Chores Completed!</string>
+    <string name="next">Next</string>
+    <string name="current_room">Current Room:</string>
+    <string name="trash_content_desc">picture of a trash bag</string>
+
+    <string name="quest_one_title">Quest 1: Trash</string>
+    <string name="quest_one_desc">Go around the room and pick up all the trash.</string>
+
+    <string name="quest_two_title">Quest 2: Laundry</string>
+    <string name="quest_two_desc">Look around the room and gather clothing.</string>
+
+    <string name="quest_three_title">Quest 3: Dishes</string>
+    <string name="quest_three_desc">Track down those dirty dishes and bring them back to the kitchen.</string>
+
+    <string name="quest_four_title">Quest 4: Lost &amp; Found</string>
+    <string name="quest_four_desc">Return the things that have a place back to where they belong.</string>
+
+    <string name="quest_five_title">Quest 5: Orphaned Items</string>
+    <string name="quest_five_desc">The things that don\'t have a place, find a place or throw them away.</string>
+    <string name="back">Back</string>
+    <string name="briefing_desc">This room needs your attention! Follow the quests to conquer the clutter.</string>
+    <string name="quest_message">It’s okay if you’re feeling overwhelmed. Just take it room-by-room. You can do this!</string>
+    <string name="quest_finished">Mission Accomplished! You tackled those rooms like a brave champion!</string>
+    <string name="quest_finished_message">Bear in mind that a weary adventurer deserves rest too.</string>
 
 </resources>

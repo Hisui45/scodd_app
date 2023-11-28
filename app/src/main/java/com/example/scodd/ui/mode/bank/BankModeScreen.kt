@@ -36,7 +36,7 @@ fun BankModeScreen(
     StatusBar(Marigold40)
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)  },
-        bottomBar = {ModeBottomBar(onStartClick = {})}
+        bottomBar = {ModeBottomBar(false, onStartClick = {})}
     ){
         Column(Modifier.padding(it)) {
             ScoddModeHeader(onNavigateBack,

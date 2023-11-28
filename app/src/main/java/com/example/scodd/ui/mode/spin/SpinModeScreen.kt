@@ -35,7 +35,7 @@ fun SpinModeScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)  },
-        bottomBar = {ModeBottomBar(onStartClick = {})}
+        bottomBar = {ModeBottomBar(false, onStartClick = {})}
     ) {
         Column(Modifier.padding(it)) {
             ScoddModeHeader(onNavigateBack,

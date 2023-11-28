@@ -2,7 +2,6 @@ package com.example.scodd.ui.mode
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,10 +17,9 @@ import com.example.scodd.ui.theme.White40
 
 
 /**
- * TODO: save/load user's mode selections
- * TODO: functioning modes (sand,bank, timer, quest, spin)
+ * TODO: complete screens (sand,bank,timer) add sound to quest
+ * TODO: are you sure? to quests
  * TODO: show money earned from Piggy Bank Mode
- * TODO: disable start button when nothing is selected
  * TODO: better error management hiding calculated values when there are errors
  */
 @Composable
@@ -33,7 +31,16 @@ fun ModeScreen(
             Modifier.padding(12.dp, 0.dp)
         ){
             ModeTitleCard()
-            ModeList(onModeClick)
+            LazyColumn(
+                contentPadding = PaddingValues(vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ){
+                item{ ModeCard(ScoddMode.BankMode, onModeClick)}
+                item{ ModeCard(ScoddMode.TimeMode, onModeClick)}
+                item{ ModeCard(ScoddMode.QuestMode, onModeClick)}
+                item{ ModeCard(ScoddMode.SandMode, onModeClick)}
+                item{ ModeCard(ScoddMode.SpinMode, onModeClick)}
+            }
         }
 
     }
@@ -62,43 +69,27 @@ fun ModeTitleCard(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModeCard(mode : ScoddMode, onModeClick: (ScoddMode) -> Unit ){
-
-    ElevatedCard(
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary,MaterialTheme.colorScheme.onPrimary),
-        onClick = {onModeClick(mode)}
-    ){
-
-        Column(
-            Modifier.fillMaxWidth().fillMaxHeight().height(150.dp),
-            horizontalAlignment = Alignment.End
+        ElevatedCard(
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary,MaterialTheme.colorScheme.onPrimary),
+            onClick = {onModeClick(mode)}
         ){
+
+            Column(
+                Modifier.fillMaxWidth().fillMaxHeight().height(150.dp),
+                horizontalAlignment = Alignment.End
+            ){
 //            IconButton(
 //                onClick ={}
 //            ){
 //                Icon(Icons.Default.MoreVert,"More")
 //
 //            }
-            Spacer(Modifier.weight(1f))
-            Text(
-                stringResource(mode.title),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp))
-        }
-
+                Spacer(Modifier.weight(1f))
+                Text(
+                    stringResource(mode.title),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(16.dp))
+            }
     }
-}
-@Composable
-fun ModeList(
-    onModeClick: (ScoddMode) -> Unit,
-){
-    LazyColumn(
-        contentPadding = PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ){
-        items(ScoddMode.allModes){ mode ->
-            ModeCard(
-                mode, onModeClick)
-        }
-    }
-}
 
+}

@@ -22,7 +22,6 @@ import com.example.scodd.model.Workflow
 import com.example.scodd.ui.components.*
 import com.example.scodd.ui.theme.Marigold40
 import com.example.scodd.utils.LazyAnimations
-import timber.log.Timber
 
 /**
  * TODO: options: to clear completed priority: 5
@@ -160,7 +159,7 @@ fun WorkflowContent(
                 onCheckChanged = {completeItem(choreItem.id, it)
                                  focusManager.clearFocus()},
                 showCheckBox = workflow.isCheckList,
-                animateModifier = Modifier.animateItemPlacement(LazyAnimations.WORKFLOW.animation)
+                modifier = Modifier.animateItemPlacement(LazyAnimations.WORKFLOW.animation)
             )
             if (index < choreItems.lastIndex)
                 Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)

@@ -12,11 +12,6 @@ import com.example.scodd.ui.dashboard.DashboardScreen
 import com.example.scodd.ui.login.LoginScreen
 import com.example.scodd.ui.chore.*
 import com.example.scodd.ui.mode.*
-import com.example.scodd.ui.mode.bank.BankModeScreen
-import com.example.scodd.ui.mode.quest.QuestModeScreen
-import com.example.scodd.ui.mode.sand.SandModeScreen
-import com.example.scodd.ui.mode.spin.SpinModeScreen
-import com.example.scodd.ui.mode.time.TimeModeScreen
 import com.example.scodd.ui.workflow.CreateWorkflowScreen
 import com.example.scodd.ui.workflow.SelectChoreScreen
 import com.example.scodd.ui.workflow.WorkflowScreen
@@ -245,105 +240,145 @@ fun NavGraphBuilder.modeGraph(navController: NavController){
                     val converted = Gson().toJson(incomingSelectedChores)
                     navController.navigate(
                         ChoreNav.SelectChore.route + "/$converted" + "/" + null
-                    )}
+                    )},
+                onStartClick = { incomingSelectedChores, modeId, timeDuration ->
+                        val convertChores = Gson().toJson(incomingSelectedChores)
+//                        val convertDuration = Gson().toJson(timeDuration)
+                        navController.navigate(
+                            ModeNav.ProgressMode.route + "/$convertChores" + "/$modeId" + "/$timeDuration"
+                        )
+                }
             )
         }
 
-
-        composable(route = ModeNav.TimeMode.route){navBackStack ->
-            val selectedItems =
-                navBackStack.savedStateHandle.
-                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
-            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
-            TimeModeScreen(
-                selectedItems = selectedItems,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onEditChore = { choreId ->
-                    navController.navigate(
-                        ChoreNav.CreateChore.route.let {
-                            "$it?choreId=$choreId"
-                        }
-                    )
-                },
-                onAddChoreClick = { incomingSelectedChores ->
-                    val converted = Gson().toJson(incomingSelectedChores)
-                    navController.navigate(
-                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
-                    )}
+        composable(route = ModeNav.ProgressMode.routeWithArgs,
+            arguments = listOf(
+                navArgument("incomingSelectedChores") { type = NavType.StringType},
+                navArgument("modeId") { type = NavType.StringType},
+                navArgument("timeDuration") {type = NavType.LongType}
             )
+        ){ navBackStack ->
+            val incomingSelectedChores = navBackStack.arguments?.getString("incomingSelectedChores")
+            val modeId = navBackStack.arguments?.getString("modeId")
+
+            if (incomingSelectedChores != null) {
+                val converted = Gson().fromJson(incomingSelectedChores, Array<String>::class.java).toList()
+                CompleteModeScreen(
+                    incomingSelectedItems = converted,
+                    modeId = modeId,
+                    onSelectFinish = { data ->
+                        // Pass data back to A
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("selectedChores", data)
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    navigateToChoreCreate = {
+                        navController.navigate(ChoreNav.CreateChore.route)
+                    }
+
+                )
+            }
         }
 
-        composable(route = ModeNav.QuestMode.route){
-            QuestModeScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
 
-            )
-        }
-
-        composable(route = ModeNav.SpinMode.route){navBackStack ->
-            val selectedItems =
-                navBackStack.savedStateHandle.
-                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
-            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
-            SpinModeScreen(
-                selectedItems = selectedItems,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onAddChoreClick = { incomingSelectedChores ->
-                    val converted = Gson().toJson(incomingSelectedChores)
-                    navController.navigate(
-                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
-                    )}
-            )
-        }
-
-        composable(route = ModeNav.SandMode.route){navBackStack ->
-            val selectedItems =
-                navBackStack.savedStateHandle.
-                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
-            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
-            SandModeScreen(
-                selectedItems = selectedItems,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onAddChoreClick = { incomingSelectedChores ->
-                    val converted = Gson().toJson(incomingSelectedChores)
-                    navController.navigate(
-                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
-                    )}
-            )
-        }
-
-        composable(route = ModeNav.BankMode.route){navBackStack ->
-            val selectedItems =
-                navBackStack.savedStateHandle.
-                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
-            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
-            BankModeScreen(
-                selectedItems = selectedItems,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onEditChore = { choreId ->
-                    navController.navigate(
-                        ChoreNav.CreateChore.route.let {
-                            "$it?choreId=$choreId"
-                        }
-                    )
-                },
-                onAddChoreClick = { incomingSelectedChores ->
-                    val converted = Gson().toJson(incomingSelectedChores)
-                    navController.navigate(
-                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
-                    )}
-            )
-        }
+//        composable(route = ModeNav.TimeMode.route){navBackStack ->
+//            val selectedItems =
+//                navBackStack.savedStateHandle.
+//                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
+//            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
+//            TimeModeScreen(
+//                selectedItems = selectedItems,
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                },
+//                onEditChore = { choreId ->
+//                    navController.navigate(
+//                        ChoreNav.CreateChore.route.let {
+//                            "$it?choreId=$choreId"
+//                        }
+//                    )
+//                },
+//                onAddChoreClick = { incomingSelectedChores ->
+//                    val converted = Gson().toJson(incomingSelectedChores)
+//                    navController.navigate(
+//                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
+//                    )}
+//            )
+//        }
+//
+//        composable(route = ModeNav.QuestMode.route){
+//            QuestModeScreen(
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                },
+//
+//            )
+//        }
+//
+//        composable(route = ModeNav.SpinMode.route){navBackStack ->
+//            val selectedItems =
+//                navBackStack.savedStateHandle.
+//                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
+//            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
+//            SpinModeScreen(
+//                selectedItems = selectedItems,
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                },
+//                onAddChoreClick = { incomingSelectedChores ->
+//                    val converted = Gson().toJson(incomingSelectedChores)
+//                    navController.navigate(
+//                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
+//                    )}
+//            )
+//        }
+//
+//        composable(route = ModeNav.SandMode.route){navBackStack ->
+//            val selectedItems =
+//                navBackStack.savedStateHandle.
+//                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
+//            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
+//            SandModeScreen(
+//                selectedItems = selectedItems,
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                },
+//                onAddChoreClick = { incomingSelectedChores ->
+//                    val converted = Gson().toJson(incomingSelectedChores)
+//                    navController.navigate(
+//                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
+//                    )}
+//            )
+//        }
+//
+//        composable(route = ModeNav.BankMode.route){navBackStack ->
+//            val selectedItems =
+//                navBackStack.savedStateHandle.
+//                getStateFlow<List<String>?>("selectedChores", null).collectAsState()
+//            navBackStack.savedStateHandle.remove<List<String>>("selectedChores")
+//            BankModeScreen(
+//                selectedItems = selectedItems,
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                },
+//                onEditChore = { choreId ->
+//                    navController.navigate(
+//                        ChoreNav.CreateChore.route.let {
+//                            "$it?choreId=$choreId"
+//                        }
+//                    )
+//                },
+//                onAddChoreClick = { incomingSelectedChores ->
+//                    val converted = Gson().toJson(incomingSelectedChores)
+//                    navController.navigate(
+//                        ChoreNav.SelectChore.route + "/$converted" + "/" + null
+//                    )}
+//            )
+//        }
     }
 }
 fun NavHostController.navigateSingleTopTo(route: String) =

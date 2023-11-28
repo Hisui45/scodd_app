@@ -19,9 +19,6 @@ object ScoddModes{
 }
 
 sealed class ScoddMode(val modeId: String, val title: Int, val description: Int){
-companion object {
-    val allModes: List<ScoddMode> = listOf(BankMode, TimeMode, QuestMode, SandMode, SpinMode)
-}
 object BankMode : ScoddMode("bank_mode", R.string.bank_mode_title, R.string.bank_mode_desc)
 object TimeMode : ScoddMode("time_mode", R.string.time_mode_title, R.string.time_mode_desc)
 object QuestMode : ScoddMode("quest_mode", R.string.quest_mode_title, R.string.quest_mode_desc)

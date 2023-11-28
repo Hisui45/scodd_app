@@ -32,23 +32,75 @@ fun StartModeScreen(
     onNavigateBack: () -> Unit,
     onAddChoreClick : (List<String>) -> Unit,
     onEditChore: (String) -> Unit,
+    onStartClick: (List<String>, String, Long) -> Unit,
     viewModel: ModeViewModel = hiltViewModel()
 ) {
     val suggestions = listOf(ADHD, Game, Motivation)
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    val uiState by viewModel.uiState.collectAsState()
+    val mode = uiState.mode
+
+    val uiTimerState by viewModel.uiTimerState.collectAsState()
+
     StatusBar(Marigold40)
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        bottomBar = { ModeBottomBar(onStartClick = {}) }
+        bottomBar = { ModeBottomBar(
+            enabled =
+            when(mode){
+                is QuestMode ->{
+                    uiState.selectedRooms.isNotEmpty()
+                }
+                is SandMode -> {
+                    if(uiTimerState.showGuided){
+                        (uiState.choresFromWorkflow.isNotEmpty() || uiState.selectedChores.isNotEmpty()) &&
+                                (uiTimerState.hourValue.isNotEmpty() && uiTimerState.hourValue != "0" && uiTimerState.hourValue != "00" ||
+                        uiTimerState.minuteValue.isNotEmpty() && uiTimerState.minuteValue != "0" && uiTimerState.minuteValue != "00" ||
+                        uiTimerState.secondValue.isNotEmpty() && uiTimerState.secondValue != "0" && uiTimerState.secondValue != "00")
+                    }else{
+                        uiTimerState.hourValue.isNotEmpty() && uiTimerState.hourValue != "0" && uiTimerState.hourValue != "00" ||
+                        uiTimerState.minuteValue.isNotEmpty() && uiTimerState.minuteValue != "0" && uiTimerState.minuteValue != "00" ||
+                        uiTimerState.secondValue.isNotEmpty() && uiTimerState.secondValue != "0" && uiTimerState.secondValue != "00"
+                    }
+                }
+                else ->{
+                    uiState.choresFromWorkflow.isNotEmpty() || uiState.selectedChores.isNotEmpty()
+                }
+           },
+            onStartClick = {onStartClick(
+                when(mode){
+                    is SandMode ->{
+                        if(uiTimerState.showGuided){
+                            viewModel.allSelectedChores()
+                        }else{
+                            emptyList()
+                        }
+                    }
+                    is QuestMode ->{
+                        viewModel.getRoomTitles()
+                    }
+                    else ->{
+                        viewModel.allSelectedChores()
+                    }
+                },
+                uiState.mode.modeId,
+                when(mode){
+                    is SandMode -> {
+                        TimeUtils.getTimeListInSeconds(listOf(uiTimerState.hourValue, uiTimerState.minuteValue, uiTimerState.secondValue))
+                    }
+                    is TimeMode -> {
+                        viewModel.getFirstChoreTimeDuration()
+                    }
+                    else -> {
+                        20
+                    }
+                }
+
+                )}) }
     ) {
         Column(Modifier.padding(it)) {
-
-            val uiState by viewModel.uiState.collectAsState()
-            val mode = uiState.mode
-
-            val uiTimerState by viewModel.uiTimerState.collectAsState()
             val currentOption =
                 if (uiTimerState.showGuided) stringResource(R.string.sand_option_two) else stringResource(R.string.sand_option_one)
 
@@ -232,12 +284,14 @@ fun StartModeScreen(
                                 )
                             }
 
-                            item {
-                                Column(
-                                    Modifier.padding(12.dp).fillMaxWidth(),
-                                    horizontalAlignment = Alignment.Start
-                                ) {
-                                    LabelText(stringResource(R.string.chore_source))
+                            if(uiState.choresFromWorkflow.isNotEmpty()){
+                                item {
+                                    Column(
+                                        Modifier.padding(12.dp).fillMaxWidth(),
+                                        horizontalAlignment = Alignment.Start
+                                    ) {
+                                        LabelText(stringResource(R.string.chore_source))
+                                    }
                                 }
                             }
 
@@ -276,7 +330,6 @@ fun StartModeScreen(
 
                                     }
                                 }
-
                                 if (index < uiState.choresFromWorkflow.lastIndex)
                                     Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
                             }
@@ -289,12 +342,12 @@ fun StartModeScreen(
                 val snackbarText = stringResource(userMessage)
                 LaunchedEffect(scope, viewModel, userMessage, snackbarText) {
                     when (mode) {
-                        is BankMode -> {
-                            if (userMessage == R.string.chore_bank_mode_not_active) {
+                        is BankMode, is TimeMode -> {
+                            if (userMessage == R.string.chore_bank_mode_not_active || userMessage == R.string.chore_timer_mode_not_active) {
                                 snackbarHostState.showSnackbar(
                                     message = snackbarText,
                                     duration = SnackbarDuration.Short,
-                                    actionLabel = stringResource(R.string.snackbar_edit)
+                                    actionLabel = "Change"
                                 ).let { result ->
                                     if (result == SnackbarResult.ActionPerformed) {
                                         uiState.choreItemError?.let { choreItem ->
@@ -304,23 +357,6 @@ fun StartModeScreen(
                                 }
                             }
                         }
-
-                        is TimeMode -> {
-                            if (userMessage == R.string.chore_timer_mode_not_active) {
-                                snackbarHostState.showSnackbar(
-                                    message = snackbarText,
-                                    duration = SnackbarDuration.Short,
-                                    actionLabel = stringResource(R.string.snackbar_edit)
-                                ).let { result ->
-                                    if (result == SnackbarResult.ActionPerformed) {
-                                        uiState.choreItemError?.let { choreItem ->
-                                            onEditChore(choreItem)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
                         else -> {
 
                         }
@@ -329,7 +365,7 @@ fun StartModeScreen(
                         snackbarHostState.showSnackbar(
                             message = snackbarText,
                             duration = SnackbarDuration.Short,
-                            actionLabel = stringResource(R.string.snackbar_remove)
+                            actionLabel = "Remove"
                         ).let { result ->
                             if (result == SnackbarResult.ActionPerformed) {
                                 uiState.choreItemError?.let { choreItem ->

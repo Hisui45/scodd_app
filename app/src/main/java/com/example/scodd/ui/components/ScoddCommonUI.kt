@@ -444,18 +444,19 @@ fun CreateDialog(header : String, onDismissRequest: () -> Unit, onCreateClick : 
 
 @Composable
 fun ChoreListItem(
-        firstRoom : String,
-        additionalAmount: Int,
-        title: String,
-        isComplete : Boolean,
-        onCheckChanged : (Boolean) -> Unit,
-        showCheckBox : Boolean,
-        animateModifier : Modifier){
+    firstRoom : String = "",
+    additionalAmount: Int = 0,
+    title: String,
+    isComplete : Boolean,
+    onCheckChanged : (Boolean) -> Unit,
+    showCheckBox : Boolean,
+    isEnabled: Boolean = true,
+    modifier : Modifier = Modifier){
     /**
      * TODO: option to hide additional rooms priority: 5
      */
     ListItem(
-        modifier = animateModifier,
+        modifier = modifier,
         overlineContent = {
             Row(Modifier.fillMaxWidth()){
                 if(firstRoom.isNotEmpty()){
@@ -477,7 +478,7 @@ fun ChoreListItem(
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         trailingContent = {
             if (showCheckBox) {
-                Checkbox(checked = isComplete, onCheckedChange = {onCheckChanged(it)})
+                Checkbox(checked = isComplete, onCheckedChange = {onCheckChanged(it)}, enabled = isEnabled)
             }
         },
     )
@@ -498,30 +499,54 @@ fun ModeChoreListItem(
             Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
         trailingContent = {
-            when {
-                timerValue != null && isDistinct && existsInWorkflow -> {
-                    LabelText("$timerValue $timeUnit")
-                }
-                bankValue != null && isDistinct && existsInWorkflow -> {
-                    LabelText("$$bankValue")
-                }
-                !existsInWorkflow -> {
-                    IconButton(
-                        onClick = { onErrorClick(R.string.chore_not_found_workflow) }
-                    ) {
-                        Icon(
-                            Icons.Default.Warning,
-                            stringResource(R.string.chore_not_found_workflow),
-                            tint = MaterialTheme.colorScheme.error
-                        )
+            if(existsInWorkflow){
+                if(isDistinct){
+                    if(timerValue != null){
+                        if(timerValue > 0){
+                            LabelText("$timerValue $timeUnit")
+                        }else{
+                            IconButton(
+                                onClick = {onErrorClick(R.string.chore_timer_mode_not_active) }
+                            ){
+                                Icon(Icons.Default.Warning, stringResource(R.string.chore_timer_mode_not_active), tint = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                    }else if(bankValue != null){
+                        if(bankValue > 0){
+                            LabelText("$$bankValue")
+                        }else{
+                            IconButton(
+                                onClick = {onErrorClick(R.string.chore_bank_mode_not_active) }
+                            ){
+                                Icon(Icons.Default.Warning, stringResource(R.string.chore_bank_mode_not_active), tint = MaterialTheme.colorScheme.error)
+                            }
+                        }
                     }
-                }
-                !isDistinct -> {
+                }else{
                     IconButton(
                         onClick = { onErrorClick(R.string.chore_repeat) }
                     ) {
                         Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
                     }
+                }
+            }else{
+                IconButton(
+                    onClick = { onErrorClick(R.string.chore_not_found_workflow) }
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        stringResource(R.string.chore_not_found_workflow),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+
+            when {
+                timerValue != null && timerValue > 0 && isDistinct && existsInWorkflow -> {
+
+                }
+                bankValue != null && bankValue > 0 && isDistinct && existsInWorkflow -> {
+                    LabelText("$$bankValue")
                 }
             }
         },

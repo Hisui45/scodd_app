@@ -33,6 +33,9 @@ import com.example.scodd.ui.theme.Burgundy40
 import com.example.scodd.ui.components.*
 import com.example.scodd.utils.*
 
+/**
+ * TODO: fix crash when typing decimal in createchore textfield
+ */
 @Composable
 fun CreateChoreScreen(
     onNavigateBack: () -> Unit,

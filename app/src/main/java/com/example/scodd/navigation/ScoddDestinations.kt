@@ -98,6 +98,12 @@ object ModeNav : ScoddBottomNavDestination {
         override val parentRoute = "modes_screen"
     }
 
+    object ProgressMode : ScoddDestination {
+        override val route = "progress_mode_screen"
+        override val routeWithArgs = "${route}/{incomingSelectedChores}/{modeId}/{timeDuration}"
+        override val parentRoute = "modes_screen"
+    }
+
     object TimeMode : ScoddDestination {
         override val route = "time_crunch_screen"
         override val parentRoute = "modes_screen"

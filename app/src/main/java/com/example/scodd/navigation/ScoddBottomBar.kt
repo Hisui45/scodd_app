@@ -57,12 +57,15 @@ private fun checkScreen(bottomNavScreen : ScoddBottomNavDestination, currentScre
 }
 
 @Composable
-fun ModeBottomBar(onStartClick : () -> Unit){
+fun ModeBottomBar(
+        enabled : Boolean,
+        onStartClick : () -> Unit){
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.background(MaterialTheme.colorScheme.background).fillMaxWidth().padding(8.dp).height(40.dp)
     ){
         Button(
+            enabled = enabled,
             onClick = {onStartClick()},
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary)

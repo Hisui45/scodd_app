@@ -40,7 +40,7 @@ private val LightColorScheme = lightColorScheme(
 //    inverseSurface = LightMarigold40,
 
     outline = LightGray40,
-//    outlineVariant = White40
+    outlineVariant = White40
 
 //    primary = Burgundy40,
 //    onPrimary = Brown40,

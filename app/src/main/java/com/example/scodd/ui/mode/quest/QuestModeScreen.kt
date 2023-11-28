@@ -31,7 +31,7 @@ fun QuestModeScreen(
 
     Scaffold(
         snackbarHost = {},
-        bottomBar = {ModeBottomBar(onStartClick = {})}
+        bottomBar = {ModeBottomBar(false, onStartClick = {})}
     ){
         val uiState by viewModel.uiState.collectAsState()
         val isSelectAll = uiState.selectedRooms.containsAll(uiState.rooms.map { room ->  room.id })

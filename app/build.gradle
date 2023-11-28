@@ -105,6 +105,10 @@ dependencies {
     kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.44'
     androidTestAnnotationProcessor 'com.google.dagger:hilt-android-compiler:2.44'
 
+    implementation 'com.github.commandiron:SpinWheelCompose:1.1.1'
+//    implementation 'com.github.zj565061763:compose-wheel-picker:Tag'
+
+
 
 }
 kapt {

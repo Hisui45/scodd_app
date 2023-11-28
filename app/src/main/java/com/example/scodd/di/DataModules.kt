@@ -8,8 +8,8 @@ import com.example.scodd.data.*
 import com.example.scodd.data.source.local.*
 import com.example.scodd.data.source.network.ChoreNetworkDataSource
 import com.example.scodd.data.source.network.NetworkDataSource
-import com.example.scodd.model.ScoddModes
 import com.example.scodd.model.RoutineInfo
+import com.example.scodd.model.ScoddMode
 import com.example.scodd.model.ScoddTime
 import com.example.scodd.utils.*
 import dagger.Binds
@@ -86,11 +86,11 @@ object DatabaseModule {
                 Executors.newSingleThreadScheduledExecutor()
                     .execute {
                         provideDataBase(context).choreDao().insertAllModes(listOf(
-                            LocalMode(ScoddModes.TIME_MODE, emptyList(), emptyList(), emptyList(), emptyList()),
-                            LocalMode(ScoddModes.SPIN_MODE, emptyList(), emptyList(), emptyList(), emptyList()),
-                            LocalMode(ScoddModes.BANK_MODE, emptyList(), emptyList(), emptyList(),emptyList()),
-                            LocalMode(ScoddModes.QUEST_MODE, emptyList(), emptyList(), emptyList(), emptyList()),
-                            LocalMode(ScoddModes.SAND_MODE, emptyList(), emptyList(), emptyList(), emptyList())
+                            LocalMode(ScoddMode.TimeMode.modeId, emptyList(), emptyList(), emptyList(), emptyList()),
+                            LocalMode(ScoddMode.SpinMode.modeId, emptyList(), emptyList(), emptyList(), emptyList()),
+                            LocalMode(ScoddMode.BankMode.modeId, emptyList(), emptyList(), emptyList(),emptyList()),
+                            LocalMode(ScoddMode.QuestMode.modeId, emptyList(), emptyList(), emptyList(), emptyList()),
+                            LocalMode(ScoddMode.SandMode.modeId, emptyList(), emptyList(), emptyList(), listOf("24", "30", "5", "1"))
                             )
                         )
                     }
