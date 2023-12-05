@@ -107,8 +107,8 @@ fun ChoreDropdownNumberInput(value : Int, selectedOption : ScoddTime, onOptionSe
             onValueChange = {onValueChange(it)},
             modifier = Modifier.width(150.dp),
             singleLine = true,
-            placeholder = {Text("Timer Value")},
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            placeholder = {},
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword),
             keyboardActions = KeyboardActions{focusManager.clearFocus()},
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.secondary,
@@ -285,29 +285,14 @@ fun ChoreCard(
     }
 }
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChoreContent(
-    onChoreSelected : (String) -> Unit,
+fun FilterRoomsContent(
     roomChips: List<Room>,
-    nestedScrollConnection : NestedScrollConnection,
-    chores : List<Chore>,
-    toggleChip : (Room) -> Unit,
-    onFavoriteChipSelected : () -> Unit,
-    favoriteSelected : Boolean,
-    onFavoriteChanged : (Chore) -> Unit,
-    getRoomTitle: (Chore, Int) -> String,
-    isSelectionActive: Boolean,
-    isInSelectionMode : MutableState<Boolean>,
-    selectedItems: SnapshotStateList<String>
-
+    toggleChip: (Room) -> Unit,
+    favoriteSelected: Boolean,
+    onFavoriteChipSelected: () -> Unit
 ){
-    Column(
-        Modifier.padding(15.dp,8.dp, 15.dp, 0.dp)
-    ) {
-        LabelText(stringResource(R.string.chore_label))
-    }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     var doAnimation by remember { mutableStateOf(false) }
@@ -342,6 +327,45 @@ fun ChoreContent(
                 modifier = modifier)
         }
     }
+
+    if(doAnimation){
+        LaunchedEffect(key1 = listState) {
+            coroutineScope.launch {
+                delay(800)
+                listState.animateScrollToItem(0)
+                doAnimation = false
+            }
+        }
+    }
+
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ChoreContent(
+    onChoreSelected : (String) -> Unit,
+    roomChips: List<Room>,
+    nestedScrollConnection : NestedScrollConnection,
+    chores : List<Chore>,
+    toggleChip : (Room) -> Unit,
+    onFavoriteChipSelected : () -> Unit,
+    favoriteSelected : Boolean,
+    onFavoriteChanged : (Chore) -> Unit,
+    getRoomTitle: (Chore, Int) -> String,
+    isSelectionActive: Boolean,
+    isInSelectionMode : MutableState<Boolean>,
+    selectedItems: SnapshotStateList<String>
+
+){
+    Column(
+        Modifier.padding(15.dp,8.dp, 15.dp, 0.dp)
+    ) {
+        LabelText(stringResource(R.string.chore_label))
+    }
+    /**
+     * Filter Room Section
+     */
+    FilterRoomsContent(roomChips,toggleChip,favoriteSelected,onFavoriteChipSelected)
     /**
      * Chore Section
      */
@@ -385,15 +409,7 @@ fun ChoreContent(
     }
 
 
-    if(doAnimation){
-        LaunchedEffect(key1 = listState) {
-            coroutineScope.launch {
-                delay(800)
-                listState.animateScrollToItem(0)
-                doAnimation = false
-            }
-        }
-    }
+
 }
 
 @Composable
@@ -444,14 +460,16 @@ fun CreateDialog(header : String, onDismissRequest: () -> Unit, onCreateClick : 
 
 @Composable
 fun ChoreListItem(
+    modifier : Modifier = Modifier,
     firstRoom : String = "",
     additionalAmount: Int = 0,
     title: String,
     isComplete : Boolean,
     onCheckChanged : (Boolean) -> Unit,
     showCheckBox : Boolean,
-    isEnabled: Boolean = true,
-    modifier : Modifier = Modifier){
+    showDelete: Boolean = false ,
+    onDeleteClicked: () -> Unit = {},
+    isEnabled: Boolean = true){
     /**
      * TODO: option to hide additional rooms priority: 5
      */
@@ -477,8 +495,15 @@ fun ChoreListItem(
         },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         trailingContent = {
-            if (showCheckBox) {
+            if (showCheckBox && !showDelete) {
                 Checkbox(checked = isComplete, onCheckedChange = {onCheckChanged(it)}, enabled = isEnabled)
+            }
+            if(showDelete){
+                IconButton(
+                    onClick = {onDeleteClicked()},
+                ){
+                    Icon(Icons.Default.Delete, "remove")
+                }
             }
         },
     )
@@ -494,6 +519,7 @@ fun ModeChoreListItem(
     timeUnit: String? = null,
     bankValue: Int? = null
 ) {
+    val warningIcon = painterResource(R.drawable.ic_egg_warning)
     ListItem(
         headlineContent = {
             Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -508,7 +534,7 @@ fun ModeChoreListItem(
                             IconButton(
                                 onClick = {onErrorClick(R.string.chore_timer_mode_not_active) }
                             ){
-                                Icon(Icons.Default.Warning, stringResource(R.string.chore_timer_mode_not_active), tint = MaterialTheme.colorScheme.error)
+                                Icon(warningIcon, stringResource(R.string.chore_timer_mode_not_active), tint = MaterialTheme.colorScheme.error)
                             }
                         }
                     }else if(bankValue != null){
@@ -518,7 +544,7 @@ fun ModeChoreListItem(
                             IconButton(
                                 onClick = {onErrorClick(R.string.chore_bank_mode_not_active) }
                             ){
-                                Icon(Icons.Default.Warning, stringResource(R.string.chore_bank_mode_not_active), tint = MaterialTheme.colorScheme.error)
+                                Icon(warningIcon, stringResource(R.string.chore_bank_mode_not_active), tint = MaterialTheme.colorScheme.error)
                             }
                         }
                     }
@@ -526,7 +552,7 @@ fun ModeChoreListItem(
                     IconButton(
                         onClick = { onErrorClick(R.string.chore_repeat) }
                     ) {
-                        Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
+                        Icon(warningIcon, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
                     }
                 }
             }else{
@@ -534,7 +560,7 @@ fun ModeChoreListItem(
                     onClick = { onErrorClick(R.string.chore_not_found_workflow) }
                 ) {
                     Icon(
-                        Icons.Default.Warning,
+                        warningIcon,
                         stringResource(R.string.chore_not_found_workflow),
                         tint = MaterialTheme.colorScheme.error
                     )
@@ -555,107 +581,38 @@ fun ModeChoreListItem(
 }
 
 @Composable
-fun TimeModeChoreListItem(
-        title: String,
-        timerValue: Int,
-        isDistinct : Boolean,
-        timeUnit: String,
-        onErrorClick:(Int) -> Unit
-){
-    ListItem(
-        headlineContent = {
-            Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis)
-        },
-        trailingContent = {
-            if(timerValue > 0 && isDistinct){
-            LabelText("$timerValue $timeUnit")
-        }else if(!isDistinct){
-            IconButton(
-                onClick = {onErrorClick(R.string.chore_repeat) }
-            ){
-                Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
-            }
-        }else{
-            IconButton(
-                onClick = {onErrorClick(R.string.chore_timer_mode_not_active) }
-            ){
-                Icon(Icons.Default.Warning, stringResource(R.string.chore_timer_mode_not_active), tint = MaterialTheme.colorScheme.error)
-            }
-
-        }
-        },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-    )
-
-}
-
-@Composable
-fun BankModeChoreListItem(
+fun OverviewModeListItem(
+    firstRoom : String = "",
+    additionalAmount: Int = 0,
     title: String,
-    bankValue: Int,
-    isDistinct : Boolean,
-    existsInWorkflow: Boolean,
-    onErrorClick:(Int) -> Unit
+    isComplete: Boolean,
+    trailingContent: @Composable () -> Unit
 ){
     ListItem(
-        headlineContent = {
-            Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis)
-        },
-        trailingContent = {
-            if(bankValue > 0 && isDistinct && existsInWorkflow) {
-                LabelText("$$bankValue")
-
-            }else if(!existsInWorkflow){
-                IconButton(
-                    onClick = {onErrorClick(R.string.chore_not_found_workflow) }
-                ){
-                    Icon(Icons.Default.Warning, stringResource(R.string.chore_not_found_workflow), tint = MaterialTheme.colorScheme.error)
-                }
-            }else if(!isDistinct){
-                IconButton(
-                    onClick = {onErrorClick(R.string.chore_repeat) }
-                ){
-                    Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
-                }
-            }else{
-                IconButton(
-                    onClick = {onErrorClick(R.string.chore_bank_mode_not_active) }
-                ){
-                    Icon(Icons.Default.Warning, stringResource(R.string.chore_bank_mode_not_active), tint = MaterialTheme.colorScheme.error)
-                }
-
-            }
-        },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-    )
-
-}
-
-@Composable
-fun ModeChoreListItem(title: String, isDistinct: Boolean, existsInWorkflow: Boolean, onErrorClick: (Int) -> Unit){
-    ListItem(
-        headlineContent = {
-            Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis)
-        },
-        trailingContent = {
-            if(!isDistinct){
-                IconButton(
-                    onClick = {onErrorClick(R.string.chore_repeat) }
-                ){
-                    Icon(Icons.Default.Warning, stringResource(R.string.chore_repeat), tint = MaterialTheme.colorScheme.error)
-                }
-            }else if(!existsInWorkflow){
-                IconButton(
-                    onClick = {onErrorClick(R.string.chore_not_found_workflow) }
-                ){
-                    Icon(Icons.Default.Warning, stringResource(R.string.chore_not_found_workflow), tint = MaterialTheme.colorScheme.error)
+        overlineContent = {
+            Row(Modifier.fillMaxWidth()){
+                if(firstRoom.isNotEmpty()){
+                    Text(firstRoom)
+                    if(additionalAmount > 0){
+                        Text(" (+$additionalAmount more)")
+                    }
                 }
             }
         },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+        headlineContent = {
+            Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1,overflow = TextOverflow.Ellipsis,
+                textDecoration = if (isComplete) {
+                    TextDecoration.LineThrough
+                } else {
+                    null
+                })
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        trailingContent = {trailingContent()},
     )
-
 }
+
+
 
 @Composable
 fun ChoreSelectModeHeaderRow(prefix : String, value : String){
@@ -673,12 +630,9 @@ fun ChoreSelectModeHeaderRow(prefix : String, value : String){
 
 @Composable
 fun AddChoreButton(onClick : () -> Unit, choreNumber: Int){
-    /**
-     * TODO: consider re-designing
-     */
     Row(
         Modifier.fillMaxWidth().background(Color.Transparent),
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.Center
     ) {
         TextButton(
             onClick = {onClick()},
@@ -692,10 +646,10 @@ fun AddChoreButton(onClick : () -> Unit, choreNumber: Int){
                 contentDescription = stringResource(R.string.edit_chore_items)
             }
 
+//            Icon(Icons.Default.Edit, contentDescription )
             Text(text,
-//                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.labelLarge
             )
-            Icon(Icons.Default.AddCircle, contentDescription )
 
         } }
 
@@ -724,6 +678,64 @@ fun DeleteConfirmationDialog(
                     }
                 ) {
                     Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun ExitConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    showDialog: Boolean
+) {
+    if(showDialog){
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(text = stringResource(R.string.exit)) },
+            text = { Text(text = stringResource(R.string.progress_lost)) },
+            confirmButton = {
+                Button(
+                    onClick = {onConfirm()}
+                ) { Text(text = stringResource(R.string.exit)) }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        onDismiss()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.keep_going))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun DoneConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    showDialog: Boolean
+) {
+    if(showDialog){
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(text = stringResource(R.string.incomplete_chores)) },
+            text = { Text(text = stringResource(R.string.chores_not_completed)) },
+            confirmButton = {
+                Button(
+                    onClick = {onConfirm()}
+                ) { Text(text = stringResource(R.string.done)) }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        onDismiss()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.keep_going))
                 }
             }
         )

@@ -20,45 +20,25 @@ import com.google.gson.Gson
 @Composable
 fun ScoddNavGraph(
     navController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+
     NavHost(
         navController = navController,
         startDestination = AuthorizeNav.route,
         modifier = modifier,
 
+
     ) {
 
         authorizeGraph(navController)
 
-        composable(route = DashboardNav.route) {
-            DashboardScreen(
-//                onClickSeeAllAccounts = {
-//                    navController.navigateSingleTopTo(Accounts.route)
-//                },
-//                onClickSeeAllBills = {
-//                    navController.navigateSingleTopTo(Bills.route)
-//                },
-//                onAccountClick = { accountType ->
-//                    navController.navigateToSingleAccount(accountType)
-//                }
-            )
-        }
+        composable(route = DashboardNav.route) { DashboardScreen() }
 
         choreGraph(navController)
 
         modeGraph(navController)
 
-
-//        composable(
-//            route = SingleAccount.routeWithArgs,
-//            arguments = SingleAccount.arguments,
-//            deepLinks = SingleAccount.deepLinks
-//        ) { navBackStackEntry ->
-//            val accountType =
-//                navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
-//            SingleAccountScreen(accountType)
-//        }
     }
 }
 
@@ -68,12 +48,14 @@ fun NavGraphBuilder.authorizeGraph(navController: NavController){
 
         composable(route = AuthorizeNav.Login.route) {
             LoginScreen(
-                onRegisterClick ={
-
-                },
-                onLoginClick = {
-                    //After authorization succeeds
-                    navController.navigate(DashboardNav.route)
+//                scoddStore = scoddStore,
+                navigateToScodd = {
+                    navController.navigate(
+                        DashboardNav.route){
+                        popUpTo(navController.graph.id){
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }

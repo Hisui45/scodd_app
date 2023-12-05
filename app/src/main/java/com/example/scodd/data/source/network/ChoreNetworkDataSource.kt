@@ -1,6 +1,5 @@
 package com.example.scodd.data.source.network
 
-import com.example.scodd.model.Room
 import com.example.scodd.model.RoutineInfo
 import com.example.scodd.model.ScoddTime
 import kotlinx.coroutines.delay
@@ -76,6 +75,17 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
         )
     )
 
+    private var users = listOf(
+        NetworkUser(
+            id = "0",
+            name = "Elizabeth",
+            bankModeValue = 0,
+            lastUpdated = 0L
+
+        )
+    )
+
+
     private var modes = listOf(
         NetworkMode("", emptyList(), emptyList(), emptyList(), emptyList())
     )
@@ -84,9 +94,9 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
         return chores
     }
 
-    override suspend fun saveChores(newChores: List<NetworkChore>) = accessMutex.withLock {
+    override suspend fun saveChores(chores: List<NetworkChore>) = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
-        chores = newChores
+        this.chores = chores
     }
 
     override suspend fun loadRooms(): List<NetworkRoom> = accessMutex.withLock {
@@ -94,9 +104,9 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
         return rooms
     }
 
-    override suspend fun saveRooms(newRooms: List<NetworkRoom>) = accessMutex.withLock {
+    override suspend fun saveRooms(chores: List<NetworkRoom>) = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
-        rooms = newRooms
+        rooms = chores
     }
 
     override suspend fun loadWorkflows(): List<NetworkWorkflow> = accessMutex.withLock {
@@ -104,9 +114,9 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
         return workflows
     }
 
-    override suspend fun saveWorkflows(newWorkflows: List<NetworkWorkflow>) = accessMutex.withLock {
+    override suspend fun saveWorkflows(chores: List<NetworkWorkflow>) = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
-        workflows = newWorkflows
+        workflows = chores
     }
 
     override suspend fun loadChoreItems(): List<NetworkChoreItem> = accessMutex.withLock {
@@ -114,9 +124,9 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
         return choreItems
     }
 
-    override suspend fun saveChoreItems(newChoreItems: List<NetworkChoreItem>) = accessMutex.withLock {
+    override suspend fun saveChoreItems(chores: List<NetworkChoreItem>) = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
-        choreItems = newChoreItems
+        choreItems = chores
     }
 
     override suspend fun loadModes(): List<NetworkMode> = accessMutex.withLock {
@@ -124,9 +134,19 @@ class ChoreNetworkDataSource @Inject constructor() : NetworkDataSource {
         return modes
     }
 
-    override suspend fun saveModes(newModes: List<NetworkMode>) = accessMutex.withLock {
+    override suspend fun saveModes(chores: List<NetworkMode>) = accessMutex.withLock {
         delay(SERVICE_LATENCY_IN_MILLIS)
-        modes = newModes
+        modes = chores
+    }
+
+    override suspend fun loadUser(): List<NetworkUser> = accessMutex.withLock {
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        return users
+    }
+
+    override suspend fun saveUser(chores: List<NetworkUser>) = accessMutex.withLock {
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        users = chores
     }
 }
 

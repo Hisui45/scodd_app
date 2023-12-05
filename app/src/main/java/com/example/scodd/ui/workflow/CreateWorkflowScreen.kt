@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,12 +39,7 @@ fun CreateWorkflowScreen(
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val createTypeWorkflow = 1
 
-    /**
-     * TODO: use interface for colors
-     * TODO: prevent creation with no chores
-     */
     val contentColor = MaterialTheme.colorScheme.onPrimary
     Scaffold(
         topBar = {
@@ -129,13 +126,16 @@ fun WorkflowContent(
 
     }else{
         Column(
-            modifier = Modifier.fillMaxHeight().padding(),
+            modifier = Modifier.fillMaxSize().padding(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(stringResource(R.string.instructions_text))
-            AddChoreButton(onClick = { onAddChoreButtonClick() }, 0) //Should create a temp object and pass it through
+            IconButton(
+                onClick = {onAddChoreButtonClick()}
+            ){
+                Icon(Icons.Default.AddCircle, contentDescription = stringResource(R.string.add_chore_items))
+            }
+            Text(stringResource(R.string.instructions_text), textAlign = TextAlign.Center)
         }
     }
 }
-        //          Check for user messages to display on the screen

@@ -14,6 +14,7 @@ import com.example.scodd.ui.chore.ChoreInputType.BANK
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneOffset
@@ -32,11 +33,11 @@ data class CreateChoreUiState(
     val routineInfo: RoutineInfo = RoutineInfo(),
     val frequencyErrorMessage: Int? = null,
     val isTimeModeActive: Boolean = false,
-    val timerModeValue: Int = -1,
+    val timerModeValue: Int = 5,
     val timerOption: ScoddTime = ScoddTime.MINUTE,
     val timerErrorMessage: Int? = null,
     val isBankModeActive: Boolean = false,
-    val bankModeValue: Int = 0,
+    val bankModeValue: Int = 5,
     val isFavorite: Boolean = false,
     val isChoreSaved: Boolean = false,
     val isLoading: Boolean = false,
@@ -50,7 +51,7 @@ data class CreateChoreUiState(
 @HiltViewModel
 class CreateChoreViewModel @Inject constructor(
     private val choreRepository: ChoreRepository,
-    @ApplicationContext private val context: Context,
+//    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -79,6 +80,29 @@ class CreateChoreViewModel @Inject constructor(
 
     // Called when clicking on 'Save' button
     fun saveChore() {
+        var hasError = false
+        if(uiState.value.bankModeValue == -1){
+            _uiState.update {
+                it.copy(bankModeValue = 0)
+            }
+        }
+        if(uiState.value.isTimeModeActive && uiState.value.timerModeValue == -1 ||
+            uiState.value.isTimeModeActive && uiState.value.timerModeValue == 0){
+                hasError = true
+        }
+
+        if(!uiState.value.routineInfo.isOneTime && ((uiState.value.routineInfo.scheduleType == ScoddTime.CUSTOM) && uiState.value.routineInfo.frequencyValue == -1) ||
+            ((uiState.value.routineInfo.scheduleType == ScoddTime.CUSTOM) && uiState.value.routineInfo.frequencyValue == 0)){
+            hasError = true
+        }
+
+        if(hasError){
+            _uiState.update {
+                it.copy(userMessage = R.string.chore_resolve_error)
+            }
+            return
+        }
+
         if (uiState.value.title.isEmpty()) {
             _uiState.update {
                 it.copy(userMessage = R.string.chore_no_title_message)
@@ -171,7 +195,13 @@ class CreateChoreViewModel @Inject constructor(
     }
 
     fun changeValue(value: String, type: ChoreInputType) {
-        var newValue = if (value.isEmpty()) -1 else value.toInt()
+        var newValue = if (value.isEmpty()){
+            -1
+        }else if(value.length >= Integer.MAX_VALUE.toString().length) {
+            value.dropLast(1).toInt()
+        }else{
+            value.toInt()
+        }
         var errorMessage: Int? = null
         when (newValue) {
             -1 -> {
@@ -214,6 +244,13 @@ class CreateChoreViewModel @Inject constructor(
             val currentRoutineInfo = it.routineInfo
             it.copy(routineInfo = currentRoutineInfo.copy(isOneTime = oneTime))
         }
+
+        if(uiState.value.routineInfo.frequencyValue == 0 || uiState.value.routineInfo.frequencyValue == -1 ){
+            _uiState.update {
+                val currentRoutineInfo = it.routineInfo
+                it.copy(routineInfo = currentRoutineInfo.copy(frequencyValue = 5))
+            }
+        }
     }
 
     fun selectFrequencyOption(scoddTime: ScoddTime) {
@@ -232,11 +269,34 @@ class CreateChoreViewModel @Inject constructor(
     }
 
     fun selectWeekday(scoddTime: ScoddTime) {
+        var dayOfWeek: DayOfWeek = DayOfWeek.MONDAY
         _uiState.update {
             val currentRoutineInfo = it.routineInfo
-            it.copy(routineInfo = currentRoutineInfo.copy(weeklyDay = scoddTime))
-        }
+            when(scoddTime){
+                ScoddTime.TUESDAY -> {
+                    dayOfWeek = DayOfWeek.TUESDAY
+                }
+                ScoddTime.WEDNESDAY -> {
+                    dayOfWeek = DayOfWeek.WEDNESDAY
+                }
+                ScoddTime.THURSDAY -> {
+                    dayOfWeek = DayOfWeek.THURSDAY
+                }
+                ScoddTime.FRIDAY -> {
+                    dayOfWeek = DayOfWeek.FRIDAY
+                }
+                ScoddTime.SATURDAY -> {
+                    dayOfWeek = DayOfWeek.SATURDAY
+                }
+                ScoddTime.SUNDAY -> {
+                    dayOfWeek = DayOfWeek.SUNDAY
+                }
+                else -> {
 
+                }
+            }
+            it.copy(routineInfo = currentRoutineInfo.copy(weeklyDay = dayOfWeek))
+        }
     }
 
     fun selectTimerOption(scoddTime: ScoddTime) {
@@ -246,9 +306,16 @@ class CreateChoreViewModel @Inject constructor(
     }
 
     fun switchTimerMode(timerModeActive: Boolean) {
+        if(uiState.value.timerModeValue == -1){
+            _uiState.update {
+                it.copy(timerModeValue = 5 )
+            }
+        }
         _uiState.update {
             it.copy(isTimeModeActive = timerModeActive )
+
         }
+
     }
 
     fun switchBankMode(bankModeActive: Boolean) {
@@ -257,12 +324,16 @@ class CreateChoreViewModel @Inject constructor(
         }
     }
 
+    /**
+     * TODO: Allow user to remove date
+     */
+
     fun dateChange(date: Long?) {
         _uiState.update {
             val currentRoutineInfo = it.routineInfo
             val scheduleTimeText = updateScheduleTimeText(date, currentRoutineInfo.hour, currentRoutineInfo.minute)
             if (scheduleTimeText == null) {
-                it.copy(userMessage = R.string.loading_date_error)
+                it.copy(userMessage = null)
             }else{
                 it.copy(
                     routineInfo = currentRoutineInfo.copy(date = date),
@@ -275,15 +346,11 @@ class CreateChoreViewModel @Inject constructor(
     fun timeChange(hour: Int, minute: Int) {
         _uiState.update {
             val currentRoutineInfo = it.routineInfo
-            val scheduleTimeText = updateScheduleTimeText(currentRoutineInfo.date, hour, minute)
-            if (scheduleTimeText == null) {
-                it.copy(userMessage = R.string.loading_date_error)
-            }else{
+            val scheduleTimeText = updateScheduleTimeText(currentRoutineInfo.date, hour, minute)?: ""
                 it.copy(
                     routineInfo = currentRoutineInfo.copy(hour = hour, minute = minute),
                     scheduleTimeText = scheduleTimeText
                 )
-            }
         }
     }
 
@@ -326,7 +393,7 @@ class CreateChoreViewModel @Inject constructor(
                     bankModeValue = it.bankModeValue,
                     isFavorite = it.isFavorite,
                     isLoading = false,
-                    userMessage = if (scheduleTimeText == null) R.string.loading_date_error else null
+                    userMessage = null
                 )
             } ?: currentState.copy(isLoading = false)
         }
@@ -368,15 +435,17 @@ class CreateChoreViewModel @Inject constructor(
         }
     }
 
+    /**
+     * TODO: create alternative to hardcoded string
+     */
+
     private fun updateScheduleTimeText(date: Long?, hour: Int, minute: Int): String? {
         return date?.let {
             val selectedDate = Instant.ofEpochMilli(date).atOffset(ZoneOffset.UTC)
             val selectedTime = LocalTime.of(hour, minute)
                 .format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 
-            "${selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))} ${
-                context.getString(R.string.date_label_conj)
-            } $selectedTime"
+            selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)) + " at " + selectedTime
         }
     }
 
@@ -389,9 +458,27 @@ class CreateChoreViewModel @Inject constructor(
 
     fun deleteChore() = viewModelScope.launch {
         if (choreId != null) {
+            choreRepository.getChoreItems().forEach { choreItem ->
+                if(choreItem.parentChoreId == choreId){
+                    choreRepository.deleteChoreItem(choreItem.id)
+                }
+            }
             choreRepository.deleteChore(choreId)
+
             _uiState.update {
                 it.copy(isChoreDeleted = true)
+            }
+        }
+
+    }
+
+    fun addToRoundUp() {
+        if(choreId != null){
+            viewModelScope.launch {
+                choreRepository.createChoreItem(choreId, ROUNDUP)
+                _uiState.update {
+                    it.copy(userMessage = R.string.added_roundup)
+                }
             }
         }
     }

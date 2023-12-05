@@ -141,7 +141,7 @@
     <string name="edit_chore_items">Edit Chores</string>
     <string name="remove">Remove</string>
     <string name="chore_not_found_workflow">This chore cannot be found in the workflow.</string>
-    <string name="bank_payout">Potential Payout:</string>
+    <string name="bank_potential_payout">Potential Payout:</string>
     <string name="time_esitmation">Estimated Time:</string>
     <string name="quest_directions">This mode focuses on rooms rather than chores.</string>
     <string name="quest_focus">Focus Areas</string>
@@ -186,5 +186,31 @@
     <string name="quest_message">It’s okay if you’re feeling overwhelmed. Just take it room-by-room. You can do this!</string>
     <string name="quest_finished">Mission Accomplished! You tackled those rooms like a brave champion!</string>
     <string name="quest_finished_message">Bear in mind that a weary adventurer deserves rest too.</string>
+    <string name="bank_payout">Payout:</string>
+    <string name="time_total">Total Time:</string>
+    <string name="well_done">Well Done.</string>
+    <string name="overview">Overview</string>
+    <string name="progress_lost">If you exit, all progress will be lost.</string>
+    <string name="keep_going">Keep Going</string>
+    <string name="exit">Exit</string>
+    <string name="incomplete_chores">Incomplete Chores</string>
+    <string name="chores_not_completed">There are still chores you haven\'t completed.</string>
+    <string name="create_workflow_message">Create a workflow and add some chores \n to use it in a mode</string>
+    <string name="dashboard_no_chores">Nothing to do today. Take some time to rest.</string>
+    <string name="completed">Completed</string>
+    <string name="clear">Clear</string>
+    <string name="hide">Hide</string>
+    <string name="hide_completed">Hide Completed</string>
+    <string name="show_completed">Show Completed</string>
+    <string name="horizon">On The Horizon</string>
+    <string name="clear_all">Clear All</string>
+    <string name="workflow_no_chores">Please add at least one chore.</string>
+    <string name="workflow_empty">It\'s looking pretty empty in here.</string>
+    <string name="added_roundup">Chore added to Today\'s Roundup</string>
+    <string name="added_roundup_workflow">Workflow added to Today\'s Roundup</string>
+    <string name="chore_resolve_error">Please resolve errors before saving.</string>
+    <string name="reset">Reset</string>
+    <string name="get_started">Get Started</string>
+    <string name="piggy_bank">Piggy Bank</string>
 
 </resources>

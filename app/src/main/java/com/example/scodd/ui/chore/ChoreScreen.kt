@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,6 +28,7 @@ import com.example.scodd.model.Workflow
 import com.example.scodd.ui.theme.White40
 import com.example.scodd.ui.components.*
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.scodd.model.ROUNDUP
 import kotlinx.coroutines.*
 
 
@@ -73,14 +75,14 @@ fun ChoreScreen(
                             ExpandableFABButtonItem(
                                 onButtonClick = { onCreateWorkflowClick()},
                                 title = stringResource(R.string.workflow_title),
-                                Icons.Default.List
+                                painterResource(R.drawable.ic_egg_basket_filled)
                             )
                            },
                         bottomFloatingActionButton = {
                             ExpandableFABButtonItem(
                                 onButtonClick = {onCreateChoreClick()},
                                 title = stringResource(R.string.chore_title),
-                                Icons.Default.Email
+                                painterResource(R.drawable.ic_egg)
                             )
                             },
                         Icons.Default.Add)
@@ -89,14 +91,17 @@ fun ChoreScreen(
 
         ) {
             val uiState by viewModel.uiState.collectAsState()
-            var selectionActive = false
-            var isInSelectionMode = remember { mutableStateOf(false) }
+            val selectionActive = false
+            val isInSelectionMode = remember { mutableStateOf(false) }
             val selectedItems = remember { mutableStateListOf<String>()}
             if(selectedItems.size == 0){ isInSelectionMode.value = false }
 
             Surface{
                 Column(Modifier.padding(it)){
-                    Search()
+                    /**
+                     * TODO: SEARCH BAR
+                     */
+//                    Search()
                     WorkflowContent(
                         workflows = uiState.workflows,
                         onCreateWorkflowClick = {onCreateWorkflowClick()},
@@ -106,7 +111,7 @@ fun ChoreScreen(
                     ChoreContent(
                         roomChips = uiState.rooms,
                         nestedScrollConnection = nestedScrollConnection,
-                        chores = uiState.items,
+                        chores = uiState.chores,
                         toggleChip = viewModel :: toggleRoom,
                         onFavoriteChipSelected = viewModel :: setFavoriteFilterType,
                         favoriteSelected = viewModel.getFavorite(),
@@ -120,7 +125,6 @@ fun ChoreScreen(
                 }
             }
 
-            //          Check for user messages to display on the screen
             uiState.userMessage?.let { userMessage ->
                 val snackbarText = stringResource(userMessage)
                 LaunchedEffect(scope, viewModel, userMessage, snackbarText) {
@@ -177,10 +181,19 @@ fun WorkflowContent(workflows : List<Workflow>, onCreateWorkflowClick : () -> Un
             item {
                 WorkflowTitleCard()
             }
-            items(workflows){ workflow ->
-                WorkflowCard(workflow.title,colors, onWorkflowClick = {
-                    onWorkflowClick(workflow.id)
-                } )
+            itemsIndexed(workflows){ index, workflow ->
+                if(workflow.id != ROUNDUP){
+                    WorkflowCard(workflow.title,colors, onWorkflowClick = {
+                        onWorkflowClick(workflow.id)
+                    } )
+//                    if (index < workflows.lastIndex)
+//                        Divider(
+//                            color = MaterialTheme.colorScheme.secondary,
+//                            modifier = Modifier
+//                                .height(25.dp)  //fill the max height
+//                                .width(1.dp)
+//                        )
+                }
             }
 
             item{

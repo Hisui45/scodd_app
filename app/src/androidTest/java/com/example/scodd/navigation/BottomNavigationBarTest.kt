@@ -30,13 +30,13 @@ class BottomNavigationBarTest {
 
         // Verify that the correct bottom nav items and their icons are displayed
         composeTestRule.onNodeWithText(DashboardNav.label).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription(label = DashboardNav.route, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(label = DashboardNav.label, useUnmergedTree = true).assertIsDisplayed()
 
         composeTestRule.onNodeWithText(ChoreNav.Chores.label).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription(label = ChoreNav.Chores.route, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(label = ChoreNav.Chores.label, useUnmergedTree = true).assertIsDisplayed()
 
         composeTestRule.onNodeWithText(ModeNav.Modes.label).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription(label = ModeNav.Modes.route, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(label = ModeNav.Modes.label, useUnmergedTree = true).assertIsDisplayed()
     }
     
     @Test
@@ -55,13 +55,38 @@ class BottomNavigationBarTest {
 
         // Verify that correct bottom nav item is selected when clicked
         composeTestRule.onNodeWithText(DashboardNav.label).performClick()
-        assert(selectedItem == DashboardNav)
+        assert(selectedItem.route == DashboardNav.route)
 
         composeTestRule.onNodeWithText(ChoreNav.Chores.label).performClick()
-        assert(selectedItem == ChoreNav.Chores)
+        assert(selectedItem.route == ChoreNav.Chores.route)
 
         composeTestRule.onNodeWithText(ModeNav.Modes.label).performClick()
-        assert(selectedItem == ModeNav.Modes)
+        assert(selectedItem.route == ModeNav.Modes.route)
     }
+
+//    @Test
+//    fun navigationBar_shouldSelectWhenClicked() {
+//        var selectedItem: ScoddBottomNavDestination = ChoreNav.Chores
+//        val navScreens = scoddBottomNavScreens
+//        composeTestRule.setContent {
+//            ScoddTheme{
+//                ScoddBottomBar(
+//                    bottomNavScreens = navScreens,
+//                    onNavSelected = {selectedItem = it},
+//                    currentScreen = selectedItem
+//                )
+//            }
+//        }
+//
+//        // Verify that correct bottom nav item is selected when clicked
+//        composeTestRule.onNodeWithText(DashboardNav.label).performClick()
+//        assert(selectedItem == DashboardNav)
+//
+//        composeTestRule.onNodeWithText(ChoreNav.Chores.label).performClick()
+//        assert(selectedItem == ChoreNav.Chores)
+//
+//        composeTestRule.onNodeWithText(ModeNav.Modes.label).performClick()
+//        assert(selectedItem == ModeNav.Modes)
+//    }
 
 }

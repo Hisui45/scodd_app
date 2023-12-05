@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -88,7 +89,7 @@ fun CustomFloatingActionButton(
 
 
 @Composable
-fun ExpandableFABButtonItem(onButtonClick: () -> Unit, title : String, icon : ImageVector){
+fun ExpandableFABButtonItem(onButtonClick: () -> Unit, title : String, icon : Painter){
     FilledIconButton(
         onClick = {onButtonClick()},
         shape = RoundedCornerShape(18.dp),

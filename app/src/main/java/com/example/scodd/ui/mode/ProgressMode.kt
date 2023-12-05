@@ -33,8 +33,7 @@ import com.example.scodd.R
 import com.example.scodd.model.ChoreItem
 import com.example.scodd.model.ScoddMode
 import com.example.scodd.spin_wheel_compose.state.rememberScoddSpinWheelState
-import com.example.scodd.ui.components.ChoreListItem
-import com.example.scodd.ui.components.StatusBar
+import com.example.scodd.ui.components.*
 import com.example.scodd.ui.theme.LightMarigold40
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,19 +53,22 @@ fun CompleteModeScreen(
 
 
     val uiState by viewModel.uiState.collectAsState()
-    val uiSandState by viewModel.uiSandState.collectAsState()
     val uiSpinState by viewModel.uiSpinState.collectAsState()
+
+    var showExitConfirmation by remember { mutableStateOf(false) }
+    var showDoneConfirmation by remember { mutableStateOf(false) }
 
     val choreTitles = remember { mutableStateListOf<String>() }
     val playSound = remember { mutableStateOf(false) }
 
     val questNumber = rememberSaveable { mutableStateOf(0)}
     val roomNumber = rememberSaveable { mutableStateOf(0) }
-    val currentRoom = rememberSaveable { mutableStateOf(incomingSelectedItems[roomNumber.value]) }
+
+    StatusBar(Color.White)
 
     when(modeId){
         ScoddMode.SandMode.modeId, ScoddMode.TimeMode.modeId ->
-            if(!uiState.isPaused){
+            if(!uiState.isPaused && !uiState.isFinished){
                 viewModel.startMode()
             }
     }
@@ -74,6 +76,16 @@ fun CompleteModeScreen(
     if(modeId != null){
         Scaffold(
             topBar = {
+                var color = Color.Transparent
+                var title = ""
+                if(uiState.isFinished) {
+                    when (modeId) {
+                        ScoddMode.TimeMode.modeId, ScoddMode.BankMode.modeId -> {
+                            color = MaterialTheme.colorScheme.primaryContainer
+                            title = stringResource(R.string.overview)
+                        }
+                    }
+                }
                 val actions: @Composable () -> Unit = {
                     if(uiState.isFinished){
 
@@ -103,22 +115,29 @@ fun CompleteModeScreen(
                                 if(questNumber.value != 0){
                                     Text(stringResource(R.string.current_room) + " " + incomingSelectedItems[roomNumber.value],
                                         textAlign = TextAlign.End,
-                                        style = MaterialTheme.typography.titleLarge)
+                                        style = MaterialTheme.typography.titleLarge,
+                                        modifier = Modifier.padding(end = 8.dp))
                                 }
                         }
                     }
                 }
                 TopAppBar(
-                    title = {},
+                    title = {Text(title,style = MaterialTheme.typography.titleLarge)},
                     navigationIcon = {
                         IconButton(onClick = {
-                            //TODO: PopUp confirming progress loss
-                            onNavigateBack()})
+                            if(ScoddMode.QuestMode.modeId == modeId && roomNumber.value == incomingSelectedItems.size){
+                                onNavigateBack()
+                            }else if(!uiState.isFinished){
+                                viewModel.pauseTimer()
+                                showExitConfirmation = true
+                            }else{
+                                onNavigateBack()
+                            }
+                        })
                         {Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close)) }
                     },
                     actions = {actions()},
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                    modifier = Modifier.padding(end = 8.dp)
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = color),
                 )
             },
             containerColor = if (modeId == ScoddMode.SpinMode.modeId) MaterialTheme.colorScheme.primaryContainer else Color.White
@@ -126,25 +145,106 @@ fun CompleteModeScreen(
             Box(
                 modifier = Modifier.padding(it)
             ){
-                Column(
-                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp).fillMaxHeight().fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ){
-                    if(uiState.isFinished){
-                        FinishSound()
-                        when(modeId){
-                            ScoddMode.BankMode.modeId-> {
-
+                if(uiState.isFinished) {
+                    StatusBar(LightMarigold40)
+                    FinishSound()
+                    Column(
+                        modifier = Modifier.padding(vertical = 0.dp, horizontal = 0.dp).fillMaxHeight().fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ){
+                        when (modeId) {
+                            ScoddMode.BankMode.modeId -> {
+                                val payout = viewModel.calculatePayout()
+                                ChoreSelectModeHeaderRow(stringResource(R.string.bank_payout), "$$payout")
+                                LazyColumn(
+                                   contentPadding = PaddingValues(horizontal = 16.dp)
+                                ) {
+                                    itemsIndexed(uiState.chores) { index, choreItem ->
+                                        val title = viewModel.getChoreTitle(choreItem.parentChoreId)
+                                        OverviewModeListItem(
+                                            title = title,
+                                            isComplete = choreItem.isComplete,
+                                            trailingContent = {
+                                                val bankValue =
+                                                    if(choreItem.isComplete){
+                                                        viewModel.getChoreBankModeValue(choreItem.parentChoreId)
+                                                    }else{
+                                                        0
+                                                    }
+                                                Text(text ="$$bankValue",style = MaterialTheme.typography.labelLarge,
+                                                    color = if (bankValue > 0) MaterialTheme.colorScheme.surfaceTint
+                                                    else MaterialTheme.colorScheme.error
+                                                )
+                                            }
+                                        )
+                                        if (index < uiState.chores.lastIndex)
+                                            Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+                                    }
+                                    item {
+                                        WellDone()
+                                    }
+                                }
                             }
-                            ScoddMode.TimeMode.modeId-> {
-
+                            ScoddMode.TimeMode.modeId -> {
+                                val totalTime = viewModel.calculateTotalTime()
+                                ChoreSelectModeHeaderRow(stringResource(R.string.time_total), totalTime)
+                                LazyColumn {
+                                    itemsIndexed(uiState.chores) { index, choreItem ->
+                                        val title = viewModel.getChoreTitle(choreItem.parentChoreId)
+                                        OverviewModeListItem(
+                                            title = title,
+                                            isComplete = choreItem.isComplete,
+                                            trailingContent = {
+                                                val timerValue = viewModel.getCompleteTimerValue(index)
+                                                LabelText(timerValue)
+                                            }
+                                        )
+                                        if (index < uiState.chores.lastIndex)
+                                            Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+                                    }
+                                    item {
+                                        WellDone()
+                                    }
+                                }
                             }
-                            ScoddMode.SandMode.modeId-> {
-
+                            ScoddMode.SandMode.modeId -> {
+                                StatusBar(Color.White)
+                                val sandTotalTime = viewModel.calculateSandTotalTime()
+                                Text(stringResource(R.string.time_total), style = MaterialTheme.typography.displayMedium,
+                                    color = MaterialTheme.colorScheme.secondary)
+                                Text(sandTotalTime, style = MaterialTheme.typography.displayLarge, fontWeight = FontWeight.Normal)
+                                if(uiState.chores.isNotEmpty()){
+                                    LazyColumn   {
+                                        itemsIndexed(uiState.chores) { index, choreItem ->
+                                            val title = viewModel.getChoreTitle(choreItem.parentChoreId)
+                                            OverviewModeListItem(
+                                                title = title,
+                                                isComplete = choreItem.isComplete,
+                                                trailingContent = {
+                                                    Checkbox(checked = choreItem.isComplete, onCheckedChange = null)
+                                                }
+                                            )
+                                            if (index < uiState.chores.lastIndex)
+                                                Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+                                        }
+                                        item {
+                                            Spacer(Modifier.weight(1f))
+                                            WellDone()
+                                        }
+                                    }
+                                }else{
+                                    Spacer(Modifier.weight(1f))
+                                    WellDone()
+                                }
                             }
                         }
-                    }else{
+                    }
+                }else{
+                    Column(
+                        modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp).fillMaxHeight().fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ){
                         when(modeId){
                             ScoddMode.BankMode.modeId-> {
                                 ChoreTitle(uiState.choreTitle)
@@ -177,23 +277,22 @@ fun CompleteModeScreen(
                                 if(uiState.chores.isNotEmpty()){
                                     ChoreList(
                                         uiState.chores,
-                                        uiSandState.completedChores,
                                         viewModel :: getIndexChoreTitle,
-                                        { index, isComplete -> viewModel.completeIndexChore(index); if (!isComplete) playSound.value = true},
+                                        { index, isComplete -> viewModel.completeSandChore(index); if (!isComplete) playSound.value = true},
                                         uiState.isPaused
                                     )
                                     CompleteTimeSound(playSound)
                                 }
-                                if(uiSandState.completedChores.size == uiState.chores.size){
+                                if(uiState.chores.all { choreItem -> choreItem.isComplete }){
                                     ModeButton(text = R.string.finish, onClick = {viewModel.setFinished()})
-                                }else if(uiSandState.completedChores.isNotEmpty()){
+                                }else if(uiState.chores.any{choreItem -> choreItem.isComplete }){
                                     ModeButton(text = R.string.done,
                                         onClick = {
-                                            //TODO: PopUp confirming completion even though chores are left undone
-                                            viewModel.setFinished()
+                                            viewModel.pauseTimer()
+                                            showDoneConfirmation = true
                                         })
                                 }else{
-                                    ModeButton(R.string.done, {}, false)
+                                    ModeButton(text = R.string.done, onClick = {},isVisible = false)
                                 }
                                 TimesUpAlarm(uiState.isTimeUp)
                             }
@@ -259,8 +358,6 @@ fun CompleteModeScreen(
                                 }
                             }
                             ScoddMode.QuestMode.modeId->{
-                                StatusBar(Color.White)
-
                                 when(questNumber.value){
                                     0->
                                         BriefingScreen(questNumber, incomingSelectedItems, roomNumber.value,
@@ -286,6 +383,11 @@ fun CompleteModeScreen(
                     }
                 }
             }
+            DoneConfirmationDialog(onConfirm = {showDoneConfirmation = false; viewModel.setFinished()},
+                onDismiss = {showDoneConfirmation = false; viewModel.pauseTimer()}, showDoneConfirmation)
+
+            ExitConfirmationDialog(onConfirm = {showDoneConfirmation = false; onNavigateBack()},
+                onDismiss = {showExitConfirmation = false; viewModel.pauseTimer()}, showExitConfirmation)
         }
     }
 
@@ -304,6 +406,16 @@ fun CompleteModeScreen(
     }
 }
 
+@Composable
+fun WellDone(){
+    Row(
+        modifier = Modifier.fillMaxWidth(1f),
+        horizontalArrangement = Arrangement.Center
+    ){
+        Text(stringResource(R.string.well_done), style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(bottom = 16.dp))
+    }
+}
 @Composable
 fun BriefingScreen(questNumber: MutableState<Int>, titles: List<String>, currentRoom: Int, onFinished: () -> Unit){
     Column(
@@ -389,9 +501,7 @@ fun QuestTips() {
     }
 
     val infiniteTransition = rememberInfiniteTransition()
-    val color by infiniteTransition.animateColor(
-        initialValue = Color.Black,
-        targetValue = Color.Transparent,
+    val color by infiniteTransition.animateColor( initialValue = Color.Black, targetValue = Color.Transparent,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 4000),
             repeatMode = RepeatMode.Reverse
@@ -405,46 +515,9 @@ fun QuestTips() {
 
 }
 
-//@Composable
-//fun QuestTips() {
-//    var currentIndex by remember { mutableStateOf(0) }
-//    val stringList = listOf("String 1", "String 2", "String 3")
-//    var isVisible by remember { mutableStateOf(true) }
-//
-//    LaunchedEffect(key1 = currentIndex) {
-//        while (true) {
-//            delay(2000) // Adjust the delay as needed
-//            isVisible = !isVisible
-//            delay(4000)
-//            // Switch to the next string in the list
-//            currentIndex = (currentIndex + 1) % stringList.size
-//        }
-//    }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        AnimatedVisibility(
-//            visible = isVisible, // Change this condition based on your logic
-//            enter = fadeIn(),
-//            exit = fadeOut()
-//        ) {
-//            Text(
-//                text = "Tip: " + stringList[currentIndex],
-//            )
-//        }
-//    }
-//}
-
 @Composable
 fun QuestButton(text: Int, onCompleteClick: () -> Unit){
     TextButton(
-//        modifier = Modifier.fillMaxWidth(0.4f),
-//                                        .alpha( if (isVisible) 1f else 0f),
         onClick = {onCompleteClick()},
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer)
@@ -471,16 +544,13 @@ fun QuestScreen(title: Int, description: Int, questNumber: MutableState<Int>, im
             style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.secondary)
         Image(
-//            modifier = Modifier.fillMaxSize(1f),
             painter = painterResource(image),
             contentDescription = stringResource(R.string.trash_content_desc),
             contentScale = ContentScale.FillHeight
         )
-//        Text("Tip: Take a deep breath.")
         QuestTips()
         Row(
             modifier = Modifier.fillMaxWidth(1f),
-//            horizontalArrangement = Arrangement.SpaceBetween
         ){
             QuestButton(R.string.back,onCompleteClick ={
                 questNumber.value = questNumber.value - 1
@@ -493,12 +563,9 @@ fun QuestScreen(title: Int, description: Int, questNumber: MutableState<Int>, im
                 }else{
                     questNumber.value = questNumber.value + 1
                 }
-
             })
         }
-
     }
-
 }
 
 @Composable
@@ -520,21 +587,22 @@ fun calculateAngle(index: Int, frequencies: List<Double>, sliceWidth: Double): D
 }
 
 @Composable
-fun ChoreList(chores: List<ChoreItem>, completedChores: List<ChoreItem>, getTitle: (Int) -> String, completeChore: (Int, Boolean) -> Unit,
+fun ChoreList(chores: List<ChoreItem>, getTitle: (Int) -> String, completeChore: (Int, Boolean) -> Unit,
               isPaused: Boolean){
     Column {
         LazyColumn(
             modifier = Modifier.fillMaxHeight(0.8f)
         ) {
-
             itemsIndexed(chores){ index, choreItem ->
-                val isComplete = choreItem in completedChores
+                var isComplete by remember { mutableStateOf(false) } //Quick Fix
                 ChoreListItem(
 //                    firstRoom = "",
 //                    additionalAmount = 0,
                     title = getTitle(index),
                     isComplete = isComplete,
-                    onCheckChanged = {completeChore(index,isComplete)},
+                    onCheckChanged = {
+                        isComplete = !isComplete
+                        completeChore(index,choreItem.isComplete)},
                     showCheckBox = true,
                     isEnabled = !isPaused
                 )
@@ -659,7 +727,7 @@ fun AmountInEscrow(amount: Int){
             text = "$$amount",
             style = MaterialTheme.typography.displayLarge,
             fontWeight = FontWeight.Normal,
-            color = Color(0xFF089630)
+            color = MaterialTheme.colorScheme.surfaceTint
 //            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 }

@@ -43,18 +43,18 @@ object AuthorizeNav : ScoddDestination {
 }
 
 object DashboardNav : ScoddBottomNavDestination {
-    override val icon = R.drawable.window_24
+    override val icon = R.drawable.ic_home_farm
     override val route = "dashboard_screen"
     override val label = "Dashboard"
 }
 
 object ChoreNav : ScoddBottomNavDestination {
-    override val icon = R.drawable.mop_24
+    override val icon = R.drawable.ic_eggs
     override val route = "chore_nav"
     override val label = "Chore"
 
     object Chores : ScoddBottomNavDestination {
-        override val icon = R.drawable.burst_mode_24
+        override val icon = R.drawable.ic_eggs
         override val route = "chores_screen"
         override val label = "Chores"
     }
@@ -82,12 +82,12 @@ object ChoreNav : ScoddBottomNavDestination {
     }
 }
 object ModeNav : ScoddBottomNavDestination {
-    override val icon = R.drawable.burst_mode_24
+    override val icon = R.drawable.ic_egg_basket_outlined
     override val route = "mode_nav"
     override val label = "Mode"
 
     object Modes : ScoddBottomNavDestination {
-        override val icon = R.drawable.burst_mode_24
+        override val icon = R.drawable.ic_egg_basket_outlined
         override val route = "modes_screen"
         override val label = "Modes"
     }

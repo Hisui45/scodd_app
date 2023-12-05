@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 data class ChoreUiState(
-    val items: List<Chore> = listOf(),
+    val chores: List<Chore> = listOf(),
     val workflows: List<Workflow> = listOf(),
     val rooms: List<Room> = listOf(),
     val isLoading: Boolean = false,
@@ -53,13 +53,13 @@ class ChoreViewModel @Inject constructor(
         filterChores(chores, selectedRooms, isFavorite)
     }
         .catch { cause ->
-            handleError(cause)
-            emit(listOf(Chore("1C", "Vacuum")))
+            handleError(cause, R.string.add_chore_items)
+            emit(emptyList())
         }
 
     private val _workflows = choreRepository.getWorkflowsStream()
         .catch { cause ->
-            handleError(cause)
+            handleError(cause, R.string.chore_no_title_message)
             emit(emptyList())
         }
 
@@ -67,15 +67,15 @@ class ChoreViewModel @Inject constructor(
         arrangeRooms(chores, selectedRooms)
     }
         .catch { cause ->
-            handleError(cause)
+            handleError(cause, R.string.no_chores_message)
             emit(emptyList())
         }
 
     val uiState: StateFlow<ChoreUiState> = combine(_isLoading, _userMessage, _filteredChores, _rooms, _workflows) { isLoading, userMessage, chores, rooms, workflows ->
         ChoreUiState(
             isLoading = isLoading,
-            userMessage = if (chores.isEmpty()) R.string.loading_chores_error else userMessage,
-            items = chores,
+            userMessage = userMessage,
+            chores = chores,
             rooms = rooms,
             workflows = workflows
         )
@@ -86,10 +86,10 @@ class ChoreViewModel @Inject constructor(
             initialValue = ChoreUiState(isLoading = true)
         )
 
-    private fun handleError(cause: Throwable) {
+    private fun handleError(cause: Throwable, userMessage: Int) {
         // Handle the error, for example, log it or emit a default value
-        Timber.e(cause, "Error loading data")
-        _userMessage.value = R.string.loading_chores_error
+//        Timber.tag("girlfriend").e(cause, cause.toString())
+        _userMessage.value = userMessage
         // Additional error handling logic if needed
     }
 
@@ -101,18 +101,15 @@ class ChoreViewModel @Inject constructor(
         return _showFavorite.value
     }
 
-    /**
-     * TODO: Decide if we're showing snackbars and come up with appropriate messages
-     */
-        fun favoriteChore(chore: Chore) = viewModelScope.launch {
-            if(chore.isFavorite){
-                choreRepository.unFavoriteChore(chore.id)
-                showSnackbarMessage(R.string.chore_unmarked_favorite)
-            }else{
-                choreRepository.favoriteChore(chore.id)
-                showSnackbarMessage(R.string.chore_marked_favorite)
-            }
+    fun favoriteChore(chore: Chore) = viewModelScope.launch {
+        if(chore.isFavorite){
+            choreRepository.unFavoriteChore(chore.id)
+            showSnackbarMessage(R.string.chore_unmarked_favorite)
+        }else{
+            choreRepository.favoriteChore(chore.id)
+            showSnackbarMessage(R.string.chore_marked_favorite)
         }
+    }
 
     fun snackbarMessageShown() {
         _userMessage.value = null

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.example.scodd.utils.ScoddSuggestions
 
 @Composable
-fun ScoddModeHeader(onNavigateBack: () -> Unit, mode : String, description : String, suggestions: List<ScoddSuggestions>,) {
+fun ScoddModeHeader(onNavigateBack: () -> Unit, mode : String, description : String, suggestions: List<String>,) {
     val horizontalPadding = 13.dp
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary),
@@ -42,7 +42,7 @@ fun ScoddModeHeader(onNavigateBack: () -> Unit, mode : String, description : Str
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ){
                 suggestions.forEach { suggestion ->
-                    ScoddSuggestionChip(suggestion.title)
+                    ScoddSuggestionChip(suggestion)
                 }
             }
         }

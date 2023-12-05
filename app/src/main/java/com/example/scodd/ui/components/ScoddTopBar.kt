@@ -35,11 +35,11 @@ import com.example.scodd.R
 fun ScoddMainTopBar(){
     CenterAlignedTopAppBar(
         navigationIcon = {
-             IconButton(
-                 onClick = {}
-             ){
-                 Icon(Icons.Default.DateRange, "schedule", tint = MaterialTheme.colorScheme.outline)
-             }
+//             IconButton(
+//                 onClick = {}
+//             ){
+//                 Icon(Icons.Default.DateRange, "schedule", tint = MaterialTheme.colorScheme.outline)
+//             }
         },
         title = {
             Image(
@@ -50,11 +50,11 @@ fun ScoddMainTopBar(){
             )
         },
         actions = {
-            IconButton(
-                onClick = {},
-            ){
-                Icon(Icons.Default.AccountCircle, "account", tint = MaterialTheme.colorScheme.outline)
-            }
+//            IconButton(
+//                onClick = {},
+//            ){
+//                Icon(Icons.Default.AccountCircle, "account", tint = MaterialTheme.colorScheme.outline)
+//            }
         }
     )
 }
@@ -67,7 +67,8 @@ fun TextFieldTopBar(title : String,
                     type : TextFieldTopBarType,
                     onTitleChanged : (String) -> Unit,
                     actions: @Composable() () -> Unit,
-                    contentColor: Color
+                    contentColor: Color,
+                    hintColor: Color = MaterialTheme.colorScheme.primaryContainer
 ){
 
     val isError = remember { mutableStateOf(false) }
@@ -93,6 +94,7 @@ fun TextFieldTopBar(title : String,
                 focusManager = focusManager,
                 isError = isError.value,
                 contentColor = contentColor,
+                hintColor = hintColor
                 )
             },
         navigationIcon = { NavigationButton(onNavigateBack) },
@@ -115,7 +117,8 @@ fun AppBarTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     focusManager : FocusManager,
     isError : Boolean,
-    contentColor : Color
+    contentColor : Color,
+    hintColor: Color
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val textStyle = LocalTextStyle.current
@@ -187,7 +190,7 @@ fun AppBarTextField(
                         Text(
                             text = hint,
                             style = mergedTextStyle,
-                            color = MaterialTheme.colorScheme.inversePrimary
+                            color = hintColor
                         )},
                     colors = colors,
                     contentPadding = PaddingValues(bottom = 4.dp),

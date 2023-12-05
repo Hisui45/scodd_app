@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,26 +32,23 @@ import com.example.scodd.R
 import com.example.scodd.model.*
 import com.example.scodd.ui.theme.Burgundy40
 import com.example.scodd.ui.components.*
+import com.example.scodd.ui.theme.RoosterRed40
 import com.example.scodd.utils.*
+import java.time.DayOfWeek
 
-/**
- * TODO: fix crash when typing decimal in createchore textfield
- */
 @Composable
 fun CreateChoreScreen(
     onNavigateBack: () -> Unit,
     viewModel: CreateChoreViewModel = hiltViewModel(),
     choreId: String? ,
     ){
-    StatusBar(Burgundy40)
+    StatusBar(RoosterRed40)
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog = remember { mutableStateOf(false) }
-    /**
-     * TODO: use interface for colors
-     */
+
     val contentColor = MaterialTheme.colorScheme.onSecondary
     Scaffold(
         topBar = {
@@ -62,18 +60,14 @@ fun CreateChoreScreen(
                 contentColor = contentColor,
                 onTitleChanged = viewModel :: updateTitle,
                 actions = {
-                    /**
-                     * TODO: prevent save if there's an error with other inputs
-                     */
                     TextButton(onClick = viewModel :: saveChore){Text(stringResource(R.string.save_button), color = contentColor)}
                     if(choreId!=null){
                         ChoreContextMenu(onAddClicked = {
-                            /**
-                             * TODO: add to round up
-                             */
+                            viewModel.addToRoundUp()
                         }, onDeleteClicked = {showDeleteDialog.value = true}, tint = contentColor)
                     }
-                }
+                },
+                hintColor = MaterialTheme.colorScheme.onSecondary
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)  }
@@ -235,8 +229,8 @@ fun RoutineSection(horizontalPadding: Dp,
                 onValueChange = {},
                 trailingIcon = {
                     Row{
-                        ScoddOpenDialogFilledButtons(selectDateDialog, Icons.Default.DateRange, stringResource(R.string.date_button_contDesc) )
-                        ScoddOpenDialogFilledButtons(selectTimeDialog, Icons.Default.CheckCircle, stringResource(R.string.time_button_contDesc) )
+                        ScoddOpenDialogFilledButtons(selectDateDialog, R.drawable.ic_edit_cal, stringResource(R.string.date_button_contDesc) )
+                        ScoddOpenDialogFilledButtons(selectTimeDialog, R.drawable.ic_time, stringResource(R.string.time_button_contDesc) )
                     }
 
                 },
@@ -258,9 +252,9 @@ fun RoutineSection(horizontalPadding: Dp,
                 selectedFrequencyOption = routineInfo.frequencyOption,
                 onFrequencyOptionSelected = {onFrequencyOptionSelected(it)},
                 onFrequencyValueChanged = {onFrequencyValueChanged(it)},
-                scheduleType = routineInfo.scheduleType ,
+                scheduleType = routineInfo.scheduleType,
                 onScheduleTypeSelected = {onScheduleTypeSelected(it)},
-                selectedWeekDay = routineInfo.weeklyDay,
+                selectedWeekDay = RoutineInfo.getScoddTime(routineInfo.weeklyDay),
                 onWeekDaySelected = {onWeekDaySelected(it)}
             )
         }
@@ -279,18 +273,14 @@ fun RoutineSection(horizontalPadding: Dp,
     var timePickerState: TimePickerState? = null
 
     if(selectTimeDialog.value){
-        if(routineInfo.hour != null && routineInfo.minute != null){
-            timePickerState = rememberTimePickerState(
-                initialHour = routineInfo.hour,
-                initialMinute = routineInfo.minute
-            )
-        }
-        if(timePickerState !=  null){
-            ScoddTimePickerDialog(timePickerState,
-                saveChanges = {onTimeChanged(timePickerState.hour, timePickerState.minute)
-                selectTimeDialog.value = false },
-                onDismissRequest = {selectTimeDialog.value = false})
-        }
+        timePickerState = rememberTimePickerState(
+            initialHour = routineInfo.hour,
+            initialMinute = routineInfo.minute
+        )
+        ScoddTimePickerDialog(timePickerState,
+            saveChanges = {onTimeChanged(timePickerState.hour, timePickerState.minute)
+            selectTimeDialog.value = false },
+            onDismissRequest = {selectTimeDialog.value = false})
     }
 }
 
@@ -335,6 +325,8 @@ fun TimingsChooser(frequencyValue: Int, frequencyErrorMessage: Int?,
 
 }
 
+
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DaysOfTheWeekChooser(selectedWeekDay : ScoddTime, onWeekDaySelected: (ScoddTime) -> Unit){
@@ -370,7 +362,7 @@ fun BankModeInput(amount : Int, onBankValueChanged: (String) -> Unit){
             Icon(imageVector = ImageVector.vectorResource(R.drawable.attach_money_24), null)
         },
         singleLine = true,
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword),
         keyboardActions = KeyboardActions(onDone = {
             focusManager.clearFocus()
         })
@@ -378,12 +370,12 @@ fun BankModeInput(amount : Int, onBankValueChanged: (String) -> Unit){
 }
 
 @Composable
-fun ScoddOpenDialogFilledButtons(open : MutableState<Boolean>, icon : ImageVector, contentDescription: String){
+fun ScoddOpenDialogFilledButtons(open : MutableState<Boolean>, icon : Int, contentDescription: String){
     FilledIconButton(
         onClick = {open.value = true},
         colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     ){
-        Icon(icon, contentDescription, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Icon(painterResource(icon), contentDescription, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 
 }
@@ -411,20 +403,8 @@ fun ScoddDatePickerDialog(datePickerState: DatePickerState, saveChanges : () -> 
                         headlineContentColor = MaterialTheme.colorScheme.outline,
                         weekdayContentColor = MaterialTheme.colorScheme.secondary,
                         subheadContentColor = MaterialTheme.colorScheme.inversePrimary,
-//                        todayContentColor = MaterialTheme.colorScheme.inversePrimary,
                         yearContentColor = MaterialTheme.colorScheme.inversePrimary,
-//                        selectedDayContentColor = MaterialTheme.colorScheme.inversePrimary,
-//                        currentYearContentColor = MaterialTheme.colorScheme.inversePrimary,
-//                        dayInSelectionRangeContentColor = MaterialTheme.colorScheme.inversePrimary,
-//                        dayContentColor = MaterialTheme.colorScheme.inversePrimary,
-//                        selectedYearContentColor = MaterialTheme.colorScheme.inversePrimary,
-////                        disabledDayContentColor = MaterialTheme.colorScheme.inversePrimary,
-//                        todayDateBorderColor = MaterialTheme.colorScheme.secondary,
-//                        disabledSelectedDayContentColor = MaterialTheme.colorScheme.inversePrimary,
-////                        selectedDayContainerColor = MaterialTheme.colorScheme.inversePrimary,
-//                        selectedYearContainerColor = MaterialTheme.colorScheme.inversePrimary
                         )
-
                 )
                 val buttonColor = MaterialTheme.colorScheme.onSurfaceVariant
                 Row{

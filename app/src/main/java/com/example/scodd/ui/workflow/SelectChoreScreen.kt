@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -79,7 +80,7 @@ fun SelectChoreScreen(
                                     navigateToChoreCreate()
                                 },
                                 title = stringResource(R.string.fab_create_chore),
-                                Icons.Default.List
+                                painterResource(R.drawable.ic_eggs)
                             )
                         },
                         bottomFloatingActionButton = {
@@ -88,7 +89,7 @@ fun SelectChoreScreen(
                                     createChoreDialog.value = true
                                 },
                                 title = stringResource(R.string.fab_quick_create),
-                                Icons.Default.List
+                                painterResource(R.drawable.ic_egg)
                             )
 
                         },
@@ -161,11 +162,11 @@ fun SelectChoreScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+/**
+ * TODO: SEARCH BAR
+ */
 fun SelectContent(count: Int, onSelectAllClick: (Boolean) -> Unit, selected: Boolean){
-    val query = ""
-
     Row(
         modifier = Modifier.padding(start = 16.dp, top = 0.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -179,32 +180,4 @@ fun SelectContent(count: Int, onSelectAllClick: (Boolean) -> Unit, selected: Boo
             colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.secondary)
         )
     }
-
-    var text by rememberSaveable { mutableStateOf("") }
-    var active by rememberSaveable { mutableStateOf(false) }
-    val textColor = MaterialTheme.colorScheme.onSecondary
-    SearchBar(
-        modifier = Modifier.fillMaxWidth().padding(10.dp, 0.dp),
-//                    colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.secondaryContainer,
-//                        inputFieldColors = TextFieldDefaults.colors(focusedPlaceholderColor = textColor,
-//                            unfocusedPlaceholderColor = textColor, focusedTextColor = textColor,
-//                            unfocusedTextColor = textColor)),
-        query = text,
-        onQueryChange = { text = it },
-        onSearch = { active = false },
-        active = active,
-        onActiveChange = {
-//            active = it  Change this to show results on the screen
-        },
-        placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null,
-//                        tint = MaterialTheme.colorScheme.onSecondaryContainer
-        )},
-        trailingIcon = {  },
-        shape = RoundedCornerShape(size = 12.dp)
-
-    ){
-
-    }
-
 }

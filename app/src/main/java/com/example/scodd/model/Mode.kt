@@ -10,14 +10,6 @@ data class Mode(
     val rooms: List<String> = emptyList()
 )
 
-object ScoddModes{
-    val TIME_MODE = "time_mode"
-    val SPIN_MODE = "spin_mode"
-    val BANK_MODE = "bank_mode"
-    val QUEST_MODE = "quest_mode"
-    val SAND_MODE = "sand_mode"
-}
-
 sealed class ScoddMode(val modeId: String, val title: Int, val description: Int){
 object BankMode : ScoddMode("bank_mode", R.string.bank_mode_title, R.string.bank_mode_desc)
 object TimeMode : ScoddMode("time_mode", R.string.time_mode_title, R.string.time_mode_desc)

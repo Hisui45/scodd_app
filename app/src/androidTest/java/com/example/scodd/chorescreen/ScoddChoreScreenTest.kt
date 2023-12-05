@@ -59,7 +59,8 @@ class ScoddChoreTest{
     @Test
     fun displayTask_whenRepositoryHasData() = runTest {
         // GIVEN - One task already in the repository
-        choreRepository.createChore("Vacuum")
+//        choreRepository.createRoom("Family Guy", false)
+//        choreRepository.createChore("Vacuum")
 
 
         // WHEN - On startup

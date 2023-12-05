@@ -122,52 +122,74 @@ class WorkflowViewModel @Inject constructor(
             showSnackbarMessage(R.string.chore_marked_complete)
         } else {
             choreRepository.activateChoreItem(choreItem.id)
-            showSnackbarMessage(R.string.chore_unmarked_favorite)
         }
     }
 
-
-    fun toggleListType() = viewModelScope.launch {
-        val workflow = uiState.value.workflow
-        if(workflow != null){
-            if (workflow.isCheckList) {
-                choreRepository.switchChoreList(workflow.id)
-            }else{
-                choreRepository.switchCheckList(workflow.id)
+    fun resetWorkflow() = viewModelScope.launch {
+        uiState.value.choreItems.forEach { choreItem ->
+            if (choreItem.isComplete) {
+                choreRepository.activateChoreItem(choreItem.id)
             }
         }
     }
 
-    fun getRoomTitle(parentChoreId: String, index : Int): String {
-        val rooms = uiState.value.parentChores.find { it.id == parentChoreId }?.rooms
-        if(rooms != null){
-            var roomText: String = if(rooms.isNotEmpty()){
-                val allRooms = uiState.value.rooms
-                val room = allRooms.find{ it.id == rooms[index]}
-                room?.title ?: " "
-            }else{
-                ""
+
+        fun toggleListType() = viewModelScope.launch {
+            val workflow = uiState.value.workflow
+            if (workflow != null) {
+                if (workflow.isCheckList) {
+                    choreRepository.switchChoreList(workflow.id)
+                } else {
+                    choreRepository.switchCheckList(workflow.id)
+                }
             }
-            return roomText
         }
-        return ""
-    }
 
-    fun getChoreTitle(parentChoreId: String): String {
-        return uiState.value.parentChores.find { it.id == parentChoreId }?.title?: ""
-    }
+        fun getRoomTitle(parentChoreId: String, index: Int): String {
+            val rooms = uiState.value.parentChores.find { it.id == parentChoreId }?.rooms
+            if (rooms != null) {
+                var roomText: String = if (rooms.isNotEmpty()) {
+                    val allRooms = uiState.value.rooms
+                    val room = allRooms.find { it.id == rooms[index] }
+                    room?.title ?: " "
+                } else {
+                    ""
+                }
+                return roomText
+            }
+            return ""
+        }
 
-    fun getAdditionalAmount(parentChoreId: String): Int {
-        return uiState.value.parentChores.find { it.id == parentChoreId }?.rooms?.count()?.minus(1) ?: 0
-    }
+        fun getChoreTitle(parentChoreId: String): String {
+            return uiState.value.parentChores.find { it.id == parentChoreId }?.title ?: ""
+        }
 
-    fun selectedItems(selectedItems: List<String>) = viewModelScope.launch {
-        choreRepository.updateWorkflow(workflowId, selectedItems)
-    }
+        fun getAdditionalAmount(parentChoreId: String): Int {
+            return uiState.value.parentChores.find { it.id == parentChoreId }?.rooms?.count()?.minus(1) ?: 0
+        }
 
-    fun updateTitle(title: String) {
+        fun selectedItems(selectedItems: List<String>) = viewModelScope.launch {
+            choreRepository.updateWorkflow(workflowId, selectedItems)
+        }
+
+        fun updateTitle(title: String) {
+            viewModelScope.launch {
+                choreRepository.updateTitle(workflowId, title)
+            }
+        }
+
+        fun addToRoundUp() {
+            uiState.value.choreItems.forEach { choreItem ->
+                viewModelScope.launch {
+                    choreRepository.createChoreItem(choreItem.parentChoreId, ROUNDUP)
+                    _userMessage.value = R.string.added_roundup_workflow
+                }
+            }
+        }
+
+    fun deleteItem(choreItemId: String) {
         viewModelScope.launch {
-            choreRepository.updateTitle(workflowId,title)
+            choreRepository.deleteChoreItem(choreItemId)
         }
     }
 

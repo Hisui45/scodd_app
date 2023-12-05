@@ -158,4 +158,34 @@ interface ChoreRepository {
 
 //    suspend fun deleteMode(mode: String)
 
+    /**
+     * User
+     */
+
+
+
+    suspend fun createUser(name : String,bankModeValue: Int, lastUpdated : Long): String
+
+    suspend fun updateUser(userId : String, name : String,bankModeValue: Int, lastUpdated : Long)
+
+    suspend fun updateUser(userId : String,bankModeValue: Int)
+    suspend fun updateUser(userId : String, lastUpdated : Long)
+
+    suspend fun getUser(userId: String, forceUpdate: Boolean = false): User?
+
+    suspend fun getUsers(forceUpdate: Boolean = false): List<User>
+
+    fun getUserStream(userId: String): Flow<User?>
+
+    fun getUsersStream(): Flow<List<User>>
+
+    suspend fun refreshUser(userId: String)
+
+    suspend fun deleteAllUsers()
+
+    suspend fun deleteUser(userId: String)
+
+
+
+
 }

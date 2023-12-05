@@ -16,17 +16,17 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
 
     primary = Marigold40,
-    onPrimary = YellowBrown40,
+    onPrimary = Black40,
     primaryContainer = LightMarigold40,
-    onPrimaryContainer = Black40,
+    onPrimaryContainer = YellowBrown40,
 
 
     //SnackBar action colors
     inversePrimary = LightMarigold40,
 
-    secondary = Burgundy40,
+    secondary = RoosterRed40, //9f1d35,91012d, a3133f, a30026
     onSecondary = White40,
-    secondaryContainer = Burgundy40,
+    secondaryContainer = RoosterRed40,
     onSecondaryContainer = White40,
 
 
@@ -36,6 +36,7 @@ private val LightColorScheme = lightColorScheme(
 
 //    onSurfaceVariant = Marigold40,
     surface = White40,
+    surfaceTint = Green40,
 
 //    inverseSurface = LightMarigold40,
 

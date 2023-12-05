@@ -18,8 +18,8 @@ fun SelectableRoomFilterChip(title : String, selected:Boolean, onSelectedChanged
         label = {Text(title) },
         colors = FilterChipDefaults.filterChipColors(labelColor = MaterialTheme.colorScheme.outline,
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedLabelColor = MaterialTheme.colorScheme.outline,
-            selectedLeadingIconColor = MaterialTheme.colorScheme.outline
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         border = FilterChipDefaults.filterChipBorder(selectedBorderColor = Color.Transparent)
     )
@@ -36,8 +36,8 @@ fun SwitchableFilterChip(scoddTime : ScoddTime, selected: ScoddTime, onSelectedC
             colors = FilterChipDefaults.filterChipColors(
                 labelColor = MaterialTheme.colorScheme.outline,
                 selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                selectedLabelColor = MaterialTheme.colorScheme.outline,
-                selectedLeadingIconColor = MaterialTheme.colorScheme.outline
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
             ),
             border = FilterChipDefaults.filterChipBorder(selectedBorderColor = Color.Transparent)
         )
@@ -56,8 +56,8 @@ fun SwitchableIconFilterChips(scoddTime : ScoddTime, selected: ScoddTime, onSele
         colors = FilterChipDefaults.filterChipColors(
             labelColor = MaterialTheme.colorScheme.outline,
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedLabelColor = MaterialTheme.colorScheme.outline,
-            selectedLeadingIconColor = MaterialTheme.colorScheme.outline
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         border = FilterChipDefaults.filterChipBorder(selectedBorderColor = Color.Transparent),
         leadingIcon = {

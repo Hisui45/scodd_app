@@ -350,3 +350,61 @@ fun NetworkMode.toExternalMode() = toLocalMode().toExternalMode()
 
 @JvmName("networkModeToExternalMode")
 fun List<NetworkMode>.toExternalMode() = map(NetworkMode::toExternalMode)
+
+
+/**
+ * User
+ */
+
+// External to local
+fun User.toLocalUser() = LocalUser(
+    id = id,
+    name = name,
+    bankModeValue = bankModeValue,
+    lastUpdated = lastUpdated
+)
+
+fun List<User>.toLocalUser() = map(User::toLocalUser)
+
+// Local to External
+fun LocalUser.toExternalUser() = User(
+    id = id,
+    name = name,
+    bankModeValue = bankModeValue,
+    lastUpdated = lastUpdated
+)
+
+// Note: JvmName is used to provide a unique name for each extension function with the same name.
+// Without this, type erasure will cause compiler errors because these methods will have the same
+// signature on the JVM.
+@JvmName("localUserToExternalUser")
+fun List<LocalUser>.toExternalUser() = map(LocalUser::toExternalUser)
+
+// Network to Local
+fun NetworkUser.toLocalUser() = LocalUser(
+    id = id,
+    name = name,
+    bankModeValue = bankModeValue,
+    lastUpdated = lastUpdated
+)
+
+@JvmName("networkUserToLocalUser")
+fun List<NetworkUser>.toLocalUser() = map(NetworkUser::toLocalUser)
+
+// External to Network
+fun User.toNetworkUser() = toLocalUser().toNetworkUser()
+
+@JvmName("externalUserToNetworkUser")
+fun List<User>.toNetworkUser() = map(User::toNetworkUser)
+
+// Local to Network
+
+//User
+fun LocalUser.toNetworkUser() = NetworkUser(
+    id = id,
+    name = name,
+    bankModeValue = bankModeValue,
+    lastUpdated = lastUpdated
+)
+
+fun List<LocalUser>.toNetworkUser() = map(LocalUser::toNetworkUser)

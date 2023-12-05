@@ -1,6 +1,8 @@
 package com.example.scodd.ui.workflow
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -12,7 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,7 +28,6 @@ import com.example.scodd.ui.theme.Marigold40
 import com.example.scodd.utils.LazyAnimations
 
 /**
- * TODO: options: to clear completed priority: 5
  * TODO: prompt workflow deletion when there's no chores, require at least one
  */
 @Composable
@@ -42,8 +45,8 @@ fun WorkflowScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
 
-    var isLocked = remember { mutableStateOf(false) }
-    var showDeleteDialog = remember { mutableStateOf(false) }
+    val isLocked = remember { mutableStateOf(false) }
+    val showDeleteDialog = remember { mutableStateOf(false) }
 
     val contentColor = MaterialTheme.colorScheme.onPrimary
 
@@ -75,15 +78,13 @@ fun WorkflowScreen(
                              */
                         }
                         WorkflowContextMenu(onAddClicked = {
-                            /**
-                             * TODO: add to round up
-                             */
+                            viewModel.addToRoundUp()
                         }, onDeleteClicked = {showDeleteDialog.value = true},
                             onLockClicked = {isLocked.value = !isLocked.value},
+                            onResetClicked = viewModel :: resetWorkflow,
                             isLocked = isLocked.value,
                             tint = contentColor)
                     }
-
             ) },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState)  }
         ){
@@ -96,16 +97,11 @@ fun WorkflowScreen(
                     choreTitle = viewModel::getChoreTitle,
                     roomTitle = viewModel::getRoomTitle,
                     additionalAmount = viewModel::getAdditionalAmount,
-                    completeItem = viewModel::setCompleted
+                    completeItem = viewModel::setCompleted,
+                    deleteItem = viewModel :: deleteItem
                 )
-
-                LaunchedEffect(uiState.isWorkflowDeleted) {
-                    if (uiState.isWorkflowDeleted) {
-                        onNavigateBack()
-                    }
-                }
             }
-            DeleteConfirmationDialog(onConfirm = {viewModel.deleteWorkflow();showDeleteDialog.value = false},
+            DeleteConfirmationDialog(onConfirm = {viewModel.deleteWorkflow();onNavigateBack();showDeleteDialog.value = false},
                 onDismiss = {showDeleteDialog.value = false}, showDeleteDialog.value)
         }
     }
@@ -119,9 +115,9 @@ fun WorkflowScreen(
         }
     }
 
-    selectedItems.value?.let { selectedItems ->
-        LaunchedEffect(selectedItems) {
-            viewModel.selectedItems(selectedItems)
+    selectedItems.value?.let { selected ->
+        LaunchedEffect(selected) {
+            viewModel.selectedItems(selected)
         }
     }
 
@@ -136,38 +132,76 @@ fun WorkflowContent(
     choreTitle: (String) -> String,
     roomTitle: (String, Int) -> String,
     additionalAmount: (String) -> Int,
-    completeItem: (String, Boolean) -> Unit,){
+    completeItem: (String, Boolean) -> Unit,
+    deleteItem: (String) -> Unit){
 
     val focusManager =  LocalFocusManager.current
     val count = choreItems.count()
-    Text(
-        stringResource(R.string.chore_label) + ": $count",
-        style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.inverseSurface,
-        modifier = Modifier.padding(start = 16.dp, top = 12.dp))
-    LazyColumn{
-        item(key = 0){Text("", Modifier.height(1.dp))}
-        itemsIndexed(
-            items = choreItems.sortedBy { it.isComplete },
-            key = { _, item -> item.id }
-        ){ index, choreItem ->
-            val isSelected = remember { mutableStateOf(choreItem.isComplete) }
-            ChoreListItem(
-                firstRoom = roomTitle(choreItem.parentChoreId, 0),
-                additionalAmount = additionalAmount(choreItem.parentChoreId),
-                title = choreTitle(choreItem.parentChoreId),
-                isComplete = choreItem.isComplete,
-                onCheckChanged = {completeItem(choreItem.id, it)
-                                 focusManager.clearFocus()},
-                showCheckBox = workflow.isCheckList,
-                modifier = Modifier.animateItemPlacement(LazyAnimations.WORKFLOW.animation)
+    Row(
+        modifier = Modifier.padding(start = 16.dp, top = 0.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ){
+        Text(
+            stringResource(R.string.chore_label) + ": $count",
+            style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.inverseSurface,
             )
-            if (index < choreItems.lastIndex)
-                Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+        AddChoreButton(onClick = {onAddChoreClick() }, choreItems.count())
+    }
+
+    if(choreItems.isNotEmpty()){
+        LazyColumn{
+            item(key = 0){Text("", Modifier.height(1.dp))}
+            itemsIndexed(
+                items = choreItems.sortedBy { it.isComplete },
+                key = { _, item -> item.id }
+            ){ index, choreItem ->
+                val showDelete = remember { mutableStateOf(false)}
+                ChoreListItem(
+                    firstRoom = roomTitle(choreItem.parentChoreId, 0),
+                    additionalAmount = additionalAmount(choreItem.parentChoreId),
+                    title = choreTitle(choreItem.parentChoreId),
+                    isComplete = choreItem.isComplete,
+                    onCheckChanged = {completeItem(choreItem.id, it)
+                        focusManager.clearFocus()},
+                    showCheckBox = workflow.isCheckList,
+                    modifier = Modifier.animateItemPlacement(LazyAnimations.WORKFLOW.animation)
+                        .combinedClickable(
+                        onClick = {
+                            focusManager.clearFocus()
+                            showDelete.value = false
+                        },
+                        onLongClick = {
+                            showDelete.value = true
+                        }
+                    ),
+                    showDelete = showDelete.value,
+                    onDeleteClicked = {deleteItem(choreItem.id); showDelete.value = false}
+                )
+                if (index < choreItems.lastIndex)
+                    Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+            }
+            item{
+
+            }
         }
-        item{
-            AddChoreButton(onClick = {onAddChoreClick() }, choreItems.count())
+    }else{
+        Column(
+            modifier = Modifier.fillMaxSize(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                modifier = Modifier.padding(6.dp),
+                painter = painterResource(R.drawable.seed_packet_80),
+                contentDescription = null,
+                contentScale = ContentScale.FillHeight
+            )
+
+            Text(stringResource(R.string.workflow_empty))
         }
     }
+
 
 }
 
@@ -176,6 +210,7 @@ fun WorkflowContextMenu(
     onAddClicked : () -> Unit,
     onDeleteClicked: () -> Unit,
     onLockClicked: () -> Unit,
+    onResetClicked: () -> Unit,
     isLocked: Boolean = false,
     tint: Color
 ){
@@ -197,6 +232,10 @@ fun WorkflowContextMenu(
         DropdownMenuItem(
             text = { Text(stringResource(R.string.add_roundup)) },
             onClick = { onAddClicked();it.value = false }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.reset)) },
+            onClick = { onResetClicked();it.value = false }
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.delete)) },

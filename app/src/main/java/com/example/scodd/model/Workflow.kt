@@ -10,6 +10,8 @@ data class Workflow(
     val routineInfo: RoutineInfo = RoutineInfo()
 )
 
+val ROUNDUP: String = "roundup"
+
 
 
 

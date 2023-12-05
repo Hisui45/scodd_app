@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.scodd.R
+import com.example.scodd.model.ScoddMode
 import com.example.scodd.model.ScoddMode.*
 import com.example.scodd.navigation.ModeBottomBar
 import com.example.scodd.ui.components.*
@@ -33,9 +34,9 @@ fun StartModeScreen(
     onAddChoreClick : (List<String>) -> Unit,
     onEditChore: (String) -> Unit,
     onStartClick: (List<String>, String, Long) -> Unit,
-    viewModel: ModeViewModel = hiltViewModel()
+    viewModel: ModesViewModel = hiltViewModel()
 ) {
-    val suggestions = listOf(ADHD, Game, Motivation)
+    val suggestions = listOf("ADHD", "Gamify", "Motivation")
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -55,18 +56,19 @@ fun StartModeScreen(
                 }
                 is SandMode -> {
                     if(uiTimerState.showGuided){
-                        (uiState.choresFromWorkflow.isNotEmpty() || uiState.selectedChores.isNotEmpty()) &&
-                                (uiTimerState.hourValue.isNotEmpty() && uiTimerState.hourValue != "0" && uiTimerState.hourValue != "00" ||
-                        uiTimerState.minuteValue.isNotEmpty() && uiTimerState.minuteValue != "0" && uiTimerState.minuteValue != "00" ||
-                        uiTimerState.secondValue.isNotEmpty() && uiTimerState.secondValue != "0" && uiTimerState.secondValue != "00")
+                        checkNoErrors(mode, uiState.selectedChores, uiState.choresFromWorkflow, viewModel)
+                                && checkSandTimerValue(uiTimerState.hourValue, uiTimerState.minuteValue, uiTimerState.secondValue)
                     }else{
-                        uiTimerState.hourValue.isNotEmpty() && uiTimerState.hourValue != "0" && uiTimerState.hourValue != "00" ||
-                        uiTimerState.minuteValue.isNotEmpty() && uiTimerState.minuteValue != "0" && uiTimerState.minuteValue != "00" ||
-                        uiTimerState.secondValue.isNotEmpty() && uiTimerState.secondValue != "0" && uiTimerState.secondValue != "00"
+                        checkSandTimerValue(uiTimerState.hourValue, uiTimerState.minuteValue, uiTimerState.secondValue)
                     }
                 }
-                else ->{
-                    uiState.choresFromWorkflow.isNotEmpty() || uiState.selectedChores.isNotEmpty()
+                else -> {
+                    checkNoErrors(
+                        mode = mode,
+                        selectedChores = uiState.selectedChores,
+                        choresFromWorkflow = uiState.choresFromWorkflow,
+                        viewModel = viewModel
+                    )
                 }
            },
             onStartClick = {onStartClick(
@@ -103,7 +105,6 @@ fun StartModeScreen(
         Column(Modifier.padding(it)) {
             val currentOption =
                 if (uiTimerState.showGuided) stringResource(R.string.sand_option_two) else stringResource(R.string.sand_option_one)
-
 
             ScoddModeHeader(onNavigateBack, stringResource(mode.title), stringResource(mode.description), suggestions)
 
@@ -168,14 +169,25 @@ fun StartModeScreen(
                 }
             }
 
+            val noErrors = checkNoErrors(mode, uiState.selectedChores, uiState.choresFromWorkflow, viewModel)
+
             when (mode) {
+
                 is BankMode -> {
-                    val potentialPayout = viewModel.calculatePotentialPayout()
-                    ChoreSelectModeHeaderRow(stringResource(R.string.bank_payout), "$$potentialPayout")
+                    val potentialPayout = if(noErrors){
+                            viewModel.calculatePotentialPayout()
+                        }else{
+                            "?"
+                        }
+                    ChoreSelectModeHeaderRow(stringResource(R.string.bank_potential_payout), "$$potentialPayout")
                 }
 
                 is TimeMode -> {
-                    val estimatedTime = viewModel.calculateEstimatedTime()
+                    val estimatedTime = if(noErrors){
+                        viewModel.calculateEstimatedTime()
+                    }else{
+                        "?"
+                    }
                     ChoreSelectModeHeaderRow(stringResource(R.string.time_esitmation), estimatedTime)
                 }
 
@@ -297,7 +309,7 @@ fun StartModeScreen(
 
                             itemsIndexed(uiState.choresFromWorkflow) { index, choreId ->
                                 val title = viewModel.getChoreTitle(choreId)
-                                val isDistinct = viewModel.checkIsDistinct(choreId)
+                                val isDistinct = true
                                 val existsInWorkflow = viewModel.checkExistInWorkflow(choreId)
                                 val onErrorClick: (Int) -> Unit =
                                     { errorMessage -> viewModel.showItemErrorMessage(errorMessage, choreId) }
@@ -387,6 +399,59 @@ fun StartModeScreen(
     }
 }
 
+fun checkSandTimerValue(hourValue: String, minuteValue: String, secondValue: String): Boolean{
+    return (hourValue.isNotEmpty() && hourValue != "0" && hourValue != "00" ||
+            minuteValue.isNotEmpty() && minuteValue != "0" && minuteValue != "00" ||
+            secondValue.isNotEmpty() && secondValue != "0" && secondValue != "00")
+}
+
+@Composable
+fun checkNoErrors(mode: ScoddMode, selectedChores: List<String>, choresFromWorkflow: List<String>, viewModel: ModesViewModel): Boolean{
+    if(selectedChores.isEmpty() && choresFromWorkflow.isEmpty() ){
+        return false
+    }
+    selectedChores.forEach { choreId ->
+        val isDistinct = viewModel.checkIsDistinct(choreId)
+        if(!isDistinct){
+            return false
+        }
+        when(mode){
+            BankMode -> {
+                if(viewModel.getChoreBankModeValue(choreId) < 0){
+                    return false
+                }
+            }
+            TimeMode -> {
+                if(viewModel.getChoreTimeModeValue(choreId) < 0 ){
+                    return false
+                }
+            }
+            else -> return true
+        }
+    }
+
+    choresFromWorkflow.forEach { choreId ->
+        val existsInWorkflow = viewModel.checkExistInWorkflow(choreId)
+        if(!existsInWorkflow){
+            return false
+        }
+        when(mode){
+            BankMode -> {
+                if(viewModel.getChoreBankModeValue(choreId) < 0){
+                    return false
+                }
+            }
+            TimeMode -> {
+                if(viewModel.getChoreTimeModeValue(choreId) < 0 ){
+                    return false
+                }
+            }
+            else -> return true
+        }
+    }
+    return true
+}
+
 @Composable
 fun TimerTextField(
     hrValue : String,
@@ -407,7 +472,7 @@ fun TimerTextField(
         modifier = Modifier.padding(top = 0.dp).fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        TextField(
+        OutlinedTextField(
             value = hrValue,
             onValueChange = {
                 onHrValueChange(it)
@@ -419,12 +484,15 @@ fun TimerTextField(
                 Text(stringResource(R.string.sand_picker_hr_label), style = labelStyle)
             },
             modifier = Modifier.width(width),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            keyboardActions = KeyboardActions { focusManager.clearFocus() },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword),
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+            }),
             colors = colors,
             textStyle = numberStyle
         )
-        TextField(
+        OutlinedTextField(
             value = minValue,
             onValueChange = {
                 onMinValueChange(it)
@@ -436,12 +504,15 @@ fun TimerTextField(
                 Text(stringResource(R.string.sand_picker_min_label), style = labelStyle)
             },
             modifier = Modifier.width(width),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            keyboardActions = KeyboardActions { focusManager.clearFocus() },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword),
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+            }),
             colors = colors,
             textStyle = numberStyle
         )
-        TextField(
+        OutlinedTextField(
             value = secValue,
             onValueChange = {
                 onSecValueChange(it)
@@ -453,8 +524,11 @@ fun TimerTextField(
                 Text(stringResource(R.string.sand_picker_sec_label), style = labelStyle)
             },
             modifier = Modifier.width(width),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            keyboardActions = KeyboardActions { focusManager.clearFocus() },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword),
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+            }),
             colors = colors,
             textStyle = numberStyle
         )
@@ -464,7 +538,7 @@ fun TimerTextField(
 
 @Composable
 private fun createTimeString(value: String, pluralResId: Int, singularResId: Int): String {
-    return if (value.isNotEmpty()) {
+    return if (value.isNotBlank()) {
         val valueInt = value.toInt()
         val unitString = stringResource(if (valueInt > 1) pluralResId else singularResId)
         "$value $unitString"

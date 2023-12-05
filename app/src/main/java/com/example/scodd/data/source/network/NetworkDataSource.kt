@@ -22,4 +22,8 @@ interface NetworkDataSource {
 
     suspend fun saveModes(chores: List<NetworkMode>)
 
+    suspend fun loadUser(): List<NetworkUser>
+
+    suspend fun saveUser(chores: List<NetworkUser>)
+
 }

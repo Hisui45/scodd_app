@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+/**T
+ * TODO: CONVERT FROM UTC TO SYSTEMDEFAUL
+ */
 data class CreateWorkflowUiState(
     val title: String = "",
     val selectedChores: List<String> = emptyList(),
@@ -57,6 +59,12 @@ class CreateWorkflowViewModel @Inject constructor(
         if (uiState.value.title.isEmpty()) {
             _uiState.update {
                 it.copy(userMessage = R.string.workflow_no_title_message)
+            }
+            return
+        }
+        if(uiState.value.selectedChores.isEmpty()){
+            _uiState.update {
+                it.copy(userMessage = R.string.workflow_no_chores)
             }
             return
         }

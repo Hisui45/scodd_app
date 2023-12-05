@@ -554,28 +554,6 @@ class DefaultChoreRepository @Inject constructor(
      * Mode
      */
 
-//    override suspend fun createMode(
-//        mode: String,
-//        workflows: List<String>,
-//        chores: List<String>,
-//        rooms: List<String>
-//    ): String {
-//        // ID creation might be a complex operation, so it's executed using the supplied
-//        // coroutine dispatcher
-//        val mode = withContext(dispatcher) {
-//            UUID.randomUUID().toString()
-//        }
-//        val room = Mode(
-//            mode = mode,
-//            workflows = workflows,
-//            chores = chores,
-//            rooms = rooms
-//        )
-//        localDataSource.upsertMode(room.toLocalMode())
-//        saveModesToNetwork()
-//        return roomId
-//    }
-
     override suspend fun updateMode(
         modeId: String,
         selectedWorkflows: List<String>,
@@ -647,6 +625,7 @@ class DefaultChoreRepository @Inject constructor(
         localDataSource.upsertMode(updatedMode.toLocalMode())
         saveModesToNetwork()
     }
+
     override suspend fun getModes(forceUpdate: Boolean): List<Mode> {
         if (forceUpdate) {
             refresh()
@@ -663,9 +642,6 @@ class DefaultChoreRepository @Inject constructor(
         }
     }
 
-//    override suspend fun refreshMode(roomId: String) {
-//        refresh()
-//    }
 
     override fun getModeStream(modeId: String): Flow<Mode?> {
         return localDataSource.observeModeById(modeId).map { it.toExternalMode() }
@@ -684,16 +660,106 @@ class DefaultChoreRepository @Inject constructor(
         return localDataSource.getModeById(modeId)?.toExternalMode()
     }
 
-//    override suspend fun deleteAllModes() {
-//        localDataSource.deleteAllModes()
-//        saveModesToNetwork()
-//    }
-//
-//    override suspend fun deleteMode(roomId: String) {
-//        localDataSource.deleteModeById(roomId)
-//        saveModesToNetwork()
-//    }
 
+    /**
+     * User
+     */
+
+    override suspend fun createUser(name: String, bankModeValue: Int, lastUpdated : Long): String {
+        // ID creation might be a complex operation, so it's executed using the supplied
+        // coroutine dispatcher
+        val userId = withContext(dispatcher) {
+            UUID.randomUUID().toString()
+        }
+        val user = User(
+            id = "scodd_user",
+            name = name,
+            bankModeValue = bankModeValue,
+            lastUpdated = lastUpdated
+        )
+        localDataSource.upsertUser(user.toLocalUser())
+        saveUsersToNetwork()
+        return userId
+    }
+
+    override suspend fun updateUser(userId: String, name: String, bankModeValue: Int, lastUpdated : Long) {
+        val user = getUser(userId)?.copy(
+            id = userId,
+            name = name,
+            bankModeValue = bankModeValue,
+            lastUpdated = lastUpdated,
+        ) ?: throw Exception("User (id $userId) not found")
+
+        localDataSource.upsertUser(user.toLocalUser())
+        saveUsersToNetwork()
+    }
+
+    override suspend fun updateUser(userId: String,bankModeValue: Int) {
+        val user = getUser(userId)?.copy(
+            id = userId,
+            bankModeValue = bankModeValue,
+        ) ?: throw Exception("User (id $userId) not found")
+
+        localDataSource.upsertUser(user.toLocalUser())
+        saveUsersToNetwork()
+    }
+
+    override suspend fun updateUser(userId: String, lastUpdated : Long) {
+        val user = getUser(userId)?.copy(
+            id = userId,
+            lastUpdated = lastUpdated,
+        ) ?: throw Exception("User (id $userId) not found")
+
+        localDataSource.upsertUser(user.toLocalUser())
+        saveUsersToNetwork()
+    }
+
+    override suspend fun getUsers(forceUpdate: Boolean): List<User> {
+        if (forceUpdate) {
+            refresh()
+        }
+        return withContext(dispatcher) {
+            localDataSource.getAllUsers().toExternalUser()
+        }
+    }
+    override fun getUsersStream(): Flow<List<User>> {
+        return localDataSource.observeAllUsers().map { users ->
+            withContext(dispatcher) {
+                users.toExternalUser()
+            }
+        }
+    }
+
+    override suspend fun refreshUser(userId: String) {
+        refresh()
+    }
+
+    override fun getUserStream(userId: String): Flow<User?> {
+        return localDataSource.observeUserById(userId).map { it.toExternalUser() }
+    }
+
+    /**
+     * Get a User with the given ID. Will return null if the workflow cannot be found.
+     *
+     * @param userId - The ID of the workflow
+     * @param forceUpdate - true if the workflow should be updated from the network data source first.
+     */
+    override suspend fun getUser(userId: String, forceUpdate: Boolean): User? {
+        if (forceUpdate) {
+            refresh()
+        }
+        return localDataSource.getUserById(userId)?.toExternalUser()
+    }
+
+    override suspend fun deleteAllUsers() {
+        localDataSource.deleteAllUsers()
+        saveUsersToNetwork()
+    }
+
+    override suspend fun deleteUser(userId: String) {
+        localDataSource.deleteUserById(userId)
+        saveUsersToNetwork()
+    }
     /**
      * The following methods load chores from (refresh), and save chores to, the network.
      *
@@ -844,6 +910,29 @@ class DefaultChoreRepository @Inject constructor(
                     localModes.toNetworkMode()
                 }
                 networkDataSource.saveModes(networkModes)
+            } catch (e: Exception) {
+                // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
+                // to an app level UI state holder which could then display a Toast message.
+            }
+        }
+    }
+
+    /**
+     * Send the User from the local data source to the network data source
+     *
+     * Returns immediately after launching the job. Real apps may want to suspend here until the
+     * operation is complete or (better) use WorkManager to schedule this work. Both approaches
+     * should provide a mechanism for failures to be communicated back to the user so that
+     * they are aware that their data isn't being backed up.
+     */
+    private fun saveUsersToNetwork() {
+        scope.launch {
+            try {
+                val user = localDataSource.getAllUsers()
+                val networkUser = withContext(dispatcher) {
+                    user.toNetworkUser()
+                }
+                networkDataSource.saveUser(networkUser)
             } catch (e: Exception) {
                 // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
                 // to an app level UI state holder which could then display a Toast message.

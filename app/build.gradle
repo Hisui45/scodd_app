@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.scodd"
-        minSdk 26
+        minSdk 33
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -48,6 +48,8 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.datastore:datastore-core:1.0.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     def room_version = "2.5.1"
     def nav_version = "2.5.3"
@@ -78,6 +80,10 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    implementation 'androidx.core:core-splashscreen:1.0.1'
+
+    //DataStore
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
 
 // Hilt
     implementation "com.google.dagger:hilt-android:2.44"

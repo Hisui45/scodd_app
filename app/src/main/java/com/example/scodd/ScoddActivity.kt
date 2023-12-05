@@ -5,14 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.scodd.navigation.*
 import com.example.scodd.ui.theme.ScoddTheme
-import com.example.scodd.navigation.ModeBottomBar
 import com.example.scodd.navigation.ScoddBottomBar
 import com.example.scodd.ui.components.ScoddMainTopBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,9 +18,11 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ScoddActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             ScoddApp()
         }
     }
@@ -31,6 +31,10 @@ class ScoddActivity : ComponentActivity() {
 @Composable
 fun ScoddApp(){
     ScoddTheme {
+//        val context = LocalContext.current
+//        val scoddStore = runBlocking { ScoddStore(context) }
+//
+
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
@@ -39,8 +43,7 @@ fun ScoddApp(){
             scoddModeScreens.find { it.route == currentDestination?.route } ?:
             scoddChoreScreens.find { it.route == currentDestination?.route } ?: DashboardNav
         val isMainDestination = scoddBottomNavScreens.any { it.route == currentDestination?.route }
-        val isModeDestination = scoddModeScreens.any { it.route == currentDestination?.route }
-        val isChoreDestination = scoddChoreScreens.any { it.route == currentDestination?.route }
+
         Scaffold(
             topBar = {
                 if (isMainDestination) {
@@ -60,7 +63,7 @@ fun ScoddApp(){
         ) { innerPadding ->
             ScoddNavGraph(
                 navController = navController,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(innerPadding),
             )
 //            if(isMainDestination || isChoreDestination){ //Organize these
 //                StatusBar(White40)

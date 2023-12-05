@@ -16,9 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.scodd.R
+import com.example.scodd.model.ROUNDUP
 import com.example.scodd.model.Workflow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,10 +88,12 @@ fun WorkflowSelectRow(
         itemsIndexed(
             items = workflows,
             key= {_, item -> item.id}
-        ){ _ ,workflow -> //Use the index value to know what workflow to add new chore to
-            WorkflowSelectCard(workflow.title, isSelected(workflow.id),
-                onClick = {onWorkflowSelect(workflow)},
-                Modifier.animateItemPlacement())
+        ){ _ ,workflow ->
+            if(workflow.id != ROUNDUP){
+                WorkflowSelectCard(workflow.title, isSelected(workflow.id),
+                    onClick = {onWorkflowSelect(workflow)},
+                    Modifier.animateItemPlacement())
+            }
         }
         item{
             AddWorkflowCard(onCreateWorkflowClick, colors)
@@ -118,16 +122,38 @@ fun WorkflowSelectModeRow(
         }
     }
     if (showWorkflows.value){
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            contentPadding = PaddingValues(horizontal = 12.dp),
-            modifier = Modifier.padding(vertical = 8.dp)
-        ) {
-            itemsIndexed(workflows) {_, workflow ->
-                WorkflowSelectCard(workflow.title,isSelected(workflow.id),
-                    onClick = {onWorkflowSelect(workflow)}, Modifier)
+        if(workflows.isNotEmpty()){
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+
+                itemsIndexed(workflows) {_, workflow ->
+                    if(workflow.id != ROUNDUP){
+                        WorkflowSelectCard(workflow.title,isSelected(workflow.id),
+                            onClick = {onWorkflowSelect(workflow)}, Modifier)
+                    }
+                }
+                item{
+                    val roundUp = workflows.find { workflow -> workflow.id == ROUNDUP }
+                    if(roundUp != null){
+                        WorkflowSelectCard(roundUp.title, isSelected(roundUp.id),
+                            onClick = {onWorkflowSelect(roundUp)}, Modifier)
+                    }
+                }
+            }
+        }else{
+            Row(
+                Modifier.fillMaxWidth(1f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(stringResource(R.string.create_workflow_message),
+                    textAlign = TextAlign.Center, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
             }
         }
+
     }
 }
 

@@ -1,6 +1,7 @@
 package com.example.scodd.model
 
 import androidx.compose.runtime.Immutable
+import java.time.DayOfWeek
 
 @Immutable
 data class RoutineInfo(
@@ -8,11 +9,43 @@ data class RoutineInfo(
     val hour: Int = 0,
     val minute: Int = 0,
     val isOneTime: Boolean = true,
-    val scheduleType: ScoddTime = ScoddTime.DAILY,
+    val scheduleType: ScoddTime = ScoddTime.SUNDAY,
     val frequencyValue: Int = 1,
     val frequencyOption: ScoddTime = ScoddTime.DAY,
-    val weeklyDay: ScoddTime = ScoddTime.SUNDAY
-)
+    val weeklyDay: DayOfWeek = DayOfWeek.MONDAY
+){
+    companion object{
+        fun getScoddTime(dayOfWeek: DayOfWeek): ScoddTime{
+            when(dayOfWeek){
+                DayOfWeek.MONDAY -> {
+                    return ScoddTime.MONDAY
+                }
+                DayOfWeek.TUESDAY -> {
+                    return ScoddTime.TUESDAY
+                }
+                DayOfWeek.WEDNESDAY -> {
+                    return ScoddTime.WEDNESDAY
+                }
+                DayOfWeek.THURSDAY -> {
+                    return ScoddTime.THURSDAY
+                }
+                DayOfWeek.FRIDAY -> {
+                    return ScoddTime.FRIDAY
+                }
+                DayOfWeek.SATURDAY -> {
+                    return ScoddTime.SATURDAY
+                }
+                DayOfWeek.SUNDAY -> {
+                    return ScoddTime.SUNDAY
+                }
+                else -> {
+
+                }
+            }
+            return ScoddTime.MONDAY
+        }
+    }
+}
 
 enum class ScoddTime(
     val title: String,
