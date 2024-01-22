@@ -13,7 +13,7 @@ Simplify the process of managing chores with user-friendly features.
 
 Offers crucial support for users seeking a more organized and efficient lifestyle.
 ## Why Scodd?
-Cleaning is a fundamental aspect of life, but it can become challenging amidst the complexities of modern living. Scodd addresses the difficulties associated with keeping track of chores and managing time, particularly for parents, young adults, and individuals with ADHD or depression. The app seeks to alleviate the mental burden, making it easier for users to enjoy clean, organized, and satisfying lives.
+Cleaning is a fundamental aspect of life, but it can be challenging in today's world. Scodd addresses the difficulties associated with keeping track of chores and managing time, particularly for parents, young adults, and individuals with ADHD or depression. The app seeks to alleviate the mental burden, making it easier for users to enjoy clean, organized, and satisfying lives.
 
 ## How to Use
 Download:
