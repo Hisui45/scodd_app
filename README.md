@@ -16,16 +16,16 @@ Offers crucial support for users seeking a more organized and efficient lifestyl
 Cleaning is a fundamental aspect of life, but it can be challenging in today's world. Scodd addresses the difficulties associated with keeping track of chores and managing time, particularly for parents, young adults, and individuals with ADHD or depression. The app seeks to alleviate the mental burden, making it easier for users to enjoy clean, organized, and satisfying lives.
 
 ## How to Use
-Download:
+#### Download:
 
 Download and install Scodd from the App Store or Google Play.
-Create an Account:
+#### Create an Account:
 
 Sign up and create a personalized account to tailor the app to your specific needs.
-Set Preferences:
+#### Set Preferences:
 
 Customize your chore preferences, task lists, and reminders for a personalized experience.
-Enjoy a Simplified Life:
+#### Enjoy a Simplified Life:
 
 Let Scodd help you streamline your chores, conquer clutter, and find a more efficient way to manage your living space.
 
