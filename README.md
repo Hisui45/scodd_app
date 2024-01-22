@@ -3,19 +3,19 @@
 Scodd is a cutting-edge chore management mobile app designed to cater to the diverse needs of individuals dealing with ADHD, depression, or those leading busy and disorganized lives. The app is a powerful tool that simplifies the chore management process, providing essential support for users striving to maintain a clean and organized living environment.
 
 ## Key Features
-### Tailored for Diverse Users:
+#### Tailored for Diverse Users:
 
 Specifically designed for individuals with ADHD, depression, or those leading busy lives.
-### Streamlined Chore Management:
+#### Streamlined Chore Management:
 
 Simplify the process of managing chores with user-friendly features.
-### Essential Support:
+#### Essential Support:
 
 Offers crucial support for users seeking a more organized and efficient lifestyle.
 ## Why Scodd?
 Cleaning is a fundamental aspect of life, but it can become challenging amidst the complexities of modern living. Scodd addresses the difficulties associated with keeping track of chores and managing time, particularly for parents, young adults, and individuals with ADHD or depression. The app seeks to alleviate the mental burden, making it easier for users to enjoy clean, organized, and satisfying lives.
 
-How to Use
+## How to Use
 Download:
 
 Download and install Scodd from the App Store or Google Play.
