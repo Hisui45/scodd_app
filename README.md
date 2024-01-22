@@ -28,11 +28,8 @@ Customize your chore preferences, task lists, and reminders for a personalized e
 Enjoy a Simplified Life:
 
 Let Scodd help you streamline your chores, conquer clutter, and find a more efficient way to manage your living space.
-Feedback and Support
-We value your feedback! If you have suggestions, encounter issues, or want to share your experience, please reach out to our support team at support@scoddapp.com.
 
-Contributing
-Contributions are welcome! If you're a developer and want to contribute to Scodd's development, check out our Contributing Guidelines.
+## Feedback and Support
+Your feedback is valued! If you have suggestions, encounter issues, or want to share your experience, please reach out to our support team at support@scoddapp.com.
 
-License
 Scodd is licensed under the MIT License.
