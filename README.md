@@ -32,4 +32,4 @@ Let Scodd help you streamline your chores, conquer clutter, and find a more effi
 ## Feedback and Support
 Your feedback is valued! If you have suggestions, encounter issues, or want to share your experience, please reach out to our support team at support@scoddapp.com.
 
-Scodd is licensed under the [MIT License].
+Scodd is licensed under the [MIT License]().
