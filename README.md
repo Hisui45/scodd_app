@@ -44,13 +44,13 @@ SCODD! is implemented following the MVVM (Model View ViewModel) architecture pat
 
 The model is crafted using SQL entity objects, ensuring robust data representation.
 
-For the view layer, we utilize Jetpack Compose, aligning with Material Design 3 guidelines for a modern and cohesive user interface.
+For the view layer, I utilize Jetpack Compose, aligning with Material Design 3 guidelines for a modern and cohesive user interface.
 
 The ViewModel seamlessly integrates the HiltViewModel dependency within the Dagger framework, optimizing dependency injection for enhanced efficiency.
 
 Database operations are handled effortlessly using the Room library, a potent SQLite object mapping tool, ensuring both flexibility and efficiency in data persistence.
 
-Our rigorous testing approach encompasses thorough unit testing and UI testing, guaranteeing the reliability and functionality of the application across various scenarios.
+A rigorous testing approach encompasses thorough unit testing and UI testing, guaranteeing the reliability and functionality of the application across various scenarios.
 
 <!--
 ## How to Use
