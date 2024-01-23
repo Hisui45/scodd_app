@@ -11,7 +11,7 @@ Cleaning is a fundamental aspect of life, but it can be challenging in today's w
 
 ## Key Features
 #### Tailored for Diverse Users:
-Intuitive personalization of chore management to meet diverse needs.
+Intuitive personalization of chores to meet diverse needs.
 
 <img src="https://github.com/Hisui45/scodd_app/assets/20029944/1523bb3f-4d34-4868-be48-df25baad775b" width="270" height="600">
 
