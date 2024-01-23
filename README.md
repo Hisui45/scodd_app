@@ -26,10 +26,13 @@ The dashboard displays scheduled and routine chores each day.
 
 #### Cleaning Modes:
 Provides support for individuals dealing with ADHD, depression, or busy lifestyles, who struggle with cleaning or seek a more organized and efficient lifestyle. The app offers various cleaning modes, gamifying the experience, and providing guidance and encouragement to users.
+
 <img src="https://github.com/Hisui45/scodd_app/assets/20029944/30dcdab3-1161-44f8-9f9a-0221287645b3" width="270" height="600">
 <img src="https://github.com/Hisui45/scodd_app/assets/20029944/5a3ae68e-f2cc-45e8-a90a-5582355aa711" width="270" height="600">
 <img src="https://github.com/Hisui45/scodd_app/assets/20029944/59617f55-0466-4377-80ab-b96a175fb966" width="270" height="600">
 
+
+Let Scodd help you streamline your chores, conquer clutter, and find a more efficient way to manage your living space.
 ## Architecture
 
 This project is exclusively written in Kotlin.
@@ -62,9 +65,6 @@ Customize your chore preferences, task lists, and reminders for a personalized e
 Let Scodd help you streamline your chores, conquer clutter, and find a more efficient way to manage your living space.
 -->
 
-Let Scodd help you streamline your chores, conquer clutter, and find a more efficient way to manage your living space.
-
 ## Feedback and Support
-Your feedback is valued! If you have suggestions, encounter issues, or want to share your experience, please send an email to jadelocke85@gmail.com.
+I'd love to hear from you! If you have suggestions, encounter issues, or want to share your experience, please send an email to jadelocke85@gmail.com.
 
-Scodd is licensed under the [MIT License]().
