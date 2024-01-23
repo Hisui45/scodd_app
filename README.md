@@ -35,6 +35,6 @@ Let Scodd help you streamline your chores, conquer clutter, and find a more effi
 Let Scodd help you streamline your chores, conquer clutter, and find a more efficient way to manage your living space.
 
 ## Feedback and Support
-Your feedback is valued! If you have suggestions, encounter issues, or want to share your experience, please send an email to [jadelocke85@gmail.com](jadelocke85@gmail.com).
+Your feedback is valued! If you have suggestions, encounter issues, or want to share your experience, please send an email to (jadelocke85@gmail.com).
 
 Scodd is licensed under the [MIT License]().
