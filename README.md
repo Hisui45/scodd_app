@@ -15,6 +15,21 @@ Offers crucial support for users seeking a more organized and efficient lifestyl
 ## Why Scodd?
 Cleaning is a fundamental aspect of life, but it can be challenging in today's world. Scodd addresses the difficulties associated with keeping track of chores and managing time, particularly for parents, young adults, and individuals with ADHD or depression. The app seeks to alleviate the mental burden, making it easier for users to enjoy clean, organized, and satisfying lives.
 
+## Architecture
+
+This project is exclusively written in Kotlin.
+
+SCODD! is implemented following the MVVM (Model View ViewModel) architecture pattern. 
+
+The model is crafted using SQL entity objects, ensuring robust data representation.
+
+For the view layer, we utilize Jetpack Compose, aligning with Material Design 3 guidelines for a modern and cohesive user interface.
+
+The viewmodel seamlessly integrates the HiltViewModel dependency within the Dagger framework, optimizing dependency injection for enhanced efficiency.
+
+Database operations are handled effortlessly using the Room library, a potent SQLite object mapping tool, ensuring both flexibility and efficiency in data persistence.
+
+Our rigorous testing approach encompasses thorough unit testing and UI testing, guaranteeing the reliability and functionality of the application across various scenarios.
 
 <!--
 ## How to Use
