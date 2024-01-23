@@ -9,7 +9,8 @@ Scodd! is a chore management mobile app designed to cater to the diverse needs o
 
 ## Key Features
 #### Tailored for Diverse Users:
-Tailored for individuals with ADHD, depression, or busy lifestyles, emphasizing personalized chore management to meet diverse needs.
+For individuals with ADHD, depression, or busy lifestyles, personalization of chore management to meet diverse needs.
+<br>
 <img src="https://github.com/Hisui45/scodd_app/assets/20029944/1523bb3f-4d34-4868-be48-df25baad775b" width="150" height="350">
 #### Streamlined Chore Management:
 
