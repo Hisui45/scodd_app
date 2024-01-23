@@ -1,4 +1,5 @@
-# SCODD! ![cropped](https://github.com/Hisui45/scodd_app/assets/20029944/dc625b75-21ee-4045-9db3-9e68e7536e16)
+# SCODD! 
+<img src="https://github.com/Hisui45/scodd_app/assets/20029944/dc625b75-21ee-4045-9db3-9e68e7536e16" width="150" height="150">
 
 ## Overview
 Scodd! is a chore management mobile app designed to cater to the diverse needs of individuals dealing with ADHD, depression, or those leading busy and disorganized lives. The app simplifies the chore management process, providing essential support for users striving to maintain a clean and organized living environment.
